@@ -1,5 +1,20 @@
 
-# Build
+# Set up
+run `npm install`
+run `bower install`
+run `./node_modules/.bin/webdriver-manager update`
+
+# Run server for development
+run `gulp dev`
+
+# Run tests
+For all tests `npm test`
+e2e tests only `./node_modules/.bin/protractor`
+Protractor tests are running slow, but running the developer server speeds them up.  Run the command before running the e2e tests.
+```shell
+gulp dev
+```
+
 
 # Directories
 
@@ -17,10 +32,4 @@
  /test - tests e2e, Angular unit and Node level testing
 
 # Bugs
-
-## e2e Tests
-Protractor tests are running slow, but running the developer server speeds them up.  Run the command before running the e2e tests.
-```shell
-gulp dev
-```
 

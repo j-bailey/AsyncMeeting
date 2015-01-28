@@ -1,7 +1,7 @@
 exports.config = {
     framework: 'cucumber',
     cucumberOpts: {
-        format: 'progress',
+        format: 'pretty',
 //        tags: '@dev',
         require: 'test/e2e/features/step_definitions/steps.js'
     },
