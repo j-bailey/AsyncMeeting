@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    // Runs JS code check, then AngularJS unit tests, then NodeJS unit tests, then e2e tests
     "test": "./node_modules/.bin/jshint . && karma start --single-run && ./node_modules/.bin/mocha && ./node_modules/.bin/protractor"
   },
   "dependencies": {
