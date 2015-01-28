@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "./node_modules/.bin/jshint . && ./node_modules/.bin/mocha && ./node_modules/.bin/protractor"
+    // Runs JS code check, then AngularJS unit tests, then NodeJS unit tests, then e2e tests
+    "test": "./node_modules/.bin/jshint . && karma start --single-run && ./node_modules/.bin/mocha && ./node_modules/.bin/protractor"
   },
   "dependencies": {
     "bcrypt": "^0.8.0",
