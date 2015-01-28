@@ -14,7 +14,7 @@ For all tests `npm test`
 e2e tests only `./node_modules/.bin/protractor`
 Protractor tests are running slow, but running the developer server speeds them up.  Run the command before running the e2e tests.
 ```shell
-gulp dev
+gulp dev 
 ```
 
 
