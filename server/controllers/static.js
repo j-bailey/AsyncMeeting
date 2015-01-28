@@ -4,11 +4,8 @@ var router = express.Router();
 router.use(express.static(__dirname + '/../../assets'));
 
 router.get('/', function (req, res) {
-    res.sendfile('server/layouts/app.html')
+    res.sendfile('client/ng/layouts/app.html')
 });
-
-router.use(express.static(__dirname + '/../templates'))
-
 
 module.exports = router;
 

@@ -31,12 +31,7 @@ var steps = function() {
 
     this.Given(/^I am logged out of the system$/, function (next) {
         browser.get('http://localhost:3001') // click 'login'
-        //expect(browser.getCurrentUrl()).toBe('http://localhost:3001');
-        //browser.refresh() // click 'login'
-        //driver.isElementPresent(by.css('nav .logout')).then(function() {
-        //    element(by.css('nav .logout')).click();
-        //    callback();
-        //});
+        //expect(browser.getCurrentUrl()).to.eventually.be('http://localhost:3001');
         expect(element(by.css('nav .login')).isPresent()).to.eventually.be.true.and.notify(next);
     });
 
@@ -51,7 +46,7 @@ var steps = function() {
     });
 
     this.Then(/^I should have access to my account$/, function (next) {
-        // Write code here that turns the phrase above into concrete actions
+        //expect(element(by.css('h1')).getText().isEqual('Welcome to Your Meeting Areas')).to.eventually.be.true.and.notify(next);
         next.pending();
     });
 

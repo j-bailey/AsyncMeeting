@@ -5,6 +5,8 @@ run `bower install`
 run `./node_modules/.bin/webdriver-manager update`
 
 # Run server for development
+start redis server
+start mongodb
 run `gulp dev`
 
 # Run tests

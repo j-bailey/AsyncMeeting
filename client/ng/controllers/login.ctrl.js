@@ -21,9 +21,9 @@ angular.module('app').controller('LoginCtrl', function ($rootScope, UserSvc, $ht
     }
     $rootScope.logout = function () {
         UserSvc.token = null;
-        $http.defaults.headers.common['X-Auth'] = null;
+        delete $http.defaults.headers.common['X-Auth'];
         $rootScope.$broadcast('logout', '');
-
+        // TODO add code to remove session on the server
     }
 })
 
