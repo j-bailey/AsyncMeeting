@@ -3,6 +3,7 @@
 run `npm install`
 run `bower install`
 run `./node_modules/.bin/webdriver-manager update`
+run `gulp css`
 
 # Run server for development
 start redis server
