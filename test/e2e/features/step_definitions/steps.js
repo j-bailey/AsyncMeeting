@@ -1,4 +1,4 @@
-var db = require('../../../../db')
+var db = require('../../../../server/db')
 var User = require('../../../../server/models/user')
 var bcrypt = require('bcrypt')
 var chai = require('chai')
@@ -46,17 +46,30 @@ var steps = function() {
     });
 
     this.Then(/^I should have access to my account$/, function (next) {
-        //expect(element(by.css('h1')).getText().isEqual('Welcome to Your Meeting Areas')).to.eventually.be.true.and.notify(next);
-        next.pending();
+        expect(element(by.css('h1')).getText()).to.eventually.equal('Welcome to Your Meeting Areas').and.notify(next);
     });
 
     this.Given(/^I have an invalid account$/, function (next) {
-        //       db.connection.db.dropDatabase()
-        next.pending();
+        db.connection.db.dropDatabase()
+        var user = new User({username: username + 1})
+        bcrypt.hash(pass, 10, function (err, hash) {
+            if (err) {
+                return next(err)
+            }
+            user.password = hash
+
+            user.save(function (err) {
+                if (err) {
+                    return next(err)
+                }
+                next();
+            })
+        })
+
     });
 
     this.Then(/^I should be denied access to my account$/, function (next) {
-        expect(element(by.css('nav .logout')).isPresent()).to.eventually.be.true.and.notify(next);
+        expect(element(by.css('nav .login')).isPresent()).to.eventually.be.true.and.notify(next);
     });
 };
 

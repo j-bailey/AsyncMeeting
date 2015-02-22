@@ -1,6 +1,6 @@
 describe('posts.ctrl', function () {
     beforeEach(module('app'))
-    var $scope
+    var scope
     var mockPostsSvc = {}
     beforeEach(inject(function ($q) {
         mockPostsSvc.fetch = function () {
@@ -18,19 +18,20 @@ describe('posts.ctrl', function () {
         }
     }))
     beforeEach(inject(function ($rootScope, $controller) {
-        $scope = $rootScope.$new()
-        $controller('PostsCtrl', {$scope: $scope, PostsSvc: mockPostsSvc})
+        scope = $rootScope.$new()
+        $controller('PostsCtrl', {$scope: scope, PostsSvc: mockPostsSvc})
     }))
     it('loads posts from the service', function () {
-        $scope.$digest()
-        expect($scope.posts).to.have.length(2)
+        scope.$digest()
+        var s = scope.posts;
+        var l = s.length;
+        expect(scope.posts.length).to.eq(2)
     })
-    it(' sends a new post to the service', function () {
-        $scope.post = {body: 'my new post'}
-        $scope.addPost()
+    it('sends a new post to the service', function () {
+        scope.post = {body: 'my new post'}
+        scope.addPost()
     })
 })
 
 
 
-    
