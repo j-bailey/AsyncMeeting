@@ -14,7 +14,7 @@
     <div class='container'>
         <ul ng-if='currentUser' class='nav navbar-nav'>
             <li><a class='posts' href="/"> Posts </a></li>
-            <li><a class=='meetingareas' href='/meetingareas'>My Meeting Areas</a></li>
+            <li><a access="CanViewMeetingAreas, CanEditMeetingAreas, CanDeleteMeetingAreas" access-permission-type="AtLeastOne" class=='meetingareas' href='/meetingareas'>My Meeting Areas</a></li>
         </ul>
         <ul ng-if='!currentUser' class=' nav navbar-nav navbar-right'>
             <li><a class='register' href="/register"> Register </a></li>

@@ -6,21 +6,27 @@ angular.module('app').config(function ($routeProvider, $locationProvider) {
         }).when('/register', {
             controller: 'RegisterCtrl',
             templateUrl: 'views/register.html'
-        }).when('/posts', {
-            controller: 'PostsCtrl',
-            templateUrl: 'views/register.html'
         }).when('/meetingareas', {
             controller: 'MeetingAreasCtrl',
-            templateUrl: 'views/meetingAreas.html'
+            templateUrl: 'views/meetingAreas.html',
+            access: {
+                requiresLogin: true,
+                requiredPermissions: ['CanViewMeetingAreas', 'CanEditMeetingAreas', 'CanDeleteMeetingAreas'],
+                permissionType: 'AtLeastOne'
+            }
         }).when('/logout', {
             controller: 'LogoutCtrl',
-            templateUrl: 'views/logout.html'
+            templateUrl: 'views/logout.html',
+            access: {
+                requiresLogin: true
+            }
         }).when('/login', {
             controller: 'LoginCtrl',
             templateUrl: 'views/login.html'
-        })
+        });
+        $routeProvider.otherwise({ redirectTo: '/login' });
     }
-)
+);
 
 
 

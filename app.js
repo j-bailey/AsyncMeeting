@@ -7,10 +7,21 @@ var cookieParser = require('cookie-parser');
 
 var app = express();
 
+// Configuring Passport
+var passport = require('passport');
+var expressSession = require('express-session');
+app.use(expressSession({secret: 'mySecretKey'}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+// Using the flash middleware provided by connect-flash to store messages in session
+// and displaying in templates
+var flash = require('connect-flash');
+app.use(flash());
 
 // uncomment after placing your favicon in /static
 //app.use(favicon(__dirname + '/static/favicon.ico'));
@@ -20,7 +31,16 @@ app.use(logger('dev'));
 app.use(cookieParser());
 //app.use(express.static(path.join(__dirname, 'static')));
 //app.use(express.static(path.join(__dirname, 'assets')));
-app.use( require('./server/controllers'))
+
+// Initialize Passport
+var initPassport = require('./server/passport/init');
+initPassport(passport);
+var routes = require('./server/routes/index');
+app.use('/', routes);
+
+
+
+//app.use( require('./server/controllers'))
 
 
 
