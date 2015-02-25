@@ -19,11 +19,14 @@ router.get('/', function (req, res) {
 });
 
 /* Handle Login POST */
-router.post('/login', passport.authenticate('login', {
-    successRedirect: '#/meetingAreas',
-    failureRedirect: '/',
-    failureFlash : true
-}));
+router.post('/login',
+    passport.authenticate('login'),
+    function(req, res) {
+        // If this function gets called, authentication was successful.
+        // `req.user` contains the authenticated user.
+        res.redirect('/users/' + req.user.username);
+    }
+);
 
 /* GET Registration Page */
 router.get('/signup', function(req, res){

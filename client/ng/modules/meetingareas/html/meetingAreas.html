@@ -1,12 +1,12 @@
 <div class='container'>
 
     <div class="panel panel-default row">
-        <ng-include src='meetingMenu.html'></ng-include>
+        <ng-include src="'ng/modules/meetingAreas/html/meetingMenu.html'"></ng-include>
         <div ng-if='currentUser' class="col-xs-3">
             <ng-include src='views/meetingMenu.html'></ng-include>
         </div>
         <div ng-if='currentUser' class="col-xs-8">
-            <h1>Welcome to Your Meeting Areas</h1
+            <h1>Welcome to Your Meeting Areas</h1>
         </div>
     </div>
 </div>
