@@ -1,12 +1,19 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
-    jcs.modules.core = {
-        name: 'jcs-core',
+    asm.modules.core = {
+        name: 'asm-core',
+        controllers: {
+            asyncMeetingCtrl: 'asyncMeetingCtrl'
+        },
         services: {
-            eventbus: 'eventbus'
+            eventbus: 'eventbus',
+            userService: 'userService'
+        },
+        filters: {
+            unique: 'unique'
         }
     };
 
-    angular.module(jcs.modules.core.name, []);
-}(angular, jcs));
+    angular.module(asm.modules.core.name, []);
+}(angular, asm));

@@ -1,7 +1,7 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
-    jcs.modules.auth = {
+    asm.modules.auth = {
         name: 'auth',
         enums: {
             authorised: {
@@ -27,14 +27,15 @@
         },
         routes: {
             login: '/login',
-            notAuthorised: '/not-authorised'
+            notAuthorised: '/not-authorised',
+            logout: '/logout'
         }
     };
 
-    angular.module(jcs.modules.auth.name, [
+    angular.module(asm.modules.auth.name, [
         'ngRoute',
-        jcs.modules.core.name
+        asm.modules.core.name
     ]);
 
 
-}(angular, jcs));
+}(angular, asm));

@@ -1,7 +1,7 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
-    jcs.modules.pages = {
+    asm.modules.pages = {
         name: 'pages',
         controllers: {
             default: 'defaultCtrl'
@@ -11,7 +11,7 @@
         }
     };
 
-    angular.module(jcs.modules.pages.name, [
+    angular.module(asm.modules.pages.name, [
         'ngRoute'
     ]);
-}(angular, jcs));
+}(angular, asm));

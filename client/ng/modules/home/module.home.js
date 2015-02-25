@@ -1,17 +1,17 @@
 (function (angular, asm) {
     'use strict';
 
-    asm.modules.admin = {
-        name: 'admin',
+    asm.modules.home = {
+        name: 'home',
         controllers: {
-            users: 'userListCtrl'
+            users: 'homeCtrl'
         },
         routes: {
-            users: '/users'
+            home: '/'
         }
     };
 
-    angular.module(asm.modules.admin.name, [
+    angular.module(asm.modules.home.name, [
         'ngRoute'
     ]);
 

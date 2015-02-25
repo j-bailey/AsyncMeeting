@@ -1,8 +1,8 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
-    angular.module(jcs.modules.admin.name).controller(jcs.modules.admin.controllers.users, [
+    angular.module(asm.modules.admin.name).controller(asm.modules.admin.controllers.users, [
         function () {
         }
     ]);
-}(angular, jcs));
+}(angular, asm));

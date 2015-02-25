@@ -1,49 +1,49 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
-    angular.module(jcs.modules.auth.name).factory(jcs.modules.auth.services.authentication, [
+    angular.module(asm.modules.auth.name).factory(asm.modules.auth.services.authentication, [
         '$q',
         '$timeout',
+        '$http',
         'eventbus',
-        function ($q, $timeout, eventbus) {
+        asm.modules.core.services.userService,
+        function ($q, $timeout, $http, eventbus, userSvc) {
             var currentUser,
-                createUser = function (name, permissions) {
-                    return {
-                        name: name,
-                        permissions: permissions
-                    };
-                },
                 login = function (email, password) {
                     var defer = $q.defer();
 
-                    // only here to simulate a network call!!!!!
-                    $timeout(function () {
-                        // for the sake of the demo this is hard code
-                        // however this would always be a call to the server.
-                        email = email.toLowerCase();
-                        if (email === 'admin@test.com') {
-                            currentUser = createUser('Admin User', ['Admin']);
-                        } else if (email === 'manager@test.com') {
-                            currentUser = createUser('Manager User', ['UserManager']);
-                        } else if (email === 'user@test.com') {
-                            currentUser = createUser('Normal User', ['User']);
-                        } else {
-                            defer.reject('Unknown Username / Password combination');
-                            return;
-                        }
+                    userSvc.login(email, password).then(function (response) {
+                        userSvc.token = response.data
+                        console.log('in userSvc login')
+                        $http.defaults.headers.common['X-Auth'] = response.data
 
-                        defer.resolve(currentUser);
-                        eventbus.broadcast(jcs.modules.auth.events.userLoggedIn, currentUser);
-                    }, 1000);
+                        userSvc.getUser().then(function (user) {
+                            currentUser = user.data;
+                            defer.resolve(currentUser);
+                            eventbus.broadcast(asm.modules.auth.events.userLoggedIn, currentUser);
+                        }).catch(function (msg) {
+                            if (msg && msg.data) {
+                                console.log('get user error = ' + msg)
+                            } else {
+                                console.log('error getting user')
+                            }
+                            throw msg;
+                        });
 
+                    }, function (val) {
+                        console.log('login error = ' + val.data)
+                    })
                     return defer.promise;
                 },
                 logout = function () {
                     // we should only remove the current user.
                     // routing back to login login page is something we shouldn't
                     // do here as we are mixing responsibilities if we do.
+                    userSvc.token = null;
+                    console.log('in userSvc logout')
+                    delete $http.defaults.headers.common['X-Auth'];
                     currentUser = undefined;
-                    eventbus.broadcast(jcs.modules.auth.events.userLoggedOut);
+                    eventbus.broadcast(asm.modules.auth.events.userLoggedOut);
                 },
                 getCurrentLoginUser = function () {
                     return currentUser;
@@ -56,4 +56,4 @@
             };
         }
     ]);
-}(angular, jcs));
+}(angular, asm));

@@ -1,21 +1,21 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
     /**
      * @ngdoc service
-     * @name jcs-core.eventbus
+     * @name asm-core.eventbus
      * @requires $rootScope
      *
      * @description
      * Provides a eventing mechanism when a user cna broadcast and subscribe to application wide events.
      */
-    angular.module(jcs.modules.core.name).factory(jcs.modules.core.services.eventbus, [
+    angular.module(asm.modules.core.name).factory(asm.modules.core.services.eventbus, [
         '$rootScope',
         function ($rootScope) {
             /**
              * @ngdoc function
              * @name subscribe
-             * @methodOf jcs-core.eventbus
+             * @methodOf asm-core.eventbus
              *
              * @description
              * Subscribes a callback to the given application wide event
@@ -31,7 +31,7 @@
                 /**
                  * @ngdoc function
                  * @name broadcast
-                 * @methodOf jcs-core.eventbus
+                 * @methodOf asm-core.eventbus
                  *
                  * @description
                  * Broadcasts the given event and data.
@@ -49,4 +49,4 @@
             };
         }
     ]);
-}(angular, jcs));
+}(angular, asm));

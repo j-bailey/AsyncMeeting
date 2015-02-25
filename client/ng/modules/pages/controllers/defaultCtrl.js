@@ -1,9 +1,9 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
-    angular.module(jcs.modules.pages.name)
-        .controller(jcs.modules.pages.controllers.default, [
+    angular.module(asm.modules.pages.name)
+        .controller(asm.modules.pages.controllers.default, [
         function () {
         }
     ]);
-}(angular, jcs));
+}(angular, asm));

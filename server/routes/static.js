@@ -15,12 +15,12 @@ var isAuthenticated = function (req, res, next) {
 router.use(express.static(__dirname + '/../../assets'));
 
 router.get('/', function (req, res) {
-    res.sendfile('client/ng/layouts/app.html')
+    res.sendfile('client/index.html')
 });
 
 /* Handle Login POST */
 router.post('/login', passport.authenticate('login', {
-    successRedirect: '/home',
+    successRedirect: '#/meetingAreas',
     failureRedirect: '/',
     failureFlash : true
 }));

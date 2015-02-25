@@ -6,7 +6,7 @@ var sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('js', function () {
 //    gulp.src(['client/ng/module.js', 'client/ng/**/*.js']).pipe(sourcemaps.init()).pipe(concat('app.js')).pipe(ngAnnotate()).pipe(uglify()).pipe(sourcemaps.write()).pipe(gulp.dest('assets'));
-    gulp.src(['client/ng/module.js', 'client/ng/**/*.js']).pipe(sourcemaps.init()).pipe(concat('app.js')).pipe(ngAnnotate()).pipe(sourcemaps.write()).pipe(gulp.dest('assets'));
+    gulp.src(['client/ng/asm.js', 'client/ng/modules/core/*.js', 'client/ng/modules/register/*.js', 'client/ng/modules/**/*.js',  'client/ng/app.js', 'client/ng/**/*.js']).pipe(sourcemaps.init()).pipe(concat('app.js')).pipe(ngAnnotate()).pipe(sourcemaps.write()).pipe(gulp.dest('assets'));
 });
 
 

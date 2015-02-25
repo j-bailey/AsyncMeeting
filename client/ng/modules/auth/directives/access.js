@@ -1,8 +1,8 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
-    angular.module(jcs.modules.auth.name).directive('access', [
-        jcs.modules.auth.services.authorization,
+    angular.module(asm.modules.auth.name).directive('access', [
+        asm.modules.auth.services.authorization,
         function (authorization) {
             return {
               restrict: 'A',
@@ -20,7 +20,7 @@
                           }
 
                           result = authorization.authorize(true, roles, attrs.accessPermissionType);
-                          if (result === jcs.modules.auth.enums.authorised.authorised) {
+                          if (result === asm.modules.auth.enums.authorised.authorised) {
                               makeVisible();
                           } else {
                               makeHidden();
@@ -35,4 +35,4 @@
               }
             };
         }]);
-}(angular, jcs));
+}(angular, asm));

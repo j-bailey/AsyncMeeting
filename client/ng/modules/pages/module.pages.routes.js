@@ -1,12 +1,12 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
-    angular.module(jcs.modules.pages.name).config([
+    angular.module(asm.modules.pages.name).config([
         '$routeProvider',
         function ($routeProvider) {
-            $routeProvider.when(jcs.modules.pages.routes.home, {
-                controller: jcs.modules.pages.controllers.default,
-                templateUrl: 'js/modules/pages/html/home.tmpl.html'
+            $routeProvider.when(asm.modules.pages.routes.home, {
+                controller: asm.modules.pages.controllers.default,
+                templateUrl: 'ng/modules/pages/html/home.tmpl.html'
             });
         }]);
-}(angular, jcs));
+}(angular, asm));

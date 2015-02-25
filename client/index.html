@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html>
+
+<html ng-app="asyncMeeting" ng-controller='asyncMeetingCtrl'>
 <head>
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/app.css">
-    <script src='/angular/angular.js'></script>
-    <script src='/angular-route/angular-route.js'></script>
 
 </head>
-<body ng-app="app" ng-controller='ApplicationCtrl'>
+<body >
 
 
 <nav class='navbar navbar-default'>
     <div class='container'>
         <ul ng-if='currentUser' class='nav navbar-nav'>
-            <li><a class='posts' href="/"> Posts </a></li>
+            <li><a class='posts' href="/"> Home </a></li>
             <li><a access="CanViewMeetingAreas, CanEditMeetingAreas, CanDeleteMeetingAreas" access-permission-type="AtLeastOne" class=='meetingareas' href='/meetingareas'>My Meeting Areas</a></li>
         </ul>
         <ul ng-if='!currentUser' class=' nav navbar-nav navbar-right'>
-            <li><a class='register' href="/register"> Register </a></li>
-            <li><a class='login' href="/login"> Login </a></li>
+            <li><a class='register' href="#/register"> Register </a></li>
+            <li><a class='login' href="#/login"> Login </a></li>
         </ul>
         <ul ng-if='currentUser' class='nav navbar-nav navbar-right'>
             <li><a class='logout' href="#" ng-click='logout()'> Logout </a></li>
@@ -30,11 +29,14 @@
 
 <div ng-view></div>
 
-<ng-include src="'views/meetingMenu.html'"></ng-include>
-
 <!--<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.js'></script>-->
 <!--<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular-route.js'></script>-->
+
+<script src='/angular/angular.js'></script>
+<script src='/angular-route/angular-route.js'></script>
+
 <script src="app.js"></script>
 </body>
 </html>
+
 

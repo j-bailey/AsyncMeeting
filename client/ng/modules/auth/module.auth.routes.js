@@ -1,20 +1,24 @@
-(function (angular, jcs) {
+(function (angular, asm) {
     'use strict';
 
-    angular.module(jcs.modules.auth.name).config([
+    angular.module(asm.modules.auth.name).config([
         '$routeProvider',
         function ($routeProvider) {
-            $routeProvider.when(jcs.modules.auth.routes.login, {
-                controller: jcs.modules.auth.controllers.login,
-                templateUrl: 'js/modules/auth/html/login.tmpl.html'
+            $routeProvider.when(asm.modules.auth.routes.login, {
+                controller: asm.modules.auth.controllers.login,
+                templateUrl: 'ng/modules/auth/html/login.tmpl.html'
             });
-            $routeProvider.when(jcs.modules.auth.routes.notAuthorised, {
-                controller: jcs.modules.auth.controllers.login,
-                templateUrl: 'js/modules/auth/html/not-authorised.tmpl.html'
+            $routeProvider.when(asm.modules.auth.routes.logout, {
+                controller: asm.modules.auth.controllers.logout,
+                templateUrl: 'ng/modules/auth/html/logout.tmpl.html'
+            });
+            $routeProvider.when(asm.modules.auth.routes.notAuthorised, {
+                controller: asm.modules.auth.controllers.login,
+                templateUrl: 'ng/modules/auth/html/not-authorised.tmpl.html'
             });
 
-            $routeProvider.otherwise({ redirectTo: jcs.modules.auth.routes.login });
+            $routeProvider.otherwise({ redirectTo: asm.modules.auth.routes.login });
         }]);
 
 
-}(angular, jcs));
+}(angular, asm));
