@@ -3,14 +3,20 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
+var fs = require('fs');
 
 
 var app = express();
 
+var models_path = __dirname + '/server/models'
+fs.readdirSync(models_path).forEach(function (file) {
+    if (~file.indexOf('.js')) require(models_path + '/' + file)
+})
+
 // Configuring Passport
 var passport = require('passport');
 var expressSession = require('express-session');
-app.use(expressSession({secret: 'mySecretKey'}));
+app.use(expressSession({secret: 'mySecretKey'}));  // TODO pull out of code
 app.use(passport.initialize());
 app.use(passport.session());
 

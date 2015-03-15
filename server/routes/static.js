@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
+var jwt = require('jwt-simple');
+var config = require('../../config');
+var User = require('../../server/models/user');
 
 var isAuthenticated = function (req, res, next) {
 // if user is authenticated in the session, call the next() to call the next request handler
@@ -22,9 +25,13 @@ router.get('/', function (req, res) {
 router.post('/login',
     passport.authenticate('login'),
     function(req, res) {
+        res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        res.redirect('/users/' + req.user.username);
+        var token = jwt.encode({username: req.user.username}, config.secret)
+        User.findPublicUserById(req.user._id).then(function(user) {
+            res.json({user:user, token: token, permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']});
+        });
     }
 );
 
@@ -34,11 +41,18 @@ router.get('/signup', function(req, res){
 });
 
 /* Handle Registration POST */
-router.post('/signup', passport.authenticate('signup', {
-    successRedirect: '/',
-    failureRedirect: '/#register',
-    failureFlash : true
-}));
+router.post('/signup',
+    passport.authenticate('signup'),
+    function(req, res) {
+        res.setHeader('Content-Type', 'application/json');
+        var un = req.user.username;
+        var user = User.findPublicUserByUserName(req.user.username);
+        var u = User.findOne({'username': 'test@test18'}).exec();
+        var uun = u.username;
+        var id = user._id;
+        res.json(user);
+    }
+);
 
 
 module.exports = router;
