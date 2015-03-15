@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
+var Q = require('q');
 
 var schema = new mongoose.Schema({
     username: {type: String, required: true},
@@ -21,15 +22,15 @@ schema.statics.findPublicUserById = function (userId, callback) {
         .populate('roles')
         .exec();
 };
-schema.statics.findPublicUserByUserName = function (userName, Promise, callback) {
-    var defer = new Promise();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
+schema.statics.findPublicUserByUserName = function (userName, callback) {
+    var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
     this.findOne({'username': userName}, 'username email permissions roles createdOn modifiedOn firstName lastName')
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
             defer.resolve(user);
         });
-    return defer.promise();
+    return defer.promise;
 };
 
 // Add plugins

@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 var websockets = require('../../../websockets')
 var pubsub = require('../../../pubsub');
+var Q = require('q');
 
 var sub = false;
 
