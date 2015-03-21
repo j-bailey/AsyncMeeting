@@ -8,7 +8,7 @@ var fs = require('fs');
 
 var app = express();
 
-var models_path = __dirname + '/server/models'
+var models_path = __dirname + '/server/models';
 fs.readdirSync(models_path).forEach(function (file) {
     if (~file.indexOf('.js')) require(models_path + '/' + file)
 })
@@ -72,7 +72,7 @@ app.use(function (req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+if (app.get('env') === 'development') { // TODO confirm this works and document in the README
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
