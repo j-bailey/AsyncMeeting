@@ -3,6 +3,7 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
+var mongoose = require('mongoose');
 var fs = require('fs');
 
 
@@ -16,7 +17,13 @@ fs.readdirSync(models_path).forEach(function (file) {
 // Configuring Passport
 var passport = require('passport');
 var expressSession = require('express-session');
-app.use(expressSession({secret: 'mySecretKey'}));  // TODO pull out of code
+var MongoStore = require('connect-mongo')(expressSession);
+app.use(expressSession({
+    store: new MongoStore({mongooseConnection: mongoose.connection}),
+    secret: 'b1bce56042e44bb7c491e03d4142b652',
+    resave: false,
+    saveUninitialized: false
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
