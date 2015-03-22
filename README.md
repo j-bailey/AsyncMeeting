@@ -20,6 +20,9 @@ Protractor tests are running slow, but running the developer server speeds them 
 gulp dev 
 ```
 
+# Run server in production mode
+- run `export NODE_ENV=production`
+- run `node server`
 
 # Directories
 

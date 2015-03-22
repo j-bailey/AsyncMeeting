@@ -6,9 +6,9 @@ var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 var fs = require('fs');
 
-
 var app = express();
 
+// Load models
 var models_path = __dirname + '/server/models';
 fs.readdirSync(models_path).forEach(function (file) {
     if (~file.indexOf('.js')) require(models_path + '/' + file)
@@ -38,7 +38,14 @@ app.use(flash());
 
 // uncomment after placing your favicon in /static
 //app.use(favicon(__dirname + '/static/favicon.ico'));
-app.use(logger('dev'));
+
+// Set logger depending on environment.
+if (app.get('env') === 'development') {
+    app.use(logger('dev'));
+}
+else {
+    app.use(logger('combined'));
+}
 //app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
@@ -79,7 +86,8 @@ app.use(function (req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') { // TODO confirm this works and document in the README
+// To set to "env" to "production" use "export NODE_ENV=production", default is development.
+if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
