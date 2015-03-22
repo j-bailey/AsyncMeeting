@@ -21,7 +21,10 @@
                     console.log('in login')
                     return $http.post('/login', {username: username, password: password});
                 },
-
+                emailLogin = function (email, password) {
+                    console.log('in emailLogin')
+                    return $http.post('/email-login', {email: email, password: password});
+                },
                 register = function (username, password, email) {
                     console.log('in logout')
                     return $http.post('/signup', {username: username, password: password, email: email});
@@ -32,6 +35,7 @@
             return {
                 getUser: getUser,
                 login: login,
+                emailLogin: emailLogin,
                 register: register,
                 logout: logout
             };

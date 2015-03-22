@@ -12,7 +12,7 @@
                 login = function (email, password) {
                     var defer = $q.defer();
 
-                    userSvc.login(email, password).then(function (response) {
+                    userSvc.emailLogin(email, password).then(function (response) {
                         userSvc.token = response.data.token;
                         console.log('in userSvc login');
                         $http.defaults.headers.common['X-Auth'] = response.data.token;
@@ -34,8 +34,9 @@
                         //    throw msg;
                         //});
 
-                    }, function (val) {
-                        console.log('login error = ' + val.data)
+                    }, function (err) {
+                        console.log('login error = ' + err);
+                        defer.reject(err);
                     });
                     return defer.promise;
                 },
