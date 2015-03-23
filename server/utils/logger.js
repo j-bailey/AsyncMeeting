@@ -1,30 +1,25 @@
 var winston = require('winston');
-var app = require('../../app');
-//winston.emitErrs = true;
+winston.emitErrs = true;
 
-var logLevel = "info";
-
-if (app.get('env') === 'development') {
-    logLevel = "debug";
-}
-
-// Remove default logger and replace
-winston.remove(winston.transports.Console);
-winston.add(winston.transports.Console, {
-    level: logLevel,
-    handleExceptions: true,
-    json: false,
-    colorize: true
+var logger = new winston.Logger({
+    transports: [
+        new winston.transports.File({
+            level: 'debug',
+            filename: './logs/all-logs.log',
+            handleExceptions: true,
+            json: true,
+            maxsize: 5242880, //5MB
+            maxFiles: 5,
+            colorize: false
+        }),
+        new winston.transports.Console({
+            level: 'debug',
+            handleExceptions: true,
+            json: false,
+            colorize: true
+        })
+    ],
+    exitOnError: false
 });
 
-winston.add(winston.transports.File, {
-    level: logLevel,
-    filename: './logs/all-logs.log',
-    handleExceptions: true,
-    json: true,
-    maxsize: 5242880,
-    maxFiles: 5,
-    colorize: false
-});
-
-module.exports = winston;
+module.exports = logger;

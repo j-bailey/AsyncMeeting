@@ -4,7 +4,7 @@ var passport = require('passport');
 var jwt = require('jwt-simple');
 var config = require('../../config');
 var User = require('../../server/models/user');
-var logger = require('winston');
+var logger = require('../utils/logger');
 
 router.use(express.static(__dirname + '/../../assets'));
 
