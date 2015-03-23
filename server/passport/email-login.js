@@ -1,6 +1,8 @@
 var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
+var logger = require('winston');
+
 module.exports = function(passport){
     passport.use('email-login', new LocalStrategy({
                 usernameField: 'email',
@@ -15,12 +17,12 @@ module.exports = function(passport){
                             return done(err);
 // Username does not exist, log the error and redirect back
                         if (!user){
-                            console.log('User Not Found with email '+email);
+                            logger.debug('User Not Found with email '+email);
                             return done(null, false, req.flash('message', 'User Not found.'));
                         }
 // User exists but wrong password, log the error
                         if (!isValidPassword(user, password)){
-                            console.log('Invalid Password');
+                            logger.debug('Invalid Password');
                             return done(null, false, req.flash('message', 'Invalid Password')); // redirect back to login page
                         }
 // User and password both match, return user from done method

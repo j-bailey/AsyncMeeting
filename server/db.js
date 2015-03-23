@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var acl = require('acl');
+var logger = require('winston');
 
 var dbVersion = '0.0.1';
 
@@ -8,7 +9,7 @@ var self = this;
 var db = null;
 
 mongoose.connect(dbUrl, function (err, db) {
-    console.log('mongodb connected to ' + dbUrl);
+    logger.info('mongodb connected to ' + dbUrl);
     self.backend = new acl.mongodbBackend(db, "acl");
     require('./security/acl');
 });

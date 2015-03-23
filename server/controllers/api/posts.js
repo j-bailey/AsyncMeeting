@@ -4,6 +4,7 @@ var router = express.Router();
 var websockets = require('../../../websockets')
 var pubsub = require('../../../pubsub');
 var Q = require('q');
+var logger = require('winston');
 
 var sub = false;
 
@@ -32,7 +33,7 @@ router.get('/', function (req, res, next) {
         }
         if (!sub) {
             pubsub.subscribe('new_post', function (post) {
-                console.log("Posted")
+                logger.debug("Posted")
                 websockets.broadcast('new_post', post)
             })
             sub = true;

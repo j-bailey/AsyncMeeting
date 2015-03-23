@@ -1,12 +1,13 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+//var logger = require('morgan');
+
 var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 var fs = require('fs');
 
-var app = express();
+var app = module.exports = express();
 
 // Load models
 var models_path = __dirname + '/server/models';
@@ -39,12 +40,14 @@ app.use(flash());
 // uncomment after placing your favicon in /static
 //app.use(favicon(__dirname + '/static/favicon.ico'));
 
-// Set logger depending on environment.
+// Setup logger using Winston and Morgan.
+var logger = require("./server/utils/logger");
 if (app.get('env') === 'development') {
-    app.use(logger('dev'));
+    logger.debug("Overriding 'Express' logger");
+    app.use(require('morgan')("dev", { stream: {write: function(str) {logger.info(str)}}}));
 }
 else {
-    app.use(logger('combined'));
+    app.use(require('morgan')("combined", {stream: {write: function(str) {logger.info(str)}}}));
 }
 //app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({extended: false}));

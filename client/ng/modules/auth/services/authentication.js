@@ -5,16 +5,17 @@
         '$q',
         '$timeout',
         '$http',
+        '$log',
         'eventbus',
         asm.modules.core.services.userService,
-        function ($q, $timeout, $http, eventbus, userSvc) {
+        function ($q, $timeout, $http, $log, eventbus, userSvc) {
             var currentUser,
                 login = function (email, password) {
                     var defer = $q.defer();
 
                     userSvc.emailLogin(email, password).then(function (response) {
                         userSvc.token = response.data.token;
-                        console.log('in userSvc login');
+                        $log.debug('in userSvc login');
                         $http.defaults.headers.common['X-Auth'] = response.data.token;
 
                         currentUser = response.data.user;
@@ -35,7 +36,8 @@
                         //});
 
                     }, function (err) {
-                        console.log('login error = ' + err);
+                        $log.error("login error = " + err);
+                        //console.log('login error = ' + err);
                         defer.reject(err);
                     });
                     return defer.promise;
@@ -45,7 +47,8 @@
                     // routing back to login login page is something we shouldn't
                     // do here as we are mixing responsibilities if we do.
                     userSvc.token = null;
-                    console.log('in userSvc logout');
+                    $log.debug("in userSvc logout");
+                    //console.log('in userSvc logout');
                     delete $http.defaults.headers.common['X-Auth'];
                     currentUser = undefined;
                     eventbus.broadcast(asm.modules.auth.events.userLoggedOut);

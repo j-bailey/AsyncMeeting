@@ -1,6 +1,8 @@
 var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
+var logger = require('winston');
+
 module.exports = function(passport){
     passport.use('signup', new LocalStrategy({
                 passReqToCallback : true // allows us to pass back the entire request to the callback
@@ -11,12 +13,12 @@ module.exports = function(passport){
                     User.findOne({ 'username' : username }, function(err, user) {
 // In case of any error, return using the done method
                         if (err){
-                            console.log('Error in SignUp: '+err);
+                            logger.debug('Error in SignUp: '+err);
                             return done(err);
                         }
 // already exists
                         if (user) {
-                            console.log('User already exists with username: '+username);
+                            logger.debug('User already exists with username: '+username);
                             return done(null, false, req.flash('message','User Already Exists'));
                         } else {
 // if there is no user with that email
@@ -31,10 +33,10 @@ module.exports = function(passport){
 // save the user
                             newUser.save(function(err, savedUser) {
                                 if (err){
-                                    console.log('Error in Saving user: '+err);
+                                    logger.debug('Error in Saving user: '+err);
                                     throw err;
                                 }
-                                console.log('User Registration succesful');
+                                logger.debug('User Registration succesful');
                                 return done(null, savedUser);
                             });
                         }
