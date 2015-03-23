@@ -46,8 +46,7 @@ Client/AngularJS Logging
 - To use, instead of using console.log(), use $log.log(""), $log.debug(""), $log.info(""), $log.error(""), etc.
 Server/NodeJS Logging
 - Use the winston logger.
-- In each JS file you need logging, require the logger.js file located in server/utils/logger.js.  
-  Ex. var logger = require("../utils/logger").
+- In each JS file you need logging just do `var logger = require('winston')`
 - Call the logger.  Ex. logger.debug(""), logger.error(""), logger.info(""), logger.log(""), etc.
 
 # Bugs

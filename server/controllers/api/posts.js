@@ -4,7 +4,7 @@ var router = express.Router();
 var websockets = require('../../../websockets')
 var pubsub = require('../../../pubsub');
 var Q = require('q');
-var logger = require('../../utils/logger');
+var logger = require('winston');
 
 var sub = false;
 

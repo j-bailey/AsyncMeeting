@@ -1,7 +1,7 @@
 var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
-var logger = require('../utils/logger');
+var logger = require('winston');
 
 module.exports = function(passport){
     passport.use('email-login', new LocalStrategy({

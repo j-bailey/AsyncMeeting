@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var acl = require('acl');
-var logger = require('./utils/logger');
+var logger = require('winston');
 
 var dbVersion = '0.0.1';
 
