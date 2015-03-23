@@ -39,5 +39,16 @@ gulp dev
 -  /node_modules - node library files
 -  /test - tests e2e, Angular unit and Node level testing
 
+# Logging
+Client/AngularJS Logging
+- Use the $log service.  This service can be injected into any controller, service, etc by adding $log to the 
+  list of services.
+- To use, instead of using console.log(), use $log.log(""), $log.debug(""), $log.info(""), $log.error(""), etc.
+Server/NodeJS Logging
+- Use the winston logger.
+- In each JS file you need logging, require the logger.js file located in server/utils/logger.js.  
+  Ex. var logger = require("../utils/logger").
+- Call the logger.  Ex. logger.debug(""), logger.error(""), logger.info(""), logger.log(""), etc.
+
 # Bugs
 
