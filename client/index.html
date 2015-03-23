@@ -19,7 +19,7 @@
             <li><a class='register' href="#/register"> Register </a></li>
             <li><a class='login' href="#/login"> Login </a></li>
         </ul>
-        <ul ng-if='currentUser' class='nav navbar-nav navbar-right'>
+        <ul ng-if='currentUser' class='nav navbar-nav navbar-right' ng-controller="logoutCtrl">
             <li><a class='logout' href="#" ng-click='logout()'> Logout </a></li>
         </ul>
         <p ng-if='currentUser' class="navbar-text navbar-right"> Signed in as {{ currentUser.username}} </p></div>

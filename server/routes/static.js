@@ -38,6 +38,13 @@ router.post('/email-login',
     }
 );
 
+router.delete('/logout', function(req, res) {
+        logger.info("User '" + req.user.username + "' logged out!");
+        req.session.destroy();
+        res.sendStatus(200);
+    }
+);
+
 /* Handle Registration POST */
 router.post('/signup',
     passport.authenticate('signup'),

@@ -26,11 +26,11 @@
                     return $http.post('/email-login', {email: email, password: password});
                 },
                 register = function (username, password, email) {
-                    $log.debug('in logout')
                     return $http.post('/signup', {username: username, password: password, email: email});
                 },
                 logout = function () {
-
+                    $log.debug('in logout');
+                    return $http.delete('/logout');
                 };
             return {
                 getUser: getUser,

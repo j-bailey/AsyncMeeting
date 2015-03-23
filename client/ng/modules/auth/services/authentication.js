@@ -43,15 +43,23 @@
                     return defer.promise;
                 },
                 logout = function () {
+                    var defer = $q.defer();
                     // we should only remove the current user.
                     // routing back to login login page is something we shouldn't
                     // do here as we are mixing responsibilities if we do.
-                    userSvc.token = null;
                     $log.debug("in userSvc logout");
-                    //console.log('in userSvc logout');
-                    delete $http.defaults.headers.common['X-Auth'];
-                    currentUser = undefined;
-                    eventbus.broadcast(asm.modules.auth.events.userLoggedOut);
+                    userSvc.logout().then(function (response) {
+                        $log.debug("User logout on server successful");
+                        userSvc.token = null;
+                        currentUser = undefined;
+                        delete $http.defaults.headers.common['X-Auth'];
+                        eventbus.broadcast(asm.modules.auth.events.userLoggedOut);
+                        defer.resolve();
+                    }, function (err) {
+                        $log.error("logout error = " + err);
+                        defer.reject(err);
+                    });
+                    return defer.promise;
                 },
                 getCurrentLoginUser = function () {
                     return currentUser;
