@@ -1,7 +1,6 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-//var logger = require('morgan');
 
 var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
@@ -15,6 +14,17 @@ fs.readdirSync(models_path).forEach(function (file) {
     if (~file.indexOf('.js')) require(models_path + '/' + file)
 })
 
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+// Static content paths - ensure it comes before session middleware, otherwise sessions will be created for each static
+// file request if user a is not logged in.
+app.use(express.static(__dirname + '/../../assets'));
+
+// Cookie-Parser Note: ensure cookie secret is the same as session secret
+app.use(cookieParser("b1bce56042e44bb7c491e03d4142b652"));
+
 // Configuring Passport
 var passport = require('passport');
 var expressSession = require('express-session');
@@ -23,14 +33,13 @@ app.use(expressSession({
     store: new MongoStore({mongooseConnection: mongoose.connection}),
     secret: 'b1bce56042e44bb7c491e03d4142b652',
     resave: false,
-    saveUninitialized: false
+    rolling: true,
+    saveUninitialized: false,
+    name: 'asm.sid',
+    cookie : { httpOnly: true, maxAge: 1800000 }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
 
 // Using the flash middleware provided by connect-flash to store messages in session
 // and displaying in templates
@@ -43,7 +52,6 @@ app.use(flash());
 // Setup logger using Winston and Morgan.
 var logger = require("./server/utils/logger");
 if (app.get('env') === 'development') {
-    logger.debug("Overriding 'Express' logger");
     app.use(require('morgan')("dev", { stream: {write: function(str) {logger.info(str)}}}));
 }
 else {
@@ -51,7 +59,6 @@ else {
 }
 //app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({extended: false}));
-app.use(cookieParser());
 //app.use(express.static(path.join(__dirname, 'static')));
 //app.use(express.static(path.join(__dirname, 'assets')));
 

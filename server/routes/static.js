@@ -6,8 +6,6 @@ var config = require('../../config');
 var User = require('../../server/models/user');
 var logger = require('winston');
 
-router.use(express.static(__dirname + '/../../assets'));
-
 /* Handle Login POST */
 router.post('/login',
     passport.authenticate('login'),
