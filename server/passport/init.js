@@ -3,17 +3,15 @@ var emailLogin = require('./email-login');
 var signup = require('./signup');
 var User = require('../models/user');
 module.exports = function(passport) {
-    // Passport needs to be able to serialize and deserialize users to support persistent login sessions
-    passport.serializeUser(function(user, done) {
-        //console.log('serializing user: ');
-        //console.log(user);
-        done(null, user._id);
+    passport.serializeUser( function (user, done) {
+        var sessionUser = { _id: user._id, name: user.name, email: user.email, roles: user.roles };
+        done(null, sessionUser);
     });
-    passport.deserializeUser(function(id, done) {
-        User.findById(id, function(err, user) {
-            //console.log('deserializing user:',user);
-            done(err, user);
-        });
+
+    passport.deserializeUser( function(sessionUser, done) {
+        // The sessionUser object is different from the user mongoose collection
+        // it's actually req.session.passport.user and comes from the session collection
+        done(null, sessionUser)
     });
 
     // Setting up Passport Strategies for Login and SignUp/Registration

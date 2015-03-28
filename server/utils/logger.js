@@ -1,29 +1,22 @@
 var winston = require('winston');
-var app = require('../../app');
-//winston.emitErrs = true;
+var cfg = require('config');
 
 winston.remove(winston.transports.Console);
 
-var logLevel = "info";
-
-if ( app.get("env") === "development" ) {
-    logLevel = "debug";
-}
-
 winston.add(winston.transports.Console, {
-    level: logLevel,
+    level: cfg.get("log.consoleLogLevel"),
     handleExceptions: true,
     json: false,
     colorize: true
 });
 
 winston.add(winston.transports.File, {
-    level: logLevel,
-    filename: './logs/all-logs.log',
+    level: cfg.get("log.fileLogLevel"),
+    filename: cfg.get('log.directory') + "/" + cfg.get('log.fileName'),
     handleExceptions: true,
     json: true,
-    maxsize: 5242880, //5MB
-    maxFiles: 5,
+    maxsize: cfg.get('log.maxFileSize'), //5MB
+    maxFiles: cfg.get('log.maxFiles'),
     colorize: false
 });
 

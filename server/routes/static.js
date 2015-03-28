@@ -37,7 +37,8 @@ router.post('/email-login',
 );
 
 router.delete('/logout', function(req, res) {
-        logger.info("User '" + req.user.username + "' logged out!");
+        logger.debug("Here in logout");
+        logger.info("User '" + req + "' logged out!");
         req.session.destroy(); // Destroy session associated with user.
         req.logout(); // Passport logout
         res.sendStatus(200);

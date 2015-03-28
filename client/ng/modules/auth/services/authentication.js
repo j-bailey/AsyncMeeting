@@ -49,7 +49,7 @@
                     // do here as we are mixing responsibilities if we do.
                     $log.debug("in userSvc logout");
                     userSvc.logout().then(function (response) {
-                        $log.debug("User logout on server successful");
+                        $log.debug("User " + currentUser.username + " logout on server successful");
                         userSvc.token = null;
                         currentUser = undefined;
                         delete $http.defaults.headers.common['X-Auth'];
