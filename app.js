@@ -12,7 +12,7 @@ var app = module.exports = express();
 var models_path = __dirname + '/server/models';
 fs.readdirSync(models_path).forEach(function (file) {
     if (~file.indexOf('.js')) require(models_path + '/' + file)
-})
+});
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -33,10 +33,10 @@ app.use(expressSession({
     store: new MongoStore({mongooseConnection: mongoose.connection}),
     secret: cfg.get('session.secret'),
     resave: false,
-    rolling: true,
+    //rolling: true, // TODO: See if this can work somehow even though angular is single page.
     saveUninitialized: false,
-    name: cfg.get('session.sessionIdName'),
-    cookie : { maxAge: cfg.get('session.timeout') }
+    name: cfg.get('session.sessionIdName')
+    //cookie : { maxAge: 1800000 }
 }));
 app.use(passport.initialize());
 app.use(passport.session());

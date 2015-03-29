@@ -13,7 +13,7 @@
     <div class='container'>
         <ul ng-if='currentUser' class='nav navbar-nav'>
             <li><a class='posts' href="/"> Home </a></li>
-            <li><a access="CanViewMeetingAreas, CanEditMeetingAreas, CanDeleteMeetingAreas" access-permission-type="AtLeastOne" class=='meetingareas' href='/meetingareas'>My Meeting Areas</a></li>
+            <li><a access="CanViewMeetingAreas, CanEditMeetingAreas, CanDeleteMeetingAreas" access-permission-type="AtLeastOne" class=='meetingareas' ng-href='#meetingareas'>My Meeting Areas</a></li>
         </ul>
         <ul ng-if='!currentUser' class=' nav navbar-nav navbar-right'>
             <li><a class='register' href="#/register"> Register </a></li>
@@ -34,6 +34,7 @@
 
 <script src='/angular/angular.js'></script>
 <script src='/angular-route/angular-route.js'></script>
+<script src='/angular-cookies/angular-cookies.min.js'></script>
 
 <script src="app.js"></script>
 </body>
