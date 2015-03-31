@@ -1,6 +1,5 @@
-<div ng-if='currentUser' class="col-xs-3">
-    <a ng-click="selectCategory()" class="btn btn-block btn-default btn-lg"> My Home </a>
-    <a ng-repeat=" item in data.products | orderBy:' category' " ng-click=" selectCategory( item)"
-       class=" btn btn-block btn-default btn-lg"> {{ item}} </a>
-</div> 
-
+<ul class="nav nav-sidebar">
+    <li class="active" ><a href="#" ng-click="selectCategory()"> My Home </a></li>
+    <li ng-repeat="item in data.products | orderBy:' category' "><a ng-click="selectCategory(item)"
+       class="">{{item}}</a></li>
+</ul>

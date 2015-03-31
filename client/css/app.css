@@ -3,11 +3,14 @@
  */
 
 /* Move down content because we have a fixed navbar that is 50px tall */
-/*
+
 body {
     padding-top: 50px;
 }
-*/
+
+.h1, .h2, .h3, h1, h2, h3 {
+    margin-top: 0px;
+}
 
 /*
  * Global add-ons
@@ -58,6 +61,18 @@ body {
     background-color: #428bca;
 }
 
+.navbar-default {
+    background-color: #545454;
+    color: #fff;
+}
+
+.navbar-default .navbar-text {
+    color: #fff;
+}
+
+.navbar-default .navbar-nav>li>a {
+    color: #fff;
+}
 
 /*
  * Main content
@@ -94,4 +109,11 @@ body {
 .placeholder img {
     display: inline-block;
     border-radius: 50%;
+}
+
+.meetingAreaItem {
+    width: 100%;
+    border: 1px solid black;
+    margin: 5px;
+    padding: 0px 10px;
 }

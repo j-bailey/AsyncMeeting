@@ -6,5 +6,5 @@ gulp.task('css', function() {gulp.src('client/css/**/*.css').pipe( gulp.dest('as
 
 gulp.task('watch:css', function () {
 //    gulp.watch('client/ng/**/*.styl', ['css'])
-    gulp.watch('client/ng/**/*.css', ['css'])
+    gulp.watch('client/css/**/*.css', ['css'])
 });

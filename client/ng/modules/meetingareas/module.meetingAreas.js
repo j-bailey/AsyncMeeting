@@ -6,6 +6,10 @@
         controllers: {
             meetingAreasCtrl: 'meetingAreasCtrl'
         },
+        services: {
+            meetingAreaService: 'meetingAreaService',
+            breadcrumbService: 'breadcrumbService'
+        },
         routes: {
             meetingAreas: '/meetingareas'
         }

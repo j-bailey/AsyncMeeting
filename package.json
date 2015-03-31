@@ -19,6 +19,7 @@
     "express-session": "^1.10.4",
     "gulp": "^3.8.11",
     "gulp-concat": "^2.5.2",
+    "gulp-livereload": "^3.8.0",
     "gulp-ng-annotate": "^0.5.2",
     "gulp-nodemon": "^2.0.2",
     "gulp-sourcemaps": "^1.5.1",

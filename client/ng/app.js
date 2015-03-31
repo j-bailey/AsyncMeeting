@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module(asm.modules.app.name, [
-        'ngRoute',
+        'ngRoute', 'ngCookies',
         asm.modules.core.name,
         asm.modules.auth.name,
         asm.modules.admin.name,
