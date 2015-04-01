@@ -13,6 +13,14 @@ body {
     text-align: right;
 }
 
+a {
+    color: #545454;
+}
+
+a:hover {
+    color: #b8bfbe
+}
+
 .productNameHeader {
     letter-spacing: -1px;
     font-weight: 200;
@@ -85,7 +93,7 @@ body {
 }
 .nav-sidebar > .active > a {
     color: #fff;
-    background-color: #428bca;
+    background-color: #545454;
 }
 
 .navbar-default {
@@ -111,12 +119,22 @@ body {
 }
 
 .nav-sidebar>li>a:focus, .nav-sidebar>li>a:hover {
-    background-color: #428bca;
+    background-color: #7b7b7b;
     color: #fff;
 }
 /*
  * Main content
  */
+
+.btn-primary {
+    background-color: #545454;
+    border-color: #545454;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #7b7b7b;
+    border-color: #545454;
+}
 
 .main {
     padding: 20px;

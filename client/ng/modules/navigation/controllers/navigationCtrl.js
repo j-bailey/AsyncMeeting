@@ -17,7 +17,17 @@
                 ];
 
             $scope.isCurrentLocation = function(path) {
-                return "#" + $location.path() === path;
+                // Check entire path first.
+                if ( "#" + $location.path() === path ) return true;
+
+                // If not a match see if anything matches up to the root path.
+                var pathElements = $location.path().split("/");
+                for ( var i = pathElements.length; i > 0; i-- ) {
+                    var subPath = "#" + pathElements.slice(0, i).join("/");
+                    if (subPath === path) return true;
+                }
+
+                return false;
             }
 
         }
