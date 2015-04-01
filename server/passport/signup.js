@@ -19,7 +19,7 @@ module.exports = function(passport){
 // already exists
                         if (user) {
                             logger.error("User already exists with username '" + username + "'!");
-                            return done(null, false, req.flash('message', "User already exists with username '" + username + "'!"));
+                            return done(null, false, { message: "User already exists with username '" + username + "'!" });
                         }
                         else {
                             var email = req.body.email;
@@ -32,7 +32,7 @@ module.exports = function(passport){
 
                                 if (user) {
                                     logger.error("User already exists with email: '" + email + "'!");
-                                    return done(null, false, req.flash("message", "User already exists with email: " + email))
+                                    return done(null, false, { message: "User already exists with email: " + email });
                                 }
 // create the user
                                 var newUser = new User();
@@ -46,7 +46,7 @@ module.exports = function(passport){
                                 newUser.save(function(err, savedUser) {
                                     if (err){
                                         logger.error('Error in Saving user: '+err);
-                                        return done(null, false, req.flash('message', "We're sorry, we could not create your account at this time!"));
+                                        return done(null, false, {message: "We're sorry, we could not create your account at this time!"});
                                     }
                                     logger.debug('User Registration successful');
                                     return done(null, savedUser);

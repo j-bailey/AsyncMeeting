@@ -45,17 +45,30 @@ router.delete('/logout', function(req, res) {
 );
 
 /* Handle Registration POST */
-router.post('/signup',
-    passport.authenticate('signup'),
-    function(req, res) {
-        res.setHeader('Content-Type', 'application/json');
-        var email = req.user.email;
-        var user = User.findPublicUserByEmail(email).then (function(user){
-            logger.debug('Found user by email during register = ' + user);
-            res.json(user);  // TODO user is missing roles and permissions need to fix in passport signup code
-        });
-    }
-);
+router.post('/signup', function(req, res, next) {
+   passport.authenticate('signup', function(err, user, info) {
+       if ( err ) {
+           return next(err);
+       }
+
+       logger.debug("info is " + info);
+       logger.debug(info);
+
+       if ( !user ) {
+           logger.debug("res is " + res);
+           return res.status(400).json(info);
+       }
+
+       req.login(user, function(err) {
+           if (err) return next(err);
+
+           // TODO user is missing roles and permissions need to fix in passport signup code
+           return res.json(user);
+       });
+   })(req, res, next);
+});
+
+
 
 module.exports = router;
 
