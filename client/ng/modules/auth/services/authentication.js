@@ -20,8 +20,6 @@
                     $http.defaults.headers.common['X-Auth'] = response.data.token;
                     currentUser = response.data.user;
                     currentUser.permissions = response.data.permissions;
-
-                    // TODO: Put the user in session instead of broadcasting.
                     eventbus.broadcast(asm.modules.auth.events.userLoggedIn, currentUser);
                     defer.resolve(currentUser);
                 }, function (err) {

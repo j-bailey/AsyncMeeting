@@ -6,7 +6,6 @@
         '$location',
         '$cookies',
         function ($scope, $log, $location, $cookies) {
-            $log.debug("Initializing navigation controller");
             $scope.currentUser = $cookies.currentUser;
 
             $log.debug($location.path());
@@ -18,7 +17,6 @@
                 ];
 
             $scope.isCurrentLocation = function(path) {
-                console.log("Calling isCurrentLocation " + $location.path());
                 return "#" + $location.path() === path;
             }
 

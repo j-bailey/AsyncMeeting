@@ -18,7 +18,7 @@
                         <h1>{{currentMeetingArea.title}}</h1>
                         <p>{{currentMeetingArea.description}}</p>
                     </div>
-                    <div class="col-sm-1 col-sm-offset-1"><button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#createMeetingAreaModal">Create</button></div>
+                    <div id="createMeetingAreaBtnDiv" class="col-sm-2"><button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#createMeetingAreaModal">Create</button></div>
                 </div>
                 <div class="meetingAreaItem" ng-repeat="meetingArea in meetingAreas">
                     <a href="#/meetingareas/{{meetingArea._id}}"><h5>{{meetingArea.title}}</h5></a>
