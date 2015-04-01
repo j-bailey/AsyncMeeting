@@ -8,6 +8,7 @@
         asm.modules.admin.name,
         asm.modules.pages.name,
         asm.modules.meetingareas.name,
+        asm.modules.navigation.name,
         asm.modules.register.name,
         asm.modules.home.name
     ]);

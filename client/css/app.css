@@ -5,7 +5,25 @@
 /* Move down content because we have a fixed navbar that is 50px tall */
 
 body {
+    font-family: 'Lato', sans-serif;
     padding-top: 50px;
+}
+
+#currentMeetingArea {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.form-signin {
+    margin-top: 30px;
+}
+
+.form-signin .form-control, .form-signin .btn {
+    margin: 5px;
+}
+
+.form-signin .alert {
+    margin: 5px -5px 5px 5px;
 }
 
 .h1, .h2, .h3, h1, h2, h3 {
@@ -74,6 +92,19 @@ body {
     color: #fff;
 }
 
+.navbar-default .navbar-brand {
+    color: #fff;
+}
+
+.navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover,
+.navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover {
+    color: #C3C3C3;
+}
+
+.nav-sidebar>li>a:focus, .nav-sidebar>li>a:hover {
+    background-color: #428bca;
+    color: #fff;
+}
 /*
  * Main content
  */
@@ -114,6 +145,19 @@ body {
 .meetingAreaItem {
     width: 100%;
     border: 1px solid black;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
     margin: 5px;
     padding: 0px 10px;
+}
+
+/* RC Wizard */
+.rc-nav-wizard > li {
+    font-size: 12px;
+}
+
+#summaryForm .form-group, #summaryForm .label {
+    width: 100%;
+    display: block;
+    text-align: center;
 }

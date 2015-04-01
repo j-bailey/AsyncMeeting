@@ -7,7 +7,7 @@
      * @requires $log
      *
      * @description
-     * Provides meeting area services to the server.
+     * Provides breadcrumb services for the UI.
      */
     angular.module(asm.modules.meetingareas.name)
         .factory(asm.modules.meetingareas.services.breadcrumbService, [
@@ -33,6 +33,10 @@
                         // If it is, remove all paths down to the path found, otherwise push it onto the trail.
                         var pathElements = currentPath.trim().split('/');
                         var currentPathLabel = pathElements[pathElements.length-1];
+                        $log.debug("currentPathLabel is " + currentPathLabel);
+                        if ( currentPathLabel.substring(0,1) === ":" ) {
+                            return;
+                        }
 
                         if ( this.breadcrumbs.length == 0 ) {
                             this.breadcrumbs.push({path: currentPath, label: currentPathLabel});
@@ -40,6 +44,8 @@
                         else {
                             var breadcrumb = {path: currentPath, label: currentPathLabel};
                             var indexOfExistingBreadcrumb = -1;
+
+                            // Find existing breadcrumb if one exists with the path.
                             _.each(this.breadcrumbs, function(data, idx) {
                                 if (data.path === breadcrumb.path) {
                                     indexOfExistingBreadcrumb = idx;
@@ -66,12 +72,12 @@
                     BreadcrumbService.generateBreadcrumbs();
                 });
 
-                $rootScope.$watch(
-                    function() { return BreadcrumbService.options; },
-                    function() {
-                        BreadcrumbService.generateBreadcrumbs();
-                    }
-                );
+                //$rootScope.$watch(
+                //    function() { return BreadcrumbService.options; },
+                //    function() {
+                //        BreadcrumbService.generateBreadcrumbs();
+                //    }
+                //);
 
                 BreadcrumbService.generateBreadcrumbs();
 

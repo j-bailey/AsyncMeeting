@@ -3,19 +3,27 @@
 <html ng-app="asyncMeeting" ng-controller='asyncMeetingCtrl'>
 <head>
     <link rel="stylesheet" href="/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/angularjs-utilities/examples/uber-wizard/styles/rcWizard.css">
     <link rel="stylesheet" href="/app.css">
 
+    <!-- Google Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Lato:100,300,400,700,900,100italic,300italic,400italic,700italic,900italic' rel='stylesheet' type='text/css'>
 </head>
-<body>
 
+<body>
 
 <nav class='navbar navbar-default navbar-fixed-top'>
     <div class='container'>
         <div id="navbar" class="navbar-collapse collapse">
-            <ul ng-if='currentUser' class='nav navbar-nav'>
-                <li><a class='posts' href="/"> Home </a></li>
-                <li><a access="CanViewMeetingAreas, CanEditMeetingAreas, CanDeleteMeetingAreas" access-permission-type="AtLeastOne" class='meetingareas' ng-href='#/meetingareas'>My Meeting Areas</a></li>
-            </ul>
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#/">Productive Gains AsyncMeeting</a>
+            </div>
+            <!--<ul ng-if='currentUser' class='nav navbar-nav'>-->
+                <!--<li><a class='posts' href="/"> Home </a></li>-->
+                <!--<li><a access="CanViewMeetingAreas, CanEditMeetingAreas, CanDeleteMeetingAreas"-->
+                       <!--access-permission-type="AtLeastOne" class='meetingareas'-->
+                       <!--ng-href='#/meetingareas'>My Meeting Areas</a></li>-->
+            <!--</ul>-->
             <ul ng-if='!currentUser' class=' nav navbar-nav navbar-right'>
                 <li><a class='register' href="#/register"> Register </a></li>
                 <li><a class='login' href="#/login"> Login </a></li>
@@ -30,15 +38,20 @@
     <div ng-view></div>
 </div>
 
-<!--<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.js'></script>-->
-<!--<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular-route.js'></script>-->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="/jquery/dist/jquery.min.js"></script>
 <script src="/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src='/angular/angular.js'></script>
+<script src='/angular/angular.min.js'></script>
 <script src='/angular-route/angular-route.js'></script>
 <script src='/angular-cookies/angular-cookies.min.js'></script>
 <script src="/underscore/underscore-min.js"></script>
-
+<!-- Start - JavaScript from RealCrowd to do wizards -->
+<script src="/twitter-bootstrap-wizard/jquery.bootstrap.wizard.js"></script>
+<script src="/angularjs-utilities/src/directives/rcSubmit.js"></script>
+<script src="/angularjs-utilities/src/directives/rcVerifySet.js"></script>
+<script src="/angularjs-utilities/src/modules/rcDisabled.js"></script>
+<script src="/angularjs-utilities/src/modules/rcForm.js"></script>
+<script src="/angularjs-utilities/src/modules/rcWizard.js"></script>
+<!-- End - JavaScript from RealCrowd to do wizards -->
 <script src="app.js"></script>
 </body>
 </html>

@@ -16,7 +16,7 @@
     };
 
     angular.module(asm.modules.meetingareas.name, [
-        'ngRoute'
+        'ngRoute', 'rcWizard', 'rcForm', 'rcDisabledBootstrap'
     ]);
 
 
