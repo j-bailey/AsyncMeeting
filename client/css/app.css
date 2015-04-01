@@ -29,6 +29,7 @@ a:hover {
 
 .signin {
     font-weight: 100;
+    padding-right: 20px;
 }
 
 .form-signin {
@@ -200,16 +201,15 @@ a:hover {
 #banner {
     background-attachment: scroll, scroll, scroll, fixed;
     background-color: #645862;
-    /*background-image: url("images/light-bl.svg"), url("images/light-br.svg"), url("images/overlay.png"), url("../images/banner.jpg");*/
+    background-image: url("images/banner/light-bl.svg"), url("images/banner/light-br.svg"), url("images/banner/overlay.png"), url("../images/banner/banner.jpg");
     background-position: bottom left, bottom right, top left, top center;
     background-repeat: no-repeat, no-repeat, repeat, no-repeat;
-    /*background-size: 25em, 25em, auto, cover;*/
-    /*background-size: 100%, 100%;*/
+    background-size: 25em, 25em, auto, cover;
     color: white;
     cursor: default;
     padding: 6em 0;
     text-align: center;
-    height: 100vh;
+    /*height: 75vh;*/
 }
 
 #banner .inner {
@@ -235,7 +235,7 @@ a:hover {
     display: inline-block;
     border-bottom: solid 2px;
     border-top: solid 2px;
-    margin: 0 0 2em 0;
+    margin: 0 0 0 0;
     padding: 3px 0 3px 0;
 }
 
@@ -255,6 +255,8 @@ a:hover {
     letter-spacing: 0.1em;
     margin: 0;
     text-transform: uppercase;
+    padding: 10px 0 0 0;
+    font-weight: 200;
 }
 
 #banner .inner p a {
@@ -265,4 +267,14 @@ a:hover {
 
 #banner .inner footer {
     margin: 2em 0 0 0;
+}
+
+footer {
+    background-color: #645862;
+    height: 100%;
+    opacity: .6;
+    font-size: 12px;
+    text-align: center;
+    color: #fff;
+    font-weight: 300;
 }
