@@ -33,6 +33,17 @@ schema.statics.findPublicUserByUserName = function (userName, callback) {
     return defer.promise;
 };
 
+schema.statics.findPublicUserByEmail = function (email, callback) {
+    var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
+    this.findOne({'email': email}, 'username email permissions roles createdOn modifiedOn firstName lastName')
+        .populate('permissions')
+        .populate('roles')
+        .exec(function (err, user) {
+            defer.resolve(user);
+        });
+    return defer.promise;
+};
+
 // Add plugins
 
 schema.plugin(modifiedOn);

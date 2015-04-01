@@ -49,9 +49,9 @@ router.post('/signup',
     passport.authenticate('signup'),
     function(req, res) {
         res.setHeader('Content-Type', 'application/json');
-        var un = req.user.username;
-        var user = User.findPublicUserByUserName(req.user.email).then (function(user){
-            logger.debug('Found user by name during register = ' + user);
+        var email = req.user.email;
+        var user = User.findPublicUserByEmail(email).then (function(user){
+            logger.debug('Found user by email during register = ' + user);
             res.json(user);  // TODO user is missing roles and permissions need to fix in passport signup code
         });
     }
