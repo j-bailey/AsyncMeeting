@@ -21,7 +21,7 @@
                 $scope.currentMeetingArea = null;
 
                 // Retrieve the current meeting area data.
-                if ( $scope.currentMeetingAreaId !== null ) {
+                if ( $scope.currentMeetingAreaId ) {
                     meetingAreaService.getMeetingArea($scope.currentMeetingAreaId).then(function(meetingArea) {
                         $scope.currentMeetingArea = meetingArea.data;
 
