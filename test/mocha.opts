@@ -1,3 +1,4 @@
-test/server --recursive --require test/server/support/coverage
-
-
+test/server
+--recursive
+--reporter spec
+--ui bdd

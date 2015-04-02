@@ -8,7 +8,7 @@ var cfg = require('config');
 
 var app = module.exports = express();
 
-// Load models
+// Load models)
 var models_path = __dirname + '/server/models';
 fs.readdirSync(models_path).forEach(function (file) {
     if (~file.indexOf('.js')) require(models_path + '/' + file)

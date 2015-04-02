@@ -12,7 +12,7 @@
                     hasPermission = true,
                     permission, i;
 
-                console.log("user is " + (user != undefined ? user.username : user));
+                console.log("user is " + (user !== undefined ? user.username : user));
 
                 permissionCheckType = permissionCheckType || asm.modules.auth.enums.permissionCheckType.atLeastOne;
                 if (loginRequired === true && user === undefined) {
@@ -49,7 +49,7 @@
                 }
 
                 return result;
-            };
+            }
 
             return {
                 authorize: authorize

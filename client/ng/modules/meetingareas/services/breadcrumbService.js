@@ -38,7 +38,7 @@
                             return;
                         }
 
-                        if ( this.breadcrumbs.length == 0 ) {
+                        if ( this.breadcrumbs.length === 0 ) {
                             this.breadcrumbs.push({path: currentPath, label: currentPathLabel});
                         }
                         else {

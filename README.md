@@ -13,7 +13,13 @@
 - run `gulp dev`
 
 # Run tests
+- To use the test configuration change the env to test.  This will do things like use the test.json configuration file
+  which will point to a test instance of the database instead of the dev or production one.  `export NODE_ENV=test`
 - For all tests `npm test`
+- For server only tests `mocha`
+  - These tests use supertest which require the express app configured the way it would be if it were actually running.
+    So this test uses test/server/support/api.js to wrap the app in a supertest object which is then use to create
+    requests.
 - e2e tests only `./node_modules/.bin/protractor`
 Protractor tests are running slow, but running the developer server speeds them up.  Run the command before running the e2e tests.
 ```shell

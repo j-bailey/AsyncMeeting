@@ -16,7 +16,7 @@
             var getMeetingArea = function (meetingAreaId) {
                     //$log.debug('in getMeetingArea');
                     var param = "";
-                    if ( meetingAreaId !== undefined && meetingAreaId !== null && meetingAreaId != "" ) {
+                    if ( meetingAreaId !== undefined && meetingAreaId !== null && meetingAreaId !== "" ) {
                         param = "/" + meetingAreaId;
                     }
                     return $http.get('/api/meetingarea' + param);

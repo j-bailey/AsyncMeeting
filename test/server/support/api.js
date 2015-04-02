@@ -1,7 +1,4 @@
-var express = require('express')
-var request = require('supertest')
-var router = require('../../../server/controllers')
-var app = express()
+var request = require('supertest');
+var app = require('../../../app');
 
-app.use(router)
-module.exports = request(app)
+module.exports = request(app);

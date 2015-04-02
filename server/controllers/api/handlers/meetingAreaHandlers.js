@@ -3,7 +3,7 @@ var ObjectId = require('mongoose').Types.ObjectId;
 var Q = require('q');
 var logger = require('winston');
 
-var getMeetingAreaWithId = function(req, res, next) {
+var getMeetingArea = function(req, res, next) {
     // TODO: add retrieving only meeting areas the user has access to.
     MeetingArea.findOne({_id: req.params.meetingAreaId}, function(err, meetingArea) {
         if ( err ) return next(err);
@@ -24,6 +24,7 @@ var createNewMeetingArea = function(req, res, next) {
     meetingArea.save(function(err, savedMeetingArea) {
         if (err) {
             logger.error("Error saving meeting area: " + err.message);
+            return next(err);
         }
 
         res.status(201).json(savedMeetingArea);
@@ -39,7 +40,7 @@ var deleteMeetingArea = function(req, res, next) {
 };
 
 module.exports = {
-    getMeetingAreaWithId: getMeetingAreaWithId,
+    getMeetingArea: getMeetingArea,
     createNewMeetingArea: createNewMeetingArea,
     deleteMeetingArea: deleteMeetingArea
 };
