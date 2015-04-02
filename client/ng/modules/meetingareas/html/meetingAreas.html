@@ -1,12 +1,132 @@
-<div class='container'>
-
-    <div class="panel panel-default row">
-        <ng-include src="'ng/modules/meetingAreas/html/meetingMenu.html'"></ng-include>
-        <div ng-if='currentUser' class="col-xs-3">
-            <ng-include src='views/meetingMenu.html'></ng-include>
+<div class='container-fluid'>
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ng-include src="'ng/modules/navigation/html/menu.html'"></ng-include>
         </div>
-        <div ng-if='currentUser' class="col-xs-8">
-            <h1>Welcome to Your Meeting Areas</h1>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <div>
+                <ol class="ab-nav breadcrumb">
+                    <li ng-repeat="breadcrumb in breadcrumbs.getBreadcrumbs()" ng-class="{ active: $last }">
+                        <a ng-if="!$last" ng-href="#{{ breadcrumb.path }}" ng-bind="breadcrumb.label" class="margin-right-xs"></a>
+                        <span ng-if="$last" ng-bind="breadcrumb.label"></span>
+                    </li>
+                </ol>
+                <div id="currentMeetingArea" class="row">
+                    <div ng-show="currentMeetingArea == null" class="col-sm-10"><h1>My Meeting Areas</h1></div>
+                    <div ng-show="currentMeetingArea" class="col-sm-10">
+                        <h1>{{currentMeetingArea.title}}</h1>
+                        <p>{{currentMeetingArea.description}}</p>
+                    </div>
+                    <div id="createMeetingAreaBtnDiv" class="col-sm-2"><button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#createMeetingAreaModal">Create</button></div>
+                </div>
+                <div class="meetingAreaItem" ng-repeat="meetingArea in meetingAreas">
+                    <a href="#/meetingareas/{{meetingArea._id}}"><h5>{{meetingArea.title}}</h5></a>
+                    <p>{{meetingArea.description}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Create Meeting Area Modal -->
+    <div class="modal fade" id="createMeetingAreaModal" tabindex="-1" role="dialog" aria-labelledby="createMeetingAreaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="resetForms(currentMeetingArea); cancelForms(rc); closeCreateMeetingAreaModal();" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="createMeetingAreaModalTitle">Create Meeting Area</h4>
+                </div>
+                <div class="modal-body">
+                    <div rc-wizard="createMeetingAreaWizard" id="rootwizard">
+                        <ul class="nav rc-nav-wizard">
+                            <li class="active">
+                                <a class="active" href="#basicInfoForm" data-toggle="tab">
+                                    <span class="badge">1</span>
+                                    <span>Basic Information</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#adminsForm" data-toggle="tab">
+                                    <span class="badge">2</span>
+                                    <span>Administrators</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#inviteesForm" data-toggle="tab">
+                                    <span class="badge">3</span>
+                                    <span>Invitees</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#summaryForm" data-toggle="tab">
+                                    <span class="badge">4</span>
+                                    <span>Summary</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <form class="tab-pane active" id="basicInfoForm" name="basicInfoForm" rc-submit rc-step novalidate>
+                                <h3>Basic Information</h3>
+                                <div class="form-group"
+                                     ng-class="{'has-error': rc.basicInfoForm.needsAttention(basicInfoForm.meetingAreaName)}">
+                                    <label class="control-label">Name</label>
+                                    <input name="meetingAreaName" class="form-control" type="text" required
+                                           ng-model="newMeetingArea.title"/>
+                                </div>
+                                <div class="form-group"
+                                     ng-class="{'has-error': rc.basicInfoForm.needsAttention(basicInfoForm.description)}">
+                                    <label class="control-label">Description</label>
+                                    <textarea name="description" class="form-control" required
+                                              ng-model="newMeetingArea.description"></textarea>
+                                </div>
+                            </form>
+                            <form class="tab-pane" id="adminsForm" name="adminsForm" rc-submit rc-step>
+                                <h3>Administrators</h3>
+                                <div class="form-group">
+                                    <label class="control-label">Administrators</label>
+                                    <!--<input name="administrators" class="form-control" type="text"/>-->
+                                    <textarea name="administrators" class="form-control" ng-model="newMeetingArea.administrators"></textarea>
+                                </div>
+                            </form>
+                            <form class="tab-pane" id="inviteesForm" name="inviteesForm" rc-submit rc-step>
+                                <h3>Invitees</h3>
+                                <div class="form-group">
+                                    <label class="control-label">Invitees</label>
+                                    <!--<input name="invitees" class="form-control" type="text"/>-->
+                                    <textarea name="invitees" class="form-control" ng-model="newMeetingArea.invitees"></textarea>
+                                </div>
+                            </form>
+                            <form class="tab-pane" id="summaryForm" name="summaryForm" rc-submit="createMeetingArea()" rc-step>
+                                <h4>Summary</h4>
+                                <div class="form-group">
+                                    <!-- TODO: Make pretty -->
+                                    <div class="label label-default">Parent Meeting Area</div> <div>{{newMeetingArea.parentMeetingArea ? newMeetingArea.parentMeetingArea.title : "None"}}</div>
+                                    <div class="label label-default">Meeting Area name</div> <div>{{newMeetingArea.title}}</div>
+                                    <div class="label label-default">Description</div> <div>{{newMeetingArea.description}}</div>
+                                    <div class="label label-default">Administrators</div> <div>{{newMeetingArea.administrators || "&nbsp;"}}</div>
+                                    <div class="label label-default">Invitees</div> <div>{{newMeetingArea.invitees || "&nbsp;"}}</div>
+                                    <div class="label label-danger">Access Restriction</div> <div>{{newMeetingArea.accessRestriction || "&nbsp;"}}</div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="form-group">
+                        <div class="pull-left">
+                            {{createMeetingAreaErrorMessage}}
+                        </div>
+                        <div class="pull-right">
+                            <a class="btn btn-default" ng-click="resetForms(currentMeetingArea); cancelForms(rc); closeCreateMeetingAreaModal();">Cancel</a>
+                            <a class="btn btn-default" ng-click="rc.createMeetingAreaWizard.backward()"
+                               ng-show="rc.createMeetingAreaWizard.currentIndex > rc.createMeetingAreaWizard.firstIndex">Back</a>
+                            <a class="btn btn-primary" data-loading-text="Please Wait..." ng-click="rc.createMeetingAreaWizard.forward()"
+                               ng-show="rc.createMeetingAreaWizard.currentIndex < rc.createMeetingAreaWizard.navigationLength">Continue</a>
+                            <a class="btn btn-primary" ng-click="rc.createMeetingAreaWizard.forward();"
+                               ng-show="rc.createMeetingAreaWizard.currentIndex == rc.createMeetingAreaWizard.navigationLength">Complete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

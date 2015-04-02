@@ -6,13 +6,17 @@
         controllers: {
             meetingAreasCtrl: 'meetingAreasCtrl'
         },
+        services: {
+            meetingAreaService: 'meetingAreaService',
+            breadcrumbService: 'breadcrumbService'
+        },
         routes: {
             meetingAreas: '/meetingareas'
         }
     };
 
     angular.module(asm.modules.meetingareas.name, [
-        'ngRoute'
+        'ngRoute', 'rcWizard', 'rcForm', 'rcDisabledBootstrap'
     ]);
 
 

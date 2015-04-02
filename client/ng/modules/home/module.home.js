@@ -4,7 +4,7 @@
     asm.modules.home = {
         name: 'home',
         controllers: {
-            users: 'homeCtrl'
+            home: 'homeCtrl'
         },
         routes: {
             home: '/'

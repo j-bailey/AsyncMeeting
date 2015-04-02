@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Q = require('q');
 var acl =  require('./security/acl');
+var logger = require('winston');
 
 var dbVersion = '0.0.1';
 

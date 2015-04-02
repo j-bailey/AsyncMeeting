@@ -1,0 +1,19 @@
+{
+  "session": {
+    "secret": "b1bce56042e44bb7c491e03d4142b652",
+    "timeout": "1800000",
+    "sessionIdName": "asm.sid"
+  },
+  "log": {
+    "directory": "logs",
+    "consoleLogLevel": "debug",
+    "fileName": "server.log",
+    "fileLogLevel": "debug",
+    "maxFileSize": 5242880,
+    "maxFiles": 5,
+    "morganLogFormat": "dev"
+  },
+  "errors": {
+    "view": "error"
+  }
+}

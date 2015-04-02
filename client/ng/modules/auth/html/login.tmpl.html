@@ -1,16 +1,25 @@
-<div class="alert alert-danger" role="alert" ng-show="invalidLogin">Oh snap! Email and password combination not recognised</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-3 col-md-6">
+            <form class="form-signin" role="form" ng-submit="login()">
+                <h3 class="form-signin-heading">Please sign in</h3>
+                <div class="alert alert-danger" role="alert" ng-show="invalidLogin">Log in attempt unsuccessful!</div>
+                <input type="email" class="form-control" placeholder="Email address" required="" autofocus=""
+                       ng-model="loginModel.email">
+                <input type="password" class="form-control" placeholder="Password" required="" ng-model="loginModel.password">
+                <button class="btn btn-default btn-primary btn-block" type="submit">
+                    <i class="fa" ng-class="{'fa-cog fa-spin': isBusy, 'fa-sign-in': !isBusy}"></i>
+                    <span>Sign in</span>
+                </button>
+            </form>
+        </div>
+    </div>
 
-<form class="form-signin" role="form" ng-submit="login()">
-    <h2 class="form-signin-heading">Please sign in</h2>
-    <input type="email" class="form-control" placeholder="Email address" required="" autofocus="" ng-model="loginModel.email">
-    <input type="password" class="form-control" placeholder="Password" required="" ng-model="loginModel.password">
-    <button class="btn btn-lg btn-primary btn-block" type="submit">
-        <i class="fa" ng-class="{'fa-cog fa-spin': isBusy, 'fa-sign-in': !isBusy}"></i>
-        <span>Sign in</span>
-    </button>
-</form>
+    <!--<h3>Logins</h3>-->
 
-<h3>Logins</h3>
-<p>Admin User: admin@test.com</p>
-<p>Manager User: manager@test.com</p>
-<p>Normal User: user@test.com</p>
+    <!--<p>Admin User: admin@test.com</p>-->
+
+    <!--<p>Manager User: manager@test.com</p>-->
+
+    <!--<p>Normal User: user@test.com</p>-->
+</div>

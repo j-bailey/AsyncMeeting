@@ -12,7 +12,7 @@
     };
 
     angular.module(asm.modules.register.name, [
-        'ngRoute'
+        'ngRoute', 'ngCookies'
     ]);
 
 

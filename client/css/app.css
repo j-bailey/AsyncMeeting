@@ -3,11 +3,50 @@
  */
 
 /* Move down content because we have a fixed navbar that is 50px tall */
-/*
+
 body {
+    font-family: 'Lato', sans-serif;
     padding-top: 50px;
 }
-*/
+
+#createMeetingAreaBtnDiv {
+    text-align: right;
+}
+
+a {
+    color: #545454;
+}
+
+a:hover {
+    color: #b8bfbe
+}
+
+.productNameHeader {
+    letter-spacing: -1px;
+    font-weight: 200;
+    padding-left: 10px;
+}
+
+.signin {
+    font-weight: 100;
+    padding-right: 20px;
+}
+
+.form-signin {
+    margin-top: 30px;
+}
+
+.form-signin .form-control, .form-signin .btn {
+    margin: 5px;
+}
+
+.form-signin .alert {
+    margin: 5px -5px 5px 5px;
+}
+
+.h1, .h2, .h3, h1, h2, h3 {
+    margin-top: 0px;
+}
 
 /*
  * Global add-ons
@@ -55,13 +94,48 @@ body {
 }
 .nav-sidebar > .active > a {
     color: #fff;
-    background-color: #428bca;
+    background-color: #545454;
 }
 
+.navbar-default {
+    background-color: #545454;
+    color: #fff;
+}
 
+.navbar-default .navbar-text {
+    color: #fff;
+}
+
+.navbar-default .navbar-nav>li>a {
+    color: #fff;
+}
+
+.navbar-default .navbar-brand {
+    color: #fff;
+}
+
+.navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover,
+.navbar-default .navbar-brand:focus, .navbar-default .navbar-brand:hover {
+    color: #C3C3C3;
+}
+
+.nav-sidebar>li>a:focus, .nav-sidebar>li>a:hover {
+    background-color: #7b7b7b;
+    color: #fff;
+}
 /*
  * Main content
  */
+
+.btn-primary {
+    background-color: #545454;
+    border-color: #545454;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #7b7b7b;
+    border-color: #545454;
+}
 
 .main {
     padding: 20px;
@@ -94,4 +168,113 @@ body {
 .placeholder img {
     display: inline-block;
     border-radius: 50%;
+}
+
+.meetingAreaItem {
+    width: 100%;
+    border: 1px solid black;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    margin: 5px;
+    padding: 0px 10px;
+}
+
+/* RC Wizard */
+.rc-nav-wizard > li {
+    font-size: 12px;
+}
+
+#summaryForm .form-group, #summaryForm .label {
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+
+/* Home page banner */
+/* Banner */
+@-moz-keyframes reveal-banner { 0% { opacity: 0; } 100% { opacity: 1; } }
+@-webkit-keyframes reveal-banner { 0% { opacity: 0; } 100% { opacity: 1; } }
+@-o-keyframes reveal-banner { 0% { opacity: 0; } 100% { opacity: 1; } }
+@-ms-keyframes reveal-banner { 0% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes reveal-banner { 0% { opacity: 0; } 100% { opacity: 1; } }
+
+#banner {
+    background-attachment: scroll, scroll, scroll, fixed;
+    background-color: #645862;
+    background-image: url("images/banner/light-bl.svg"), url("images/banner/light-br.svg"), url("images/banner/overlay.png"), url("../images/banner/banner.jpg");
+    background-position: bottom left, bottom right, top left, top center;
+    background-repeat: no-repeat, no-repeat, repeat, no-repeat;
+    background-size: 25em, 25em, auto, cover;
+    color: white;
+    cursor: default;
+    padding: 6em 0;
+    text-align: center;
+    /*height: 75vh;*/
+}
+
+#banner .inner {
+    -moz-animation: reveal-banner 1s 0.25s ease-in-out;
+    -webkit-animation: reveal-banner 1s 0.25s ease-in-out;
+    -o-animation: reveal-banner 1s 0.25s ease-in-out;
+    -ms-animation: reveal-banner 1s 0.25s ease-in-out;
+    animation: reveal-banner 1s 0.25s ease-in-out;
+    -moz-animation-fill-mode: forwards;
+    -webkit-animation-fill-mode: forwards;
+    -o-animation-fill-mode: forwards;
+    -ms-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    background: rgba(52, 27, 43, 0.5);
+    color: white;
+    display: inline-block;
+    opacity: 0;
+    padding: 3em;
+    text-align: center;
+}
+
+#banner .inner header {
+    display: inline-block;
+    border-bottom: solid 2px;
+    border-top: solid 2px;
+    margin: 0 0 0 0;
+    padding: 3px 0 3px 0;
+}
+
+#banner .inner header h2 {
+    border-bottom: solid 2px;
+    border-top: solid 2px;
+    font-size: 2.5em;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    margin: 0;
+    padding-left: 0.05em;
+    position: relative;
+    text-transform: uppercase;
+}
+
+#banner .inner p {
+    letter-spacing: 0.1em;
+    margin: 0;
+    text-transform: uppercase;
+    padding: 10px 0 0 0;
+    font-weight: 200;
+}
+
+#banner .inner p a {
+    color: inherit;
+    font-weight: 400;
+    text-decoration: none;
+}
+
+#banner .inner footer {
+    margin: 2em 0 0 0;
+}
+
+footer {
+    background-color: #645862;
+    height: 100%;
+    opacity: .6;
+    font-size: 12px;
+    text-align: center;
+    color: #fff;
+    font-weight: 300;
 }

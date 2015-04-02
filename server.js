@@ -5,12 +5,9 @@
  */
 
 var app = require('./app');
-var debug = require('debug')('NodeTest:server');
+var debug = require('debug')('AsyncMeeting:server');
 var http = require('http');
 var websockets = require('./websockets');
-
-
-
 
 /**
  * Get port from environment and store in Express.

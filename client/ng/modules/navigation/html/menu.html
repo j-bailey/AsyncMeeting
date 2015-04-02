@@ -1,0 +1,5 @@
+<ul class="nav nav-sidebar" ng-controller="navigationCtrl">
+    <li ng-repeat="menuItem in menuItems" ng-class="{ active: isCurrentLocation(menuItem.path) }">
+        <a href="{{menuItem.path}}">{{menuItem.name}}</a>
+    </li>
+</ul>

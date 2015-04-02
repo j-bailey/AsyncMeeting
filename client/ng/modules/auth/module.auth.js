@@ -19,7 +19,8 @@
           userLoggedOut: 'auth:user:loggedOut'
         },
         controllers: {
-            login: 'loginCtrl'
+            login: 'loginCtrl',
+            logout: 'logoutCtrl'
         },
         services: {
             authentication: 'authentication',

@@ -1,57 +1,58 @@
 (function (angular, asm) {
     'use strict';
-
     angular.module(asm.modules.auth.name).factory(asm.modules.auth.services.authentication, [
         '$q',
         '$timeout',
         '$http',
+        '$log',
         'eventbus',
         asm.modules.core.services.userService,
-        function ($q, $timeout, $http, eventbus, userSvc) {
-            var currentUser,
-                login = function (email, password) {
-                    var defer = $q.defer();
+        function ($q, $timeout, $http, $log, eventbus, userSvc) {
+            $log.debug("Instantiating authentication service");
 
-                    userSvc.login(email, password).then(function (response) {
-                        userSvc.token = response.data.token;
-                        console.log('in userSvc login');
-                        $http.defaults.headers.common['X-Auth'] = response.data.token;
+            var currentUser;
 
-                        currentUser = response.data.user;
-                        currentUser.permissions = response.data.permissions;
-                        eventbus.broadcast(asm.modules.auth.events.userLoggedIn, currentUser);
-                        defer.resolve(currentUser);
-                        //userSvc.getUser().then(function (user) {
-                        //    currentUser = user.data;
-                        //    defer.resolve(currentUser);
-                        //    eventbus.broadcast(asm.modules.auth.events.userLoggedIn, currentUser);
-                        //}).catch(function (msg) {
-                        //    if (msg && msg.data) {
-                        //        console.log('get user error = ' + msg)
-                        //    } else {
-                        //        console.log('error getting user')
-                        //    }
-                        //    throw msg;
-                        //});
+            function login(email, password) {
+                var defer = $q.defer();
+                userSvc.emailLogin(email, password).then(function (response) {
+                    userSvc.token = response.data.token;
+                    $log.debug('in userSvc login');
+                    $http.defaults.headers.common['X-Auth'] = response.data.token;
+                    currentUser = response.data.user;
+                    currentUser.permissions = response.data.permissions;
+                    eventbus.broadcast(asm.modules.auth.events.userLoggedIn, currentUser);
+                    defer.resolve(currentUser);
+                }, function (err) {
+                    $log.error("login error = " + err);
+                    defer.reject(err);
+                });
+                return defer.promise;
+            }
 
-                    }, function (val) {
-                        console.log('login error = ' + val.data)
-                    });
-                    return defer.promise;
-                },
-                logout = function () {
-                    // we should only remove the current user.
-                    // routing back to login login page is something we shouldn't
-                    // do here as we are mixing responsibilities if we do.
+            function logout() {
+                var defer = $q.defer();
+                // we should only remove the current user.
+                // routing back to login login page is something we shouldn't
+                // do here as we are mixing responsibilities if we do.
+                $log.debug("in userSvc logout");
+                userSvc.logout().then(function (response) {
+                    $log.debug("User " + currentUser.username + " logout on server successful");
                     userSvc.token = null;
-                    console.log('in userSvc logout');
-                    delete $http.defaults.headers.common['X-Auth'];
                     currentUser = undefined;
+                    delete $http.defaults.headers.common['X-Auth'];
                     eventbus.broadcast(asm.modules.auth.events.userLoggedOut);
-                },
-                getCurrentLoginUser = function () {
-                    return currentUser;
-                };
+                    defer.resolve();
+                }, function (err) {
+                    $log.error("logout error = " + err);
+                    defer.reject(err);
+                });
+                return defer.promise;
+            }
+
+            function getCurrentLoginUser() {
+                $log.debug("Calling getCurrentLoginUser " + (currentUser != undefined ? currentUser.username : "currentUser is undefined"));
+                return currentUser;
+            }
 
             return {
                 login: login,

@@ -10,28 +10,32 @@
      * Provides user services to the server.
      */
     angular.module(asm.modules.core.name).factory(asm.modules.core.services.userService, [
-        '$http',
-        function ($http) {
+        '$http', '$log',
+        function ($http, $log) {
 
             var getUser = function () {
-                    console.log('in get user')
+                    $log.debug('in get user')
                     return $http.get('/api/users')
                 },
                 login = function (username, password) {
-                    console.log('in login')
+                    $log.debug('in login')
                     return $http.post('/login', {username: username, password: password});
                 },
-
+                emailLogin = function (email, password) {
+                    $log.debug('in emailLogin')
+                    return $http.post('/email-login', {email: email, password: password});
+                },
                 register = function (username, password, email) {
-                    console.log('in logout')
                     return $http.post('/signup', {username: username, password: password, email: email});
                 },
                 logout = function () {
-
+                    $log.debug('in logout');
+                    return $http.delete('/logout');
                 };
             return {
                 getUser: getUser,
                 login: login,
+                emailLogin: emailLogin,
                 register: register,
                 logout: logout
             };

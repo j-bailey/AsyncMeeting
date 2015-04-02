@@ -20,6 +20,9 @@ Protractor tests are running slow, but running the developer server speeds them 
 gulp dev 
 ```
 
+# Run server in production mode
+- run `export NODE_ENV=production`
+- run `node server`
 
 # Directories
 
@@ -35,6 +38,16 @@ gulp dev
 -  /assets - is the build area
 -  /node_modules - node library files
 -  /test - tests e2e, Angular unit and Node level testing
+
+# Logging
+Client/AngularJS Logging
+- Use the $log service.  This service can be injected into any controller, service, etc by adding $log to the 
+  list of services.
+- To use, instead of using console.log(), use $log.log(""), $log.debug(""), $log.info(""), $log.error(""), etc.
+Server/NodeJS Logging
+- Use the winston logger.
+- In each JS file you need logging just do `var logger = require('winston')`
+- Call the logger.  Ex. logger.debug(""), logger.error(""), logger.info(""), logger.log(""), etc.
 
 # Bugs
 
