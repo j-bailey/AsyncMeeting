@@ -9,6 +9,6 @@
     "font-awesome": "~4.3.0",
     "underscore": "~1.8.2",
     "twitter-bootstrap-wizard": "81e96eee183a3716522a14469a8ab377f88679b5",
-    "angularjs-utilities": "https://kglee79@bitbucket.org/productivegains/angularjs-utilities.git#0.0.10"
+    "angularjs-utilities": "https://bitbucket.org/productivegains/angularjs-utilities.git#0.0.10"
   }
 }
