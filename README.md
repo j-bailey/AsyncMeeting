@@ -1,16 +1,11 @@
 
 # Set up
-- run `npm install`
-- run `bower install`
-- run `./node_modules/.bin/webdriver-manager update`
-- run `gulp css`
 - install Mongodb
 - install Redis
+- run `npm install`
 
 # Run server for development
-- start redis server
-- start mongodb
-- run `gulp dev`
+run `npm run-script dev`
 
 # Run tests
 - To use the test configuration change the env to test.  This will do things like use the test.json configuration file
@@ -20,15 +15,15 @@
   - These tests use supertest which require the express app configured the way it would be if it were actually running.
     So this test uses test/server/support/api.js to wrap the app in a supertest object which is then use to create
     requests.
-- e2e tests only `./node_modules/.bin/protractor`
+- e2e tests only `npm run-script e2e`
 Protractor tests are running slow, but running the developer server speeds them up.  Run the command before running the e2e tests.
-```shell
-gulp dev 
+```
+npm dev
 ```
 
 # Run server in production mode
 - run `export NODE_ENV=production`
-- run `node server`
+- run `npm start`
 
 # Directories
 

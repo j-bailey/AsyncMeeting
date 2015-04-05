@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "test": "./node_modules/.bin/jshint . && karma start --single-run && ./node_modules/.bin/mocha && ./node_modules/.bin/protractor",
-    "postinstall": "bower install && ./node_modules/.bin/webdriver-manager update",
-    "dev": ""
+    "postinstall": "bower install && ./node_modules/.bin/webdriver-manager update && node ./support/npm/post-install.js",
+    "dev": "node ./support/npm/launch-dev.js",
+    "e2e": "./node_modules/.bin/protractor"
   },
   "dependencies": {
     "acl": "^0.4.7",
@@ -53,6 +54,8 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-sinon-chai": "^0.3.0",
     "mocha": "^2.2.1",
+    "node-fs": "^0.1.7",
+    "terminate": "^1.0.4",
     "protractor": "^2.0.0",
     "supertest": "^0.15.0"
   }
