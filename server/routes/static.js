@@ -15,6 +15,7 @@ router.post('/login',
         // `req.user` contains the authenticated user.
         var token = jwt.encode({username: req.user.username}, config.secret);
         User.findPublicUserById(req.user._id).then(function(user) {
+
             res.json({user:user, token: token, permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']});  // TODO test permissions need to be removed after permissions are fixed
         });
     }

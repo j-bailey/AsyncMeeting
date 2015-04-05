@@ -9,8 +9,8 @@ var dbVersion = '0.0.1';
 var dbUrl = cfg.get("database.url");
 
 mongoose.connect(dbUrl, function (err, db) {
-    logger.info('mongodb connected to ' + dbUrl);
-    //acl.init(db);
+    logger.info('Mongoose is connected to ' + dbUrl);
+    acl.init();
 });
 
 module.exports = mongoose;
