@@ -1,3 +1,5 @@
+tmp/
+
 # Build target area
 assets
 environment.js

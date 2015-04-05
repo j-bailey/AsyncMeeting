@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "./node_modules/.bin/jshint . && karma start --single-run && ./node_modules/.bin/mocha && ./node_modules/.bin/protractor"
+    "test": "./node_modules/.bin/jshint . && karma start --single-run && ./node_modules/.bin/mocha && ./node_modules/.bin/protractor",
+    "postinstall": "bower install && ./node_modules/.bin/webdriver-manager update",
+    "dev": ""
   },
   "dependencies": {
     "acl": "^0.4.7",
