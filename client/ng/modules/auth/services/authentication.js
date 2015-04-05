@@ -50,7 +50,7 @@
             }
 
             function getCurrentLoginUser() {
-                $log.debug("Calling getCurrentLoginUser " + (currentUser != undefined ? currentUser.username : "currentUser is undefined"));
+                $log.debug("Calling getCurrentLoginUser " + (currentUser !== undefined ? currentUser.username : "currentUser is undefined"));
                 return currentUser;
             }
 

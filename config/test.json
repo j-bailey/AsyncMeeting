@@ -1,6 +1,6 @@
 {
   "database": {
-    "url": "mongodb://localhost/asyncmeeting_dev"
+    "url": "mongodb://localhost/asyncmeeting_test"
   },
   "session": {
     "secret": "b1bce56042e44bb7c491e03d4142b652",

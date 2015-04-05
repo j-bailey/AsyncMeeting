@@ -21,7 +21,7 @@
                 $scope.currentMeetingArea = null;
 
                 // Retrieve the current meeting area data.
-                if ( $scope.currentMeetingAreaId != null ) {
+                if ( $scope.currentMeetingAreaId ) {
                     meetingAreaService.getMeetingArea($scope.currentMeetingAreaId).then(function(meetingArea) {
                         $scope.currentMeetingArea = meetingArea.data;
 
@@ -31,8 +31,7 @@
                         // Reset the form data.
                         $scope.resetForms($scope.currentMeetingArea);
                     }, function (err) {
-                        $scope.errorMsg = "Encountered error retrieving meeting area with id "
-                                            + $scope.currentMeetingAreaId;
+                        $scope.errorMsg = "Encountered error retrieving meeting area with id " + $scope.currentMeetingAreaId;
                     });
                 }
                 else {
@@ -43,8 +42,7 @@
                 }
             }, function(err) {
                 $scope.meetingAreas = null;
-                $scope.errorMsg = "Encountered error retrieving meeting areas for meeting id'"
-                                      + $scope.currentMeetingAreaId + "'.";
+                $scope.errorMsg = "Encountered error retrieving meeting areas for meeting id'" + $scope.currentMeetingAreaId + "'.";
             });
 
             // Initialize create new meeting area form values.
@@ -95,8 +93,7 @@
                             $scope.meetingAreas = meetingAreas.data;
                         }, function(err) {
                             $scope.meetingAreas = null;
-                            $scope.errorMsg = "Encountered error retrieving meeting areas for '"
-                                                    + createdMeetingArea.data.title + "'.";
+                            $scope.errorMsg = "Encountered error retrieving meeting areas for '" + createdMeetingArea.data.title + "'.";
                         });
                     },
                     function(err) {
