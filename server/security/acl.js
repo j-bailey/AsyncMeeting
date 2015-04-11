@@ -19,7 +19,7 @@ function init() {
 }
 
 function getAcl() {
-    if (acl == null) {
+    if (acl === null) {
         init();
     }
     return acl;
