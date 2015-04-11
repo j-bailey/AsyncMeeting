@@ -1,7 +1,6 @@
 var fs = require('fs'),
     redisServer = require('./redis-server'),
     mongoServer = require('./mongo-server'),
-    terminate = require('terminate'),
     spawn = require('child_process').spawnSync;
 
 var calledBeforeExit = 0,
