@@ -38,7 +38,7 @@
                 },
                 updateMeetingArea = function (meetingAreaId, title, description) {
                     //$log.debug('in updateMeetingArea');
-                    return $http.put('/api/meetingarea/' + meetingAreaId, {});
+                    return $http.put('/api/meetingarea/' + meetingAreaId, {title: title, description: description});
                 };
             return {
                 getMeetingArea: getMeetingArea,
