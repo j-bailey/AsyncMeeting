@@ -1,23 +1,12 @@
 exports.config = {
+    baseUrl: 'http://localhost:3001',
     framework: 'cucumber',
     cucumberOpts: {
         format: 'pretty'
-//        tags: '@dev',
-//        require: 'test/e2e/features/step_definitions/steps.js'
     },
     specs: [
         'test/e2e/features/**/*.feature'
     ],
-
-
-
-    //framework: 'mocha',
-    //specs: [
-    //    'test/e2e/**/*.spec.js'
-    //],
-    //mochaOpts: {
-    //    enableTimeouts: false
-    //},
 
     plugins: [{
         path: 'node_modules/protractor/plugins/timeline',
@@ -32,18 +21,8 @@ exports.config = {
     }],
 
     onPrepare: function () {
-        process.env.PORT = 3001
+        process.env.PORT = 3001;
         require('./server')
     }
-
-    //capabilities: {
-    //    'browserName' : 'chrome'
-    //}
-    //
-    //multiplecapabilities: [{
-    //    'browserName' : 'firefox'
-    //}, {
-    //    'browserName' : 'chrome'
-    //}]
-}
+};
 

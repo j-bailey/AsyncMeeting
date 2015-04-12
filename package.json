@@ -58,6 +58,7 @@
     "mocha": "^2.2.1",
     "node-fs": "^0.1.7",
     "protractor": "^2.0.0",
+    "selenium-webdriver": "^2.45.1",
     "supertest": "^0.15.0"
   }
 }
