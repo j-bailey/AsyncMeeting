@@ -1,7 +1,7 @@
 module.exports = function (config) {
     config.set({
         basePath: '',
-        frameworks: ['mocha', 'chai', 'sinon-chai'],
+        frameworks: ['mocha', 'chai', 'sinon', 'sinon-chai'],
         files: [
             'assets/underscore/underscore.js',
             'assets/jquery/dist/jquery.js',
