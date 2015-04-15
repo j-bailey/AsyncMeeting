@@ -54,11 +54,13 @@
     "karma-chai": "^0.1.0",
     "karma-mocha": "^0.1.10",
     "karma-phantomjs-launcher": "^0.1.4",
+    "karma-sinon": "^1.0.4",
     "karma-sinon-chai": "^0.3.0",
     "mocha": "^2.2.1",
     "node-fs": "^0.1.7",
     "protractor": "^2.0.0",
     "selenium-webdriver": "^2.45.1",
+    "sinon": "^1.14.1",
     "supertest": "^0.15.0"
   }
 }

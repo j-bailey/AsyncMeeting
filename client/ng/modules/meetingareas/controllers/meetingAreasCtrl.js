@@ -47,24 +47,28 @@
 
             // Initialize create new meeting area form values.
             $scope.resetForms = function(currentMeetingArea) {
-                // Reset input fields
-                $scope.basicInfoForm.$setPristine();
-                $scope.adminsForm.$setPristine();
-                $scope.inviteesForm.$setPristine();
-                $scope.summaryForm.$setPristine();
+                if ( $('#rootwizard').data('bootstrapWizard') ) {
+                    // Reset input fields
+                    $scope.basicInfoForm.$setPristine();
+                    $scope.adminsForm.$setPristine();
+                    $scope.inviteesForm.$setPristine();
+                    $scope.summaryForm.$setPristine();
 
-                $('#rootwizard').data('bootstrapWizard').resetWizard();
-                $('#rootwizard').data('bootstrapWizard').show(0);
-                console.log($('#rootwizard').data('bootstrapWizard'));
-                //console.log("After reset " + $('#rootwizard').data('bootstrapWizard').currentIndex());
+                    $('#rootwizard').data('bootstrapWizard').resetWizard();
+                    $('#rootwizard').data('bootstrapWizard').show(0);
+                    //console.log($('#rootwizard').data('bootstrapWizard'));
+                    //console.log("After reset " + $('#rootwizard').data('bootstrapWizard').currentIndex());
 
-                // Fill in empty form with pointer to parent.
-                $scope.newMeetingArea =  {title: "",
-                    description: "",
-                    administrators: "",
-                    invitees: "",
-                    accessRestriction: "",
-                    parentMeetingArea: currentMeetingArea}
+                    // Fill in empty form with pointer to parent.
+                    $scope.newMeetingArea = {
+                        title: "",
+                        description: "",
+                        administrators: "",
+                        invitees: "",
+                        accessRestriction: "",
+                        parentMeetingArea: currentMeetingArea
+                    }
+                }
             };
 
             $scope.cancelForms = function (rc) {

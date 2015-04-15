@@ -11,4 +11,7 @@ router.post('/', handlers.createNewMeetingArea);
 // TODO: add authentication
 router.delete('/:meetingAreaId', handlers.deleteMeetingArea);
 
+// TODO: add authentication
+router.put('/:meetingAreaId', handlers.updateMeetingArea);
+
 module.exports = router;

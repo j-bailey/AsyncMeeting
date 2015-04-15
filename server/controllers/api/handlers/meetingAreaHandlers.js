@@ -31,6 +31,24 @@ var createNewMeetingArea = function(req, res, next) {
     });
 };
 
+var updateMeetingArea = function(req, res, next) {
+    MeetingArea.findOne({_id: req.params.meetingAreaId}, function(err, meetingArea) {
+        if (err) return next(err);
+
+        meetingArea.title = req.params.title;
+        meetingArea.description = req.params.description;
+
+        meetingArea.save(function(err, savedMeetingArea) {
+            if (err) {
+                logger.error("Error updating meeting area: " + err.message);
+                return next(err);
+            }
+
+            res.status(200);
+        });
+    });
+};
+
 var deleteMeetingArea = function(req, res, next) {
     MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function(err, deletedMeetingArea) {
         if (err) return next(err);
@@ -42,5 +60,6 @@ var deleteMeetingArea = function(req, res, next) {
 module.exports = {
     getMeetingArea: getMeetingArea,
     createNewMeetingArea: createNewMeetingArea,
+    updateMeetingArea: updateMeetingArea,
     deleteMeetingArea: deleteMeetingArea
 };
