@@ -2,7 +2,8 @@ var LocalStrategy = require('passport-local').Strategy;
 var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
 var logger = require('winston');
-var acl = require('../security/acl');
+var acl = require('../security/acl'),
+    freeTier = require('../security/resources/free-tier-role');
 
 module.exports = function(passport){
     passport.use('signup', new LocalStrategy({
@@ -50,7 +51,7 @@ module.exports = function(passport){
                                         return done(null, false, {message: "We're sorry, we could not create your account at this time!"});
                                     }
                                     logger.debug('User Registration successful');
-                                    acl.getAcl().addUserRoles(savedUser.username, acl.GENERAL_USER_ROLE);
+                                    acl.getAcl().addUserRoles(savedUser.username, freeTier.object.key);
                                     return done(null, savedUser);
                                 });
                             });

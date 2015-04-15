@@ -5,9 +5,9 @@ var versionInfo = require('./plugins/versionInfo');
 var Q = require('q');
 
 var schema = new mongoose.Schema({
-    username: {type: String, required: true},
+    username: {type: String, required: false},
     password: {type: String, required: true},
-    email: String,
+    email: {type: String, required: true},
     firstName: String,
     lastName: String,
     permissions: [{type: mongoose.Schema.Types.ObjectId, ref: 'Permission'}],
