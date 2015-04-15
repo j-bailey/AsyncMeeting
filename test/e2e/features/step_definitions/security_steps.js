@@ -51,21 +51,15 @@ var steps = function () {
     this.Given(/^I have an invalid account$/, function (next) {
         db.connection.db.dropCollection('users', function (err, result) {
             //if (err) next(err);
-            var user = new User({username: email + 1});
-            bcrypt.hash(pass, 10, function (err, hash) {
+            var user = new User({email: email + 1, username: 'user1'});
+            user.password = bcrypt.hashSync(pass, bcrypt.genSaltSync(10), null);
+            user.save(function (err) {
                 if (err) {
                     return next(err)
                 }
-                user.password = hash;
-
-                user.save(function (err) {
-                    if (err) {
-                        return next(err)
-                    }
-                    next();
-                })
+                //acl.getAcl().addUserRoles(user.username, freeTierRole.key);
+                next();
             })
-
         });
     });
 
