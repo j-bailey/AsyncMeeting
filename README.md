@@ -5,9 +5,11 @@
 - run `npm install`
 
 # Run server for development
-run `npm run-script dev`
+run `npm run dev`
 
-# Run tests
+# Tests
+
+## Running Tests
 **NOTE:** Grunt tasks starts all external dependencies, so no need to start you own Redis and MongoDB server.
 
 - To use the test configuration change the env to test.  This will do things like use the test.json configuration file
@@ -18,6 +20,19 @@ run `npm run-script dev`
     So this test uses test/server/support/api.js to wrap the app in a supertest object which is then use to create
     requests.
 - e2e tests only `grunt e2e`
+
+## Developing e2e Tests
+
+When developing e2e tests, use the base commands for quicker development.  
+
+1. `NODE_ENV=test`
+2. `export PORT=3001`
+3. `grunt start-mongo-server`
+4. `grunt start-redis-server`
+5. `gulp dev`
+6. In another terminal, run `grunt protractor:chrome` or `grunt protractor:firefox` to run tests, after making changes to the e2e test suite.  
+
+
 
 # Run server in production mode
 - run `export NODE_ENV=production`

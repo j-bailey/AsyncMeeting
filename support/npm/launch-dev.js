@@ -3,6 +3,8 @@ var fs = require('fs'),
     mongoServer = require('./mongo-server'),
     spawn = require('child_process').spawnSync;
 
+// TODO move all NPM JS files to Grunt
+
 var calledBeforeExit = 0,
     serverList = [redisServer, mongoServer];
 
