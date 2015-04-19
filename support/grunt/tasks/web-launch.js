@@ -4,7 +4,7 @@
 
 module.exports = function (grunt) {
 
-    grunt.registerTask('web-launch', function (port, cmd, arguments, pause) {
+    grunt.registerTask('web-launch', function (port, cmd, cmdArgs, pause) {
         var webServer;
         var fs = require('fs'),
             nodeFs = require('node-fs'),
@@ -18,11 +18,11 @@ module.exports = function (grunt) {
             nodeFs.mkdirSync(logPath, 511, true);
         }
 
-        console.log('--' + arguments + '--')
+        console.log('--' + cmdArgs + '--')
         var args = ['support/grunt/web-launch-server', port, cmd];
-        if (arguments && typeof arguments == 'string' && arguments.length > 0) {
-            arguments = JSON.parse(arguments.replace(/'/g, '"').replace(/\|/g, ':'));
-            args.push.apply(args, arguments);
+        if (cmdArgs && typeof cmdArgs == 'string' && cmdArgs.length > 0) {
+            cmdArgs = JSON.parse(cmdArgs.replace(/'/g, '"').replace(/\|/g, ':'));
+            args.push.apply(args, cmdArgs);
         }
         console.log('### 1')
         console.log('args = ' + JSON.stringify(args))
