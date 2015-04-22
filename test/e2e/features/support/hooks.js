@@ -34,8 +34,6 @@ var afterScenario = function(event, callback) {
         if (err) console.log(err);
         callback();
     })
-
-    callback();
 };
 
 var beforeStep = function(event, callback) {

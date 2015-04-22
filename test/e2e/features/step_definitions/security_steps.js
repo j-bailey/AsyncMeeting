@@ -102,26 +102,20 @@ var steps = function () {
 
     this.Given(/^I submit for registration$/, function (next) {
         var self = this;
-        element(by.css('form .btn')).click().then(function () {
-
-            self.takeScreenshot('After', 'afterClick_screenshot.png', '').then(function (err) {
-                if (err) console.log(err);
-                next();
-            })
-        });
+        element(by.css('form .btn')).click().then(next);
     });
 
     this.Then(/^The screenshot will look like invalid registration reference image for invalid field (.*) with value (.*)$/, function (field, value, next) {
         // Write code here that turns the phrase above into concrete actions
-        next();
+        next().pending();
     });
 
     this.Given(/^I provide my email (.*) for registration$/, function (email, next) {
-        element(by.model('registerModel.email')).sendKeys(email).then(next)
+        element(by.model('registerModel.email')).sendKeys(email).then(next);
     });
 
     this.Given(/^I provide my password (.*) for registration$/, function (password, next) {
-        element(by.model('registerModel.password')).sendKeys(password).then(next)
+        element(by.model('registerModel.password')).sendKeys(password).then(next);
     });
 
     this.Given(/^I reconfirm my password (.*) for registration$/, function (password, next) {
@@ -134,6 +128,21 @@ var steps = function () {
 
     this.When(/^I provide my username (.*) for registration$/, function (username, next) {
         element(by.model('registerModel.username')).sendKeys(username).then(next);
+    });
+
+    this.Then(/^I see password strength of (.*)$/, function (strength, next) {
+        // Write code here that turns the phrase above into concrete actions
+        next.pending();
+    });
+
+    this.Given(/^I see no message of being an unacceptable password$/, function (next) {
+        // Write code here that turns the phrase above into concrete actions
+        next.pending();
+    });
+
+    this.Then(/^I see a message of being an unacceptable password$/, function (next) {
+        // Write code here that turns the phrase above into concrete actions
+        next.pending();
     });
 
 };

@@ -3,6 +3,7 @@ Feature: Register for an account
   I want to register for an account,
   so I can use AsyncMeeting
 
+
   Scenario Outline: Register with valid credentials
     Given System does not have any registration credentials
     And I am at registration point
