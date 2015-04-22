@@ -25,12 +25,13 @@ run `npm run dev`
 
 When developing e2e tests, use the base commands for quicker development.  
 
-1. `NODE_ENV=test`
+1. `export NODE_ENV=test`
 2. `export PORT=3001`
-3. `grunt start-mongo-server`
-4. `grunt start-redis-server`
-5. `gulp dev`
+3. `npm dev`
 6. In another terminal, run `grunt protractor:chrome` or `grunt protractor:firefox` to run tests, after making changes to the e2e test suite.  
+
+**NOTE:** to run scenarios with specific tags add the following option `--cucumberOpts={\"tags\":\"@WIP\"}`.  This example
+runs all the scenarios with the WIP tag.  
 
 
 
