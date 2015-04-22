@@ -30,6 +30,11 @@ var beforeScenario = function(event, callback) {
 };
 
 var afterScenario = function(event, callback) {
+    takeScreenshot('After', 'afterScenario_screenshot.png', '').then(function(err){
+        if (err) console.log(err);
+        callback();
+    })
+
     callback();
 };
 
