@@ -3,7 +3,7 @@ Feature: Register for an account
   I want to register for an account,
   so I can use AsyncMeeting
 
-
+# TODO need to add an account type to the process
   Scenario Outline: Register with valid credentials
     Given System does not have any registration credentials
     And I am at registration point
