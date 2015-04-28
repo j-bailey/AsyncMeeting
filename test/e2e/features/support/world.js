@@ -6,6 +6,7 @@ module.exports = function() {
         cfg = require('config'),
         dbUrl = cfg.get("database.url"),
         fs = require('fs'),
+        imageUtils = require('./image-utils'),
         nodeFs = require('node-fs'),
         path = require('path'),
         promise = require('selenium-webdriver').promise,
@@ -35,6 +36,7 @@ module.exports = function() {
 
     this.World = function World(callback) {
         this.takeScreenshot = takeScreenshot;
+        this.imageUtils = imageUtils;
         mongodb.connect(dbUrl, function (error, db) {
             if (error) {
                 throw error;
@@ -44,4 +46,4 @@ module.exports = function() {
         });
 
     };
-}
+};

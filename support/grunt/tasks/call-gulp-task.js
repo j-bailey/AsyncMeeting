@@ -13,8 +13,8 @@ module.exports = function (grunt) {
 
         var spawn = require('child_process').spawn;
 
-        console.log('task ' + task.replace(/\|/g, ':'))
-        console.log('readyText = ' + readyText)
+        console.log('task ' + task.replace(/\|/g, ':'));
+        console.log('readyText = ' + readyText);
         gulpTask = spawn('gulp', [task.replace(/\|/g, ':')]);
 
         gulpTask.on('close', function (code, signal) {
@@ -34,9 +34,9 @@ module.exports = function (grunt) {
         gulpTask.stdout.on('data', function (data) {
             console.log('Gulp- ' + task + ' stdout: ' + data);
             if (readyText && !isRunning){
-                console.log('#####  ' + (new RegExp(readyText)).exec(data))
+                console.log('#####  ' + (new RegExp(readyText)).exec(data));
                 if((new RegExp(readyText)).exec(data)){
-                    console.log('#### Heree')
+                    console.log('#### Heree');
                     isRunning = true;
                     done();
                 }

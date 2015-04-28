@@ -13,7 +13,7 @@ module.exports = function(passport){
                 User.findOne({ 'username' : username },
                     function(err, user) {
 // In case of any error, return using the done method
-                        console.log('found user = ' + JSON.stringify(user))
+                        console.log('found user = ' + JSON.stringify(user));
                         if (err)
                             return done(err);
 // Username does not exist, log the error and redirect back
@@ -37,4 +37,4 @@ module.exports = function(passport){
     var isValidPassword = function(user, password){
         return bCrypt.compareSync(password, user.password);
     }
-}
+};

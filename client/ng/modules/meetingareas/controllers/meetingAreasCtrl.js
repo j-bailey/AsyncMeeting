@@ -76,7 +76,7 @@
                 rc.adminsForm.reset();
                 rc.inviteesForm.reset();
                 rc.summaryForm.reset();
-            }
+            };
 
 
             // Create a new meeting

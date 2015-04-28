@@ -30,12 +30,20 @@ var steps = function () {
 
     this.Given(/^I am logged out of the system$/, function (next) {
         browser.get('http://localhost:3001');  // click 'login'
+
         //expect(browser.getCurrentUrl()).to.eventually.be('http://localhost:3001');
         expect(element(by.css('nav .login')).isPresent()).to.eventually.be.true.and.notify(next);
     });
 
     this.Given(/^I request to authenticate myself$/, function (next) {
-        element(by.css('nav .login')).click().then(next); // fill out and submit registration form ' +
+        //this.imageUtils.createReferenceImageForElement(browser.driver, element(by.css('nav .login')), 'security', 'login').then(
+        this.imageUtils.compareReferenceImageWithElementScreenShot(element(by.css('nav .login')), browser.driver, 'security', 'login', 0).then(
+            function (compareValue) {
+                console.log('compare value = ' + compareValue);
+                element(by.css('nav .login')).click().then(next);
+            }
+        );
+        //element(by.css('nav .login')).click().then(next); // fill out and submit registration form ' +
     });
 
     this.When(/^I provide my credentials of username (.*), email (.*), and password (.*)$/, function (username, email, password, next) {

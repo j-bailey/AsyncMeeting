@@ -1,8 +1,8 @@
-var expect = require('chai').expect
-var api = require('../../support/api')
-var Post = require('../../../../server/models/post')
-var api = require('../../support/api')
-var user = require('../../support/user')
+var expect = require('chai').expect;
+var api = require('../../support/api');
+var Post = require('../../../../server/models/post');
+var api = require('../../support/api');
+var user = require('../../support/user');
 
 //describe('controllers.api.posts', function () {
 //    beforeEach(function (done) {

@@ -10,10 +10,10 @@ var fs = require('fs'),
 
 var args = process.argv.slice(2);
 var port = args[0];
-var cmd = args[1]
+var cmd = args[1];
 var cmdArgs = args.slice(2);
 
-console.log('cmdArgs = ' + cmdArgs)
+console.log('cmdArgs = ' + cmdArgs);
 childProcess = spawn(cmd, cmdArgs, {
     detached: false,
     stdio: 'inherit',
@@ -29,10 +29,10 @@ var sys = require("sys"),
 
 var server = my_http.createServer(function (request, response) {
     var myPath = url.parse(request.url).pathname;
-    console.log('New request ' + myPath)
+    console.log('New request ' + myPath);
     if (myPath && myPath === '/shutdown') {
-        console.log(' ---- Here')
-        console.log('Connected')
+        console.log(' ---- Here');
+        console.log('Connected');
         childProcess.on('exit', function (code, signal) {
             console.log('child process terminated due to receipt of code ' + code);
             response.statusCode = 200;
@@ -40,7 +40,7 @@ var server = my_http.createServer(function (request, response) {
                 process.exit(0);
             });
         });
-        console.log('Before kill')
+        console.log('Before kill');
 
         childProcess.kill();
     }

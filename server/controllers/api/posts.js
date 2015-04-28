@@ -1,7 +1,7 @@
 var Post = require('../../../server/models/post');
 var express = require('express');
 var router = express.Router();
-var websockets = require('../../../websockets')
+var websockets = require('../../../websockets');
 var pubsub = require('../../../pubsub');
 var Q = require('q');
 var logger = require('winston');
@@ -9,8 +9,8 @@ var logger = require('winston');
 var sub = false;
 
 router.post('/', function (req, res, next) {
-    var post = new Post({body: req.body.body})
-    post.username = req.auth.username
+    var post = new Post({body: req.body.body});
+    post.username = req.auth.username;
     post.save(function (err, post) {
         if (err) {
             return next(err)
@@ -24,7 +24,7 @@ router.post('/', function (req, res, next) {
 
         res.json(201, post)
     })
-})
+});
 
 router.get('/', function (req, res, next) {
     Post.find().sort('-date').exec(function (err, posts) {
@@ -33,9 +33,9 @@ router.get('/', function (req, res, next) {
         }
         if (!sub) {
             pubsub.subscribe('new_post', function (post) {
-                logger.debug("Posted")
+                logger.debug("Posted");
                 websockets.broadcast('new_post', post)
-            })
+            });
             sub = true;
         }
 
