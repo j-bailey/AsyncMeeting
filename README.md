@@ -27,7 +27,7 @@ When developing e2e tests, use the base commands for quicker development.
 
 1. `export NODE_ENV=test`
 2. `export PORT=3001`
-3. `npm dev`
+3. `npm run dev`
 6. In another terminal, run `grunt protractor:chrome` or `grunt protractor:firefox` to run tests, after making changes to the e2e test suite.  
 
 **NOTE:** to run scenarios with specific tags add the following option `--cucumberOpts={\"tags\":\"@WIP\"}`.  This example
