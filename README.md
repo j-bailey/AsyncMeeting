@@ -7,7 +7,7 @@
 # Run server for development
 run `npm run dev`
 
-# Tests
+# Testing
 
 ## Running Tests
 **NOTE:** Grunt tasks starts all external dependencies, so no need to start you own Redis and MongoDB server.
@@ -21,7 +21,9 @@ run `npm run dev`
     requests.
 - e2e tests only `grunt e2e`
 
-## Developing e2e Tests
+## e2e Testing
+
+### Developing e2e Tests
 
 When developing e2e tests, use the base commands for quicker development.  
 
@@ -33,7 +35,28 @@ When developing e2e tests, use the base commands for quicker development.
 **NOTE:** to run scenarios with specific tags add the following option `--cucumberOpts={\"tags\":\"@WIP\"}`.  This example
 runs all the scenarios with the WIP tag.  
 
+### Screen Shot Comparison of Screen Elements
 
+e2e have a library available to do screen shot comparison of page elements.  This allows us to ensure the layout of the 
+software does not break across various platforms and is not broken in the future.  This tool depends on ImageMagick being 
+available, which provides the image comparison capability.  
+
+For these types of tests to run, you first need to capture the images using a specific function in the image library.  
+When you write a step requiring a screen shot comparison use the function named "createReferenceImageForElement" in your
+step definition and run it on all the browsers available to the test suite.  The process requires the images to be 
+captured for a specific type of browser on a specific type of system.  There is such a variance in browsers and systems, 
+ImageMagick will pick up the difference, so the function takes this information into account and stores them in a folder
+under test.  In addition, you can provide a function and sub-function name as a means to organize the reference images 
+ and use that as a form of lookup during comparisons.  Therefore, you need to keep your function and sub-function combination
+ unique. 
+ 
+**NOTE:** Tag all screen shot comparison scenarios with the `@element_comparison`, as these are not run by default.
+**NOTE:** Best to add element comparison after the UI is settled, not in the beginning.
+
+Once you create all the pictures you replace the create function with the comparison function, "compareReferenceImageWithElementScreenShot".
+This takes the Selenium element along with a few other arguments and creates the screen shot of the element and compares 
+it with the reference image.  The comparison will return a value, zero means there is no difference between the screen shot
+and the reference image.  Any value above zero is a measure the difference between the two images.
 
 # Run server in production mode
 - run `export NODE_ENV=production`

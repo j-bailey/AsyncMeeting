@@ -22,7 +22,7 @@ Feature: Login to my account
       | user6                              | user6                              | user6@user.com                              | Pass#123                                   | Shortetst allowed password |
 
 #    TODO Expand this negative test
-  @negative_test @WIP
+  @negative_test @WIP @element_comparison
   Scenario: Deny access for an invalid account
     Given I have an invalid account
     And I am logged out of the system

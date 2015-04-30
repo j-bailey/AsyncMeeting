@@ -21,10 +21,10 @@ module.exports = function(grunt){
         if (runInjectionProxy) {
             grunt.task.run(['run-injection-proxy']);
             grunt.config.set('cucumbertags', '@proxy_test');
+            grunt.task.run(['protractor:' + browser]);
+        } else {
+            grunt.task.run(['protractor:' + browser + 'NoTags']);
         }
-
-
-        grunt.task.run(['protractor:' + browser]);
 
         grunt.task.run(['kill-redis-server', 'kill-mongo-server', 'web-launch-kill:63636']);
     });

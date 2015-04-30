@@ -51,6 +51,35 @@ module.exports = {
                 }
             }
         }
+    },
+    chromeNoTags: {
+        options: {
+            args: {
+                browser: 'chrome'
+            }
+        }
+    },
+    firefoxNoTags: {
+        options: {
+            args: {
+                browser: 'firefox'
+            }
+        }
+    },
+    ieNoTags: {
+        options: {
+            args: {
+                browser: 'ie',
+                seleniumAddress: 'http://127.0.0.1:4444/wd/hub'
+            }
+        }
+    },
+    phantomjsNoTags: {
+        options: {
+            args: {
+                browser: 'phantomjs',
+                seleniumAddress: 'http://127.0.0.1:<%= seleniumAddress %>/wd/hub'
+            }
+        }
     }
-
 };
