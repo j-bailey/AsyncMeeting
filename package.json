@@ -62,6 +62,7 @@
     "karma-sinon-chai": "^0.3.0",
     "mocha": "^2.2.1",
     "node-fs": "^0.1.7",
+    "pg-testing-utils": "git+ssh://git@bitbucket.org:productivegains/pg-testing-utils.git#develop",
     "selenium-webdriver": "2.45.1",
     "sinon": "^1.14.1",
     "supertest": "^0.15.0"

@@ -27,12 +27,22 @@ var steps = function () {
         });
     });
 
+    this.Given(/^I am logged into the sysyetm$/, function (callback) {
+        // Write code here that turns the phrase above into concrete actions
+        callback.pending();
+    });
+
 
     this.Given(/^I am logged out of the system$/, function (next) {
         browser.get('http://localhost:3001');  // click 'login'
 
         //expect(browser.getCurrentUrl()).to.eventually.be('http://localhost:3001');
         expect(element(by.css('nav .login')).isPresent()).to.eventually.be.true.and.notify(next);
+    });
+
+    this.When(/^I logout$/, function (callback) {
+        // Write code here that turns the phrase above into concrete actions
+        callback.pending();
     });
 
     this.Given(/^I request to authenticate myself$/, function (next) {
@@ -143,14 +153,24 @@ var steps = function () {
         next.pending();
     });
 
-    this.Given(/^I see no message of being an unacceptable password$/, function (next) {
+    this.Given(/^I see a message of being an unacceptable password$/, function (next) {
         // Write code here that turns the phrase above into concrete actions
         next.pending();
     });
 
-    this.Then(/^I see a message of being an unacceptable password$/, function (next) {
+    this.Given(/^I see no message of being an unacceptable password$/, function (callback) {
         // Write code here that turns the phrase above into concrete actions
-        next.pending();
+        callback.pending();
+    });
+
+    this.Then(/^I see logout message stating "([^"]*)"$/, function (arg1, callback) {
+        // Write code here that turns the phrase above into concrete actions
+        callback.pending();
+    });
+
+    this.Then(/^I see a link to log back in$/, function (callback) {
+        // Write code here that turns the phrase above into concrete actions
+        callback.pending();
     });
 
 };

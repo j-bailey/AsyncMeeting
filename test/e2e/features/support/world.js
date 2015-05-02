@@ -6,11 +6,16 @@ module.exports = function() {
         cfg = require('config'),
         dbUrl = cfg.get("database.url"),
         fs = require('fs'),
-        imageUtils = require('./image-utils'),
         nodeFs = require('node-fs'),
         path = require('path'),
         promise = require('selenium-webdriver').promise,
         self = this;
+
+
+    var testFolder = path.normalize(path.join(__dirname, '..', '..')),
+        tmpFolder = path.normalize(path.join(__dirname, '..', '..', '..', 'tmp')),
+        testingUtils = require('pg-testing-utils'),
+        imageUtils = testingUtils.imageUtils(testFolder, tmpFolder);
 
     console.log('[INFO] Using base URL = ' + browser.baseUrl);
 
