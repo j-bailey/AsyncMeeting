@@ -18,14 +18,14 @@ module.exports = function (grunt) {
             nodeFs.mkdirSync(logPath, 511, true);
         }
 
-        console.log('--' + cmdArgs + '--')
+        console.log('--' + cmdArgs + '--');
         var args = ['support/grunt/web-launch-server', port, cmd];
         if (cmdArgs && typeof cmdArgs == 'string' && cmdArgs.length > 0) {
             cmdArgs = JSON.parse(cmdArgs.replace(/'/g, '"').replace(/\|/g, ':'));
             args.push.apply(args, cmdArgs);
         }
-        console.log('### 1')
-        console.log('args = ' + JSON.stringify(args))
+        console.log('### 1');
+        console.log('args = ' + JSON.stringify(args));
         webServer = spawn('node', args, {
             detached: true,
             stdio: ['ignore', out, err],
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
 
             setTimeout(function () {
                 done();
-            }, pause * 1000)
+            }, pause * 1000);
             return done;
         }
     });
@@ -53,7 +53,7 @@ module.exports = function (grunt) {
             path: '/shutdown',
             method: 'GET'
         };
-        console.log('%%% -- ' + 'http://127.0.0.1:' + port + '/shutdown')
+        console.log('%%% -- ' + 'http://127.0.0.1:' + port + '/shutdown');
 
 
         http.get('http://127.0.0.1:' + port + '/shutdown', function (res) {
@@ -67,9 +67,9 @@ module.exports = function (grunt) {
             console.log("Got error: " + e.message);
             http.get('http://127.0.0.1:' + port + '/shutdown', function (res) {
                 console.log("Got response: " + res.statusCode);
-                console.log('here')
+                console.log('here');
                 if (res.statusCode == 200) {
-                    console.log('here')
+                    console.log('here');
                     //done();
                     //} else {
                     //    done('Not 200, but ' + res.statusCode)

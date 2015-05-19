@@ -2,7 +2,8 @@ Feature: Login to my account
   As a AsyncMeeting Customer,
   I want to login into my account,
   so I can use AsyncMeeting for meetings
-  @WIP
+
+
   Scenario Outline: Authorize access for an active and valid account
     Given I have a valid and active account with username <saved username>, email <email>, and password <password>
     And I am logged out of the system
@@ -21,7 +22,7 @@ Feature: Login to my account
       | user6                              | user6                              | user6@user.com                              | Pass#123                                   | Shortetst allowed password |
 
 #    TODO Expand this negative test
-  @negative_test
+  @negative_test @WIP @element_comparison
   Scenario: Deny access for an invalid account
     Given I have an invalid account
     And I am logged out of the system

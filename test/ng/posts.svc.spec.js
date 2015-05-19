@@ -1,15 +1,15 @@
 describe('posts.svc', function () {
-    beforeEach(module('app'))
+    beforeEach(module('app'));
 
-    var PostsSvc, $httpBackend
+    var PostsSvc, $httpBackend;
     beforeEach(inject(function (_PostsSvc_, _$httpBackend_) {
-            PostsSvc = _PostsSvc_
+            PostsSvc = _PostsSvc_;
             $httpBackend = _$httpBackend_
         }
-    ))
+    ));
     afterEach(function () {
         $httpBackend.flush()
-    })
+    });
 
 
     describe('#fetch', function () {
@@ -18,11 +18,11 @@ describe('posts.svc', function () {
                 username: 'dickeyxxx',
                 body: 'first post'
             }, {username: 'dickeyxxx', body: 'second post'}])
-        })
+        });
         it('gets 2 posts', function () {
             PostsSvc.fetch().success(function (posts) {
                 expect(posts).to.have.length(2)
             })
         })
     })
-})
+});

@@ -26,7 +26,7 @@ var createTokenForUser = function (req, res, next) {
 
 module.exports = {
     createTokenForUser: createTokenForUser
-}
+};
 
 
 

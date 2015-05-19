@@ -7,7 +7,7 @@ var HTTP_PERMISSIONS =
     get: 'get',
     post: 'post',
     put: 'put'
-}
+};
 
 var MEETING_AREA_RESOURCE = {
         key: 'MeetingAreaResource', name: 'Meeting Area Resource', desc: '',
@@ -65,4 +65,4 @@ module.exports.MEETING_RESOURCE = MEETING_RESOURCE;
 module.exports.SITE_ADMIN_RESOURCES = SITE_ADMIN_RESOURCES;
 module.exports.MEETING_SECTION_ADMIN_RESOURCES = MEETING_SECTION_ADMIN_RESOURCES;
 module.exports.MEETING_AREA_SEARCH_RESOURCE = MEETING_AREA_SEARCH_RESOURCE;
-module.exports.HTTP_PERMISSIONS = HTTP_PERMISSIONS
+module.exports.HTTP_PERMISSIONS = HTTP_PERMISSIONS;

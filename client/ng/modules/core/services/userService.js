@@ -14,15 +14,15 @@
         function ($http, $log) {
 
             var getUser = function () {
-                    $log.debug('in get user')
+                    $log.debug('in get user');
                     return $http.get('/api/users')
                 },
                 login = function (username, password) {
-                    $log.debug('in login')
+                    $log.debug('in login');
                     return $http.post('/login', {username: username, password: password});
                 },
                 emailLogin = function (email, password) {
-                    $log.debug('in emailLogin')
+                    $log.debug('in emailLogin');
                     return $http.post('/email-login', {email: email, password: password});
                 },
                 register = function (username, password, email) {

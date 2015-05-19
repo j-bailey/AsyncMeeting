@@ -7,7 +7,6 @@ module.exports = function(grunt){
         var fs = require('fs'),
             path = require('path');
         var browser = (testBrowser || 'chrome').toLowerCase();
-        var manageSeleniumDriver = ['phantomjs', 'ie'].indexOf(browser) >= 0;
         var runInjectionProxy = proxy;
 
         process.env.PORT = 3001;
@@ -21,25 +20,11 @@ module.exports = function(grunt){
         if (runInjectionProxy) {
             grunt.task.run(['run-injection-proxy']);
             grunt.config.set('cucumbertags', '@proxy_test');
+            grunt.task.run(['protractor:' + browser]);
+        } else {
+            grunt.task.run(['protractor:' + browser + 'NoTags']);
         }
-
-
-        grunt.task.run(['protractor:' + browser]);
 
         grunt.task.run(['kill-redis-server', 'kill-mongo-server', 'web-launch-kill:63636']);
     });
-
-    //grunt.registerTask('protractor', function(browser){
-    //    var childProcess;
-    //    var fs = require('fs'),
-    //        nodeFs = require('node-fs'),
-    //        path = require('path'),
-    //        spawnSync = require('child_process').spawnSync;
-    //
-    //    childProcess = spawnSync('./node_modules/.bin/protractor', [], {
-    //        detached: false,
-    //        stdio: 'inherit',
-    //        env: process.env
-    //    });
-    //});
 };
