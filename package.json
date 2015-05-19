@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "./node_modules/.bin/jshint . && grunt karma && grunt mocha && grunt e2e ",
-    "postinstall": "./node_modules/.bin/init-pg-testing-utils.js && bower install && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && node ./support/npm/post-install.js",
+    "postinstall": "'./node_modules/.bin/init-pg-testing-utils.js' && bower install && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && node ./support/npm/post-install.js",
     "dev": "node ./support/npm/launch-dev.js"
   },
   "dependencies": {
