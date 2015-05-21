@@ -2,6 +2,7 @@
  * Created by jlb on 4/19/15.
  */
 
+
 module.exports = function (grunt) {
 
     grunt.registerTask('web-launch', function (port, cmd, cmdArgs, pause) {
@@ -10,13 +11,14 @@ module.exports = function (grunt) {
             nodeFs = require('node-fs'),
             path = require('path'),
             logPath = path.join('.', 'tmp', 'web-launch'),
-            out = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a'),
-            err = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a'),
             spawn = require('child_process').spawn;
 
         if (!fs.existsSync(logPath)) {
             nodeFs.mkdirSync(logPath, 511, true);
         }
+
+        var out = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a'),
+            err = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a');
 
         console.log('--' + cmdArgs + '--');
         var args = ['support/grunt/web-launch-server', port, cmd];
