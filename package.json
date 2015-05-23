@@ -3,12 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "pretest": "npm run-script lint && ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --recursive -R spec -r should",
+    "posttest": "./node_modules/.bin/istanbul check-coverage && rm -rf coverage",
+    "test": "npm run client-unittests && npm run server-unittests && npm run e2e",
+    "postinstall": "./node_modules/.bin/init-pg-testing-utils.js && bower install --config.interactive=false && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && node ./support/npm/post-install.js",
+    "client-unittests": "./node_modules/grunt-cli/bin/grunt karma",
+    "server-unittests": "./node_modules/grunt-cli/bin/grunt mocha",
+    "e2e": "./node_modules/grunt-cli/bin/grunt e2e",
     "lint": "./node_modules/.bin/jshint .",
     "checkStyle": "./node_modules/.bin/jscs .",
-    "pretest": "npm run-script lint && npm run-script checkStyle && ./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- --recursive -R spec -r should",
-    "posttest": "./node_modules/.bin/istanbul check-coverage && rm -rf coverage",
-    "test": "./node_modules/grunt-cli/bin/grunt karma && ./node_modules/grunt-cli/bin/grunt mocha && ./node_modules/grunt-cli/bin/grunt e2e ",
-    "postinstall": "./node_modules/.bin/init-pg-testing-utils.js && bower install --config.interactive=false && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && node ./support/npm/post-install.js",
     "dev": "node ./support/npm/launch-dev.js"
   },
   "dependencies": {
