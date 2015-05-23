@@ -1,5 +1,6 @@
 tmp/
 dump.rdb
+*.log
 
 # Build target area
 assets
@@ -88,3 +89,5 @@ build/Release
 node_modules
 
 
+
+npm-debug.log
