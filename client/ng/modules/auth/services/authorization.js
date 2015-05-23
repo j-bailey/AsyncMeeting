@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -7,7 +8,6 @@
             function authorize (loginRequired, requiredPermissions, permissionCheckType) {
                 var result = asm.modules.auth.enums.authorised.authorised,
                     user = authentication.getCurrentLoginUser(),
-                    testVar = authentication.testVar,
                     loweredPermissions = [],
                     hasPermission = true,
                     permission, i;

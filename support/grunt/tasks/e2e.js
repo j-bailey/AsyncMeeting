@@ -4,8 +4,6 @@
 
 module.exports = function(grunt){
     grunt.registerTask('e2e', function (testBrowser, proxy) {
-        var fs = require('fs'),
-            path = require('path');
         var browser = (testBrowser || 'chrome').toLowerCase();
         var runInjectionProxy = proxy;
 

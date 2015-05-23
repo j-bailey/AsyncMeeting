@@ -1,3 +1,4 @@
+/* globals angular, asm, _ */
 (function (angular, asm) {
     'use strict';
 

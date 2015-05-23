@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -15,7 +16,7 @@
 
             var getUser = function () {
                     $log.debug('in get user');
-                    return $http.get('/api/users')
+                    return $http.get('/api/users');
                 },
                 login = function (username, password) {
                     $log.debug('in login');

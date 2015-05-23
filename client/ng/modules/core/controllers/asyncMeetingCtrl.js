@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -8,9 +9,9 @@
             eventbus.subscribe(asm.modules.auth.events.userLoggedIn, function (_, user) {
                 $scope.currentUser = user;
             });
-            eventbus.subscribe(asm.modules.auth.events.userLoggedOut, function (event, msg) {
+            eventbus.subscribe(asm.modules.auth.events.userLoggedOut, function () {
                 $scope.currentUser = null;
-            })
+            });
         }
     ]);
 }(angular, asm));

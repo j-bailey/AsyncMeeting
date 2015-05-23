@@ -1,12 +1,11 @@
 var MeetingArea = require('../../../../server/models/meetingArea');
 var ObjectId = require('mongoose').Types.ObjectId;
-var Q = require('q');
 var logger = require('winston');
 
 var getMeetingArea = function(req, res, next) {
     // TODO: add retrieving only meeting areas the user has access to.
     MeetingArea.findOne({_id: req.params.meetingAreaId}, function(err, meetingArea) {
-        if ( err ) return next(err);
+        if ( err ) { return next(err); }
 
         res.status(200).json(meetingArea);
     });
@@ -33,27 +32,25 @@ var createNewMeetingArea = function(req, res, next) {
 
 var updateMeetingArea = function(req, res, next) {
     MeetingArea.findOne({_id: req.params.meetingAreaId}, function(err, meetingArea) {
-        if (err) return next(err);
+        if (err) { return next(err); }
 
         meetingArea.title = req.params.title;
         meetingArea.description = req.params.description;
 
-        meetingArea.save(function(err, savedMeetingArea) {
+        meetingArea.save(function(err) {
             if (err) {
                 logger.error("Error updating meeting area: " + err.message);
                 return next(err);
             }
-
             res.status(200);
         });
     });
 };
 
 var deleteMeetingArea = function(req, res, next) {
-    MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function(err, deletedMeetingArea) {
-        if (err) return next(err);
-
-        res.sendStatus(200)
+    MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function(err) {
+        if (err) { return next(err); }
+        res.sendStatus(200);
     });
 };
 

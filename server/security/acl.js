@@ -5,6 +5,17 @@ var Acl = require('acl'),
 
 var acl = null;
 
+function setUpRoles() {
+    fs.readdirSync(__dirname + '/resources').forEach(function (file) {
+        if (file.indexOf('-role') > -1) {
+            var role = require('./resources/' + file);
+            role.object.allows.forEach(function(allow) {
+                acl.allow(role.object.key, allow.resources, allow.permissions);
+            });
+        }
+    });
+}
+
 function init() {
     var mongodb = require('mongodb'),
         dbUrl = cfg.get("database.url");
@@ -25,16 +36,6 @@ function getAcl() {
     return acl;
 }
 
-function setUpRoles() {
-    fs.readdirSync(__dirname + '/resources').forEach(function (file) {
-        if (file.indexOf('-role') > -1) {
-            var role = require('./resources/' + file);
-            role.object.allows.forEach(function(allow) {
-                acl.allow(role.object.key, allow.resources, allow.permissions);
-            });
-        }
-    });
-}
 
 module.exports.init = init;
 module.exports.getAcl = getAcl;

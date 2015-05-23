@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
     angular.module(asm.modules.auth.name).factory(asm.modules.auth.services.authentication, [
@@ -35,7 +36,7 @@
                 // routing back to login login page is something we shouldn't
                 // do here as we are mixing responsibilities if we do.
                 $log.debug("in userSvc logout");
-                userSvc.logout().then(function (response) {
+                userSvc.logout().then(function () {
                     $log.debug("User " + currentUser.username + " logout on server successful");
                     userSvc.token = null;
                     currentUser = undefined;

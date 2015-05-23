@@ -10,7 +10,7 @@ module.exports = function(passport){
                 passReqToCallback : true // allows us to pass back the entire request to the callback
             },
             function(req, username, password, done) {
-                findOrCreateUser = function(){
+                var findOrCreateUser = function(){
 // find a user in Mongo with provided username
                     User.findOne({ 'username' : req.body.username }, function(err, user) {
 // In case of any error, return using the done method
@@ -66,5 +66,5 @@ module.exports = function(passport){
 // Generates hash using bCrypt
     var createHash = function(password){
         return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
-    }
+    };
 };

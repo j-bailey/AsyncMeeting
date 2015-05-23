@@ -1,5 +1,4 @@
-var fs = require('fs'),
-    redisServer = require('./redis-server'),
+var redisServer = require('./redis-server'),
     mongoServer = require('./mongo-server'),
     spawn = require('child_process').spawnSync;
 
@@ -15,11 +14,11 @@ function killProcesses() {
     });
 }
 
-process.on('beforeExit', function (code) {
+process.on('beforeExit', function () {
     if (calledBeforeExit > 0){
         return;
     }
-    calledBeforeExit++;
+    calledBeforeExit += 1;
     killProcesses();
 });
 
@@ -30,7 +29,7 @@ serverList.forEach(function(server){
     server.start();
 });
 
-var dev = spawn('gulp', ['dev'], {
+spawn('gulp', ['dev'], {
     detached: false,
     stdio: [ 'inherit', 'inherit', 'inherit' ],
     cwd: '.'

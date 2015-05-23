@@ -16,13 +16,13 @@ var schema = new mongoose.Schema({
 });
 
 // Add static methods
-schema.statics.findPublicUserById = function (userId, callback) {
+schema.statics.findPublicUserById = function (userId) {
     return this.findById(userId, 'username email permissions roles createdOn modifiedOn firstName lastName')
         .populate('permissions')
         .populate('roles')
         .exec();
 };
-schema.statics.findPublicUserByUserName = function (userName, callback) {
+schema.statics.findPublicUserByUserName = function (userName) {
     var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
     this.findOne({'username': userName}, 'username email permissions roles createdOn modifiedOn firstName lastName')
         .populate('permissions')
@@ -33,7 +33,7 @@ schema.statics.findPublicUserByUserName = function (userName, callback) {
     return defer.promise;
 };
 
-schema.statics.findPublicUserByEmail = function (email, callback) {
+schema.statics.findPublicUserByEmail = function (email) {
     var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
     this.findOne({'email': email}, 'username email permissions roles createdOn modifiedOn firstName lastName')
         .populate('permissions')

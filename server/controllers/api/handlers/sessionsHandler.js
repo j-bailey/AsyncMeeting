@@ -19,7 +19,7 @@ var createTokenForUser = function (req, res, next) {
                 return res.send(401);
             }
             var token = jwt.encode({username: user.username}, config.secret);
-            res.send(token)
+            res.send(token);
         });
     });
 };

@@ -1,17 +1,20 @@
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
 var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 var fs = require('fs');
 var cfg = require('config');
+
+//var favicon = require('serve-favicon');
 
 var app = module.exports = express();
 
 // Load models)
 var models_path = __dirname + '/server/models';
 fs.readdirSync(models_path).forEach(function (file) {
-    if (~file.indexOf('.js')) require(models_path + '/' + file)
+    if (file.indexOf('.js')){
+        require(models_path + '/' + file);
+    }
 });
 
 // View engine setup
@@ -51,7 +54,7 @@ app.use(flash());
 
 // Setup logger using Winston and Morgan.
 var logger = require("./server/utils/logger");
-app.use(require('morgan')(cfg.get('log.morganLogFormat'), {stream: {write: function(str) {logger.info(str)}}}));
+app.use(require('morgan')(cfg.get('log.morganLogFormat'), {stream: {write: function(str) {logger.info(str);}}}));
 
 // Initialize Passport
 var initPassport = require('./server/passport/init');
@@ -73,6 +76,7 @@ app.use(function(err, req, res, next) {
         message: err.message,
         error: err
     });
+    next();
 });
 
 module.exports = app;

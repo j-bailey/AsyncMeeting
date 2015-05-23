@@ -3,10 +3,7 @@
  */
 
 var childProcess;
-var fs = require('fs'),
-    nodeFs = require('node-fs'),
-    path = require('path'),
-    spawn = require('child_process').spawn;
+var spawn = require('child_process').spawn;
 
 var args = process.argv.slice(2);
 var port = args[0];
@@ -21,11 +18,8 @@ childProcess = spawn(cmd, cmdArgs, {
 });
 
 
-var sys = require("sys"),
-    my_http = require("http"),
-    path = require("path"),
-    url = require("url"),
-    filesys = require("fs");
+var my_http = require("http"),
+    url = require("url");
 
 var server = my_http.createServer(function (request, response) {
     var myPath = url.parse(request.url).pathname;
@@ -33,7 +27,7 @@ var server = my_http.createServer(function (request, response) {
     if (myPath && myPath === '/shutdown') {
         console.log(' ---- Here');
         console.log('Connected');
-        childProcess.on('exit', function (code, signal) {
+        childProcess.on('exit', function (code) {
             console.log('child process terminated due to receipt of code ' + code);
             response.statusCode = 200;
             response.end(function () {
@@ -46,7 +40,7 @@ var server = my_http.createServer(function (request, response) {
     }
 });
 server.listen(port, '127.0.0.1', function () {
-    console.log('Web launch server listening on', port)
+    console.log('Web launch server listening on', port);
 });
 server.on('error', onError);
 server.on('listening', onListening);

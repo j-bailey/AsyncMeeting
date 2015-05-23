@@ -1,3 +1,4 @@
+/* globals angular, asm, $ */
 (function (angular, asm) {
     'use strict';
     angular.module(asm.modules.meetingareas.name).controller(asm.modules.meetingareas.controllers.meetingAreasCtrl, [
@@ -10,7 +11,7 @@
         function ($scope, $log, $routeParams, $cookies, breadcrumbService, meetingAreaService) {
             $scope.currentUser = $cookies.currentUser;
             $scope.meetingAreas = [];
-            $scope.currentMeetingAreaId = $routeParams.meetingAreaId != ':meetingAreaId' ?
+            $scope.currentMeetingAreaId = $routeParams.meetingAreaId !== ':meetingAreaId' ?
                                                                 $routeParams.meetingAreaId : null;
             $scope.breadcrumbs = breadcrumbService;
             $scope.createMeetingAreaErrorMessage = "";
@@ -30,7 +31,7 @@
 
                         // Reset the form data.
                         $scope.resetForms($scope.currentMeetingArea);
-                    }, function (err) {
+                    }, function () {
                         $scope.errorMsg = "Encountered error retrieving meeting area with id " + $scope.currentMeetingAreaId;
                     });
                 }
@@ -40,7 +41,7 @@
                     // No parent meeting area, so this is the highest level.
                     $scope.breadcrumbs.setLabel("Meeting Areas");
                 }
-            }, function(err) {
+            }, function() {
                 $scope.meetingAreas = null;
                 $scope.errorMsg = "Encountered error retrieving meeting areas for meeting id'" + $scope.currentMeetingAreaId + "'.";
             });
@@ -67,7 +68,7 @@
                         invitees: "",
                         accessRestriction: "",
                         parentMeetingArea: currentMeetingArea
-                    }
+                    };
                 }
             };
 
@@ -95,12 +96,12 @@
                         meetingAreaService.getChildMeetingAreas($scope.currentMeetingAreaId)
                             .then(function(meetingAreas) {
                             $scope.meetingAreas = meetingAreas.data;
-                        }, function(err) {
+                        }, function() {
                             $scope.meetingAreas = null;
                             $scope.errorMsg = "Encountered error retrieving meeting areas for '" + createdMeetingArea.data.title + "'.";
                         });
                     },
-                    function(err) {
+                    function() {
                         $scope.createMeetingAreaErrorMessage = "Error occurred, meeting area was not created!";
                     }
                 );
@@ -109,7 +110,7 @@
             // Close the modal that shows the add new meeting area form.
             $scope.closeCreateMeetingAreaModal = function() {
                 $('#createMeetingAreaModal').modal("hide");
-            }
+            };
         }
     ]);
 }(angular, asm));

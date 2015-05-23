@@ -9,7 +9,7 @@ gulp.task('dev:server', function () {
 
 gulp.task('test:server', function () {
     console.log('Server starting');
-    nodemon({script: 'server.js', ext:'never', igonore: ['*.*'], tasks:function(files) {return []}});
+    nodemon({script: 'server.js', ext:'never', igonore: ['*.*'], tasks:function() {return [];}});
     console.log('Server started');
 });
 

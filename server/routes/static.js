@@ -16,7 +16,9 @@ router.post('/login',
         var token = jwt.encode({username: req.user.username}, config.secret);
         User.findPublicUserById(req.user._id).then(function(user) {
 
-            res.json({user:user, token: token, permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']});  // TODO test permissions need to be removed after permissions are fixed
+            res.json({user:user, token: token,
+                permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']});
+                // TODO test permissions need to be removed after permissions are fixed
         });
     }
 );
@@ -32,7 +34,9 @@ router.post('/email-login',
         var token = jwt.encode({username: req.user.username}, config.secret);
         User.findPublicUserById(req.user._id).then(function(user) {
             logger.debug("Sending response");
-            res.json({user:user, token: token, permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']});  // TODO test permissions need to be removed after permissions are fixed
+            res.json({user:user, token: token,
+                permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']});
+            // TODO test permissions need to be removed after permissions are fixed
         });
     }
 );
@@ -61,7 +65,7 @@ router.post('/signup', function(req, res, next) {
        }
 
        req.login(user, function(err) {
-           if (err) return next(err);
+           if (err) { return next(err); }
 
            // TODO user is missing roles and permissions need to fix in passport signup code
            return res.json(user);

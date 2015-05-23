@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -11,7 +12,7 @@
      */
     angular.module(asm.modules.meetingareas.name).factory(asm.modules.meetingareas.services.meetingAreaService, [
         '$http', '$log',
-        function ($http, $log) {
+        function ($http) {
 
             var getMeetingArea = function (meetingAreaId) {
                     //$log.debug('in getMeetingArea');
@@ -29,7 +30,7 @@
                 createMeetingArea = function (title, description, parentMeetingAreaId) {
                     //$log.debug('in createMeetingArea');
 
-                    if ( parentMeetingAreaId === undefined ) parentMeetingAreaId = null;
+                    if ( parentMeetingAreaId === undefined ) { parentMeetingAreaId = null; }
                     return $http.post('/api/meetingarea', {title: title, description: description, parentMeetingAreaId: parentMeetingAreaId});
                 },
                 deleteMeetingArea = function (meetingAreaId) {

@@ -8,16 +8,16 @@ exports.connect = function (server) {
         clients.push( ws);
         exports.broadcast('new client joined');
         ws.on('close', function () {
-            _.remove(clients, ws)
-        })
-    })
+            _.remove(clients, ws);
+        });
+    });
 };
 
 exports.broadcast = function (topic, data) {
     var json = JSON.stringify({topic: topic, data: data});
     clients.forEach(function (client) {
-        client.send(json)
-    })
+        client.send(json);
+    });
 };
 
 

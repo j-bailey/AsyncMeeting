@@ -22,7 +22,7 @@ module.exports = function (grunt) {
 
         console.log('--' + cmdArgs + '--');
         var args = ['support/grunt/web-launch-server', port, cmd];
-        if (cmdArgs && typeof cmdArgs == 'string' && cmdArgs.length > 0) {
+        if (cmdArgs && typeof cmdArgs === 'string' && cmdArgs.length > 0) {
             cmdArgs = JSON.parse(cmdArgs.replace(/'/g, '"').replace(/\|/g, ':'));
             args.push.apply(args, cmdArgs);
         }
@@ -49,28 +49,21 @@ module.exports = function (grunt) {
         var http = require('http'),
             done = this.async();
 
-        var options = {
-            hostname: 'localhost',
-            port: port,
-            path: '/shutdown',
-            method: 'GET'
-        };
         console.log('%%% -- ' + 'http://127.0.0.1:' + port + '/shutdown');
-
 
         http.get('http://127.0.0.1:' + port + '/shutdown', function (res) {
             console.log("Got response: " + res.statusCode);
-            if (res.statusCode == 200) {
+            if (res.statusCode === 200) {
                 done();
             } else {
-                done('Not 200, but ' + res.statusCode)
+                done('Not 200, but ' + res.statusCode);
             }
         }).on('error', function (e) {
             console.log("Got error: " + e.message);
             http.get('http://127.0.0.1:' + port + '/shutdown', function (res) {
                 console.log("Got response: " + res.statusCode);
                 console.log('here');
-                if (res.statusCode == 200) {
+                if (res.statusCode === 200) {
                     console.log('here');
                     //done();
                     //} else {
@@ -96,8 +89,8 @@ module.exports = function (grunt) {
         //});
         //
         //req.end();
-        setTimeout((function () {
-            done('Timed out on web launch kill for port ' + port)
-        }), 5000)
+        setTimeout(function () {
+            done('Timed out on web launch kill for port ' + port);
+        }, 5000);
     });
 };

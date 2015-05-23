@@ -5,16 +5,6 @@ module.exports = function(grunt) {
         cucumberTags: '~@proxy_test'
     };
 
-    grunt.util._.extend(config, loadConfig('./support/grunt/options/'));
-
-    grunt.initConfig(config);
-
-    grunt.loadNpmTasks('grunt-gulp');
-
-    require('load-grunt-tasks')(grunt);
-
-    grunt.loadTasks('support/grunt/tasks');
-
     function loadConfig(path) {
         var glob = require('glob');
         var object = {};
@@ -27,4 +17,15 @@ module.exports = function(grunt) {
 
         return object;
     }
+
+    grunt.util._.extend(config, loadConfig('./support/grunt/options/'));
+
+    grunt.initConfig(config);
+
+    grunt.loadNpmTasks('grunt-gulp');
+
+    require('load-grunt-tasks')(grunt);
+
+    grunt.loadTasks('support/grunt/tasks');
+
 };

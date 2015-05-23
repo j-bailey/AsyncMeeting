@@ -1,6 +1,5 @@
 
 module.exports = function(grunt) {
-    var mongoServer = null;
     grunt.registerTask('start-mongo-server', function(){
         var fs = require('fs'),
             nodeFs = require('node-fs'),
@@ -15,7 +14,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('kill-mongo-server', function(){
-        grunt.task.run(['web-launch-kill:62626'])
+        grunt.task.run(['web-launch-kill:62626']);
     });
 
 };

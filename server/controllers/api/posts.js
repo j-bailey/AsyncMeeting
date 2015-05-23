@@ -3,7 +3,6 @@ var express = require('express');
 var router = express.Router();
 var websockets = require('../../../websockets');
 var pubsub = require('../../../pubsub');
-var Q = require('q');
 var logger = require('winston');
 
 var sub = false;
@@ -13,7 +12,7 @@ router.post('/', function (req, res, next) {
     post.username = req.auth.username;
     post.save(function (err, post) {
         if (err) {
-            return next(err)
+            return next(err);
         }
         //websockets.broadcast('new_post', post)
 // called after a post in created in MongoDB
@@ -22,24 +21,24 @@ router.post('/', function (req, res, next) {
         pubsub.publish('new_post', post);
         // function to send a message to the clients on the current process
 
-        res.json(201, post)
-    })
+        res.json(201, post);
+    });
 });
 
 router.get('/', function (req, res, next) {
     Post.find().sort('-date').exec(function (err, posts) {
         if (err) {
-            return next(err)
+            return next(err);
         }
         if (!sub) {
             pubsub.subscribe('new_post', function (post) {
                 logger.debug("Posted");
-                websockets.broadcast('new_post', post)
+                websockets.broadcast('new_post', post);
             });
             sub = true;
         }
 
-        res.json(posts)
+        res.json(posts);
     });
     //    Post.find(function (err, posts) {
     //    if (err) {

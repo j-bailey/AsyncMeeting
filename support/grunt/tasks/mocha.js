@@ -15,10 +15,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('launch-mocha-process', function(){
-        var childProcess;
-        var fs = require('fs'),
-            nodeFs = require('node-fs'),
-            path = require('path'),
+        var childProcess,
             spawnSync = require('child_process').spawnSync;
 
         childProcess = spawnSync('./node_modules/.bin/mocha', [], {

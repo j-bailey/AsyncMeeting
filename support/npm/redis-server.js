@@ -33,5 +33,5 @@ module.exports = (function() {
         start: start,
         kill: kill,
         getProcessInfo: getProcessInfo
-    }
+    };
 })();

@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -16,7 +17,7 @@
                     $scope.invalidRegistration = true;
                     $scope.errorMessage = data.data.message;
                 });
-            }
+            };
         }
     ]);
 }(angular, asm));
