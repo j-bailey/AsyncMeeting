@@ -9,7 +9,7 @@ var calledBeforeExit = 0,
     serverList = [redisServer, mongoServer];
 
 function killProcesses() {
-    serverList.forEach(function(process){
+    serverList.forEach(function(process) {
         console.log('Killing process: ' + JSON.stringify(process.getProcessInfo()));
         process.kill();
     });
@@ -26,7 +26,7 @@ process.on('beforeExit', function () {
 process.on('SIGINT', function() {
     killProcesses();
 });
-serverList.forEach(function(server){
+serverList.forEach(function(server) {
     server.start();
 });
 

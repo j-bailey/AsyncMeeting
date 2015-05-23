@@ -8,7 +8,7 @@ var getUserFromXAuthHeader = function (req, res, next) {
         return res.send(401);
     }
     var auth = jwt.decode(req.headers['x-auth'], config.secret);
-    User.findOne({username: auth.username}, function (err, user) {
+    User.findOne({ username: auth.username }, function (err, user) {
         if (err) {
             return next(err);
         }
@@ -18,7 +18,7 @@ var getUserFromXAuthHeader = function (req, res, next) {
 
 var createUser = function (req, res, next) {
 
-    var user = new User({username: req.body.username});
+    var user = new User({ username: req.body.username });
     bcrypt.hash(req.body.password, 10, function (err, hash) {
         if (err) {
             return next(err);

@@ -14,7 +14,7 @@ module.exports = function(grunt) {
             'kill-mongo-server']);
     });
 
-    grunt.registerTask('launch-karma-process', function(){
+    grunt.registerTask('launch-karma-process', function() {
         var childProcess,
             spawnSync = require('child_process').spawnSync;
 

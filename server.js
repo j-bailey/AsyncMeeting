@@ -32,7 +32,6 @@ server.on('listening', onListening);
 
 websockets.connect(server);
 
-
 /**
  * Event listener for HTTP server "error" event.
  */
@@ -64,5 +63,4 @@ function onError(error) {
 function onListening() {
     debug('Listening on port ' + server.address().port);
 }
-
 

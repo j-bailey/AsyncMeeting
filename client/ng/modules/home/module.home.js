@@ -16,5 +16,4 @@
         'ngRoute'
     ]);
 
-
 }(angular, asm));

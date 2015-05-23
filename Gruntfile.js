@@ -10,8 +10,8 @@ module.exports = function(grunt) {
         var object = {};
         var key;
 
-        glob.sync('*', {cwd: path}).forEach(function(option) {
-            key = option.replace(/\.js$/,'');
+        glob.sync('*', { cwd: path }).forEach(function(option) {
+            key = option.replace(/\.js$/, '');
             object[key] = require(path + option);
         });
 

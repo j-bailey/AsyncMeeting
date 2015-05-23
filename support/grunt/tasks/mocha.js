@@ -14,7 +14,7 @@ module.exports = function(grunt) {
             'kill-mongo-server']);
     });
 
-    grunt.registerTask('launch-mocha-process', function(){
+    grunt.registerTask('launch-mocha-process', function() {
         var childProcess,
             spawnSync = require('child_process').spawnSync;
 

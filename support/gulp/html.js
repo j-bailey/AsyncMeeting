@@ -9,7 +9,6 @@ gulp.task('html', function () {
     gulp.src(['client/**/*.html']).pipe(gulp.dest('assets'));
 });
 
-
 gulp.task('watch:html', ['html'], function () {
     gulp.watch('client/**/*.html', ['html']);
 });

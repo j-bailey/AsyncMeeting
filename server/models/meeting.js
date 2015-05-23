@@ -4,10 +4,10 @@ var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 
 var schema = new mongoose.Schema({
-    type: {type: String, required: true},
-    format: {type: String, required: false},
-    objective: {type: String, required: false},
-    agendaItems: {type: String, required: false}
+    type: { type: String, required: true },
+    format: { type: String, required: false },
+    objective: { type: String, required: false },
+    agendaItems: { type: String, required: false }
 });
 
 // Add static methods
@@ -17,7 +17,6 @@ var schema = new mongoose.Schema({
 schema.plugin(modifiedOn);
 schema.plugin(createInfo);
 schema.plugin(versionInfo);
-
 
 var Meeting  = mongoose.model('Meeting', schema);
 

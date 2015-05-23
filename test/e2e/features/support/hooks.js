@@ -30,7 +30,7 @@ var beforeScenario = function(event, callback) {
 };
 
 var afterScenario = function(event, callback) {
-    takeScreenshot('After', 'afterScenario_screenshot.png', '').then(function(err){
+    takeScreenshot('After', 'afterScenario_screenshot.png', '').then(function(err) {
         if (err) console.log(err);
         callback();
     })
@@ -49,7 +49,7 @@ JsonFormatter.log = function(json) {
         file = 'cucumberReport.json',
         filePath = path.join(dir, file);
     nodeFs.mkdirSync(dir, '0777', true);
-    fs.writeFile(filePath, json, function (err){
+    fs.writeFile(filePath, json, function (err) {
         if (err) throw err;
         console.log('Cucumber json file loctaed here: ' + filePath);
     });
@@ -91,8 +91,8 @@ var hooks = function() {
     this.registerListener(JsonFormatter);
 
     // TODO Set up to take screenshots on errors only and name the file based on the failing scenario
-    this.After(function(scenario, callback){
-        takeScreenshot('After', 'error_screenshot.png', '').then(function(err){
+    this.After(function(scenario, callback) {
+        takeScreenshot('After', 'error_screenshot.png', '').then(function(err) {
             if (err) console.log(err);
             callback();
         })

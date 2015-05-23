@@ -3,7 +3,7 @@
  */
 var r = require('./acl-resources');
 
-var MEETING_SECTION_ADMIN_USER_ROLE = {key:'MeetingSectionAdminUserRole', name:'Meeting Section Admin User', desc:'',
+var MEETING_SECTION_ADMIN_USER_ROLE = { key:'MeetingSectionAdminUserRole', name:'Meeting Section Admin User', desc:'',
     allows: [
         {
             resources: [
@@ -13,6 +13,6 @@ var MEETING_SECTION_ADMIN_USER_ROLE = {key:'MeetingSectionAdminUserRole', name:'
                 r.HTTP_PERMISSIONS
             ]
         },
-    ]};
+    ] };
 
 module.exports.object = MEETING_SECTION_ADMIN_USER_ROLE;

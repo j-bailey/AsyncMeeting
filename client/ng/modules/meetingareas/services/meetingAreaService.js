@@ -31,7 +31,7 @@
                     //$log.debug('in createMeetingArea');
 
                     if ( parentMeetingAreaId === undefined ) { parentMeetingAreaId = null; }
-                    return $http.post('/api/meetingarea', {title: title, description: description, parentMeetingAreaId: parentMeetingAreaId});
+                    return $http.post('/api/meetingarea', { title: title, description: description, parentMeetingAreaId: parentMeetingAreaId });
                 },
                 deleteMeetingArea = function (meetingAreaId) {
                     //$log.debug('in deleteMeetingArea');
@@ -39,7 +39,7 @@
                 },
                 updateMeetingArea = function (meetingAreaId, title, description) {
                     //$log.debug('in updateMeetingArea');
-                    return $http.put('/api/meetingarea/' + meetingAreaId, {title: title, description: description});
+                    return $http.put('/api/meetingarea/' + meetingAreaId, { title: title, description: description });
                 };
             return {
                 getMeetingArea: getMeetingArea,
@@ -51,6 +51,4 @@
         }
     ]);
 }(angular, asm));
-
-
 

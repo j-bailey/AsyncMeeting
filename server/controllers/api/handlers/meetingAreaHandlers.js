@@ -4,7 +4,7 @@ var logger = require('winston');
 
 var getMeetingArea = function(req, res, next) {
     // TODO: add retrieving only meeting areas the user has access to.
-    MeetingArea.findOne({_id: req.params.meetingAreaId}, function(err, meetingArea) {
+    MeetingArea.findOne({ _id: req.params.meetingAreaId }, function(err, meetingArea) {
         if ( err ) { return next(err); }
 
         res.status(200).json(meetingArea);
@@ -31,7 +31,7 @@ var createNewMeetingArea = function(req, res, next) {
 };
 
 var updateMeetingArea = function(req, res, next) {
-    MeetingArea.findOne({_id: req.params.meetingAreaId}, function(err, meetingArea) {
+    MeetingArea.findOne({ _id: req.params.meetingAreaId }, function(err, meetingArea) {
         if (err) { return next(err); }
 
         meetingArea.title = req.params.title;
@@ -48,7 +48,7 @@ var updateMeetingArea = function(req, res, next) {
 };
 
 var deleteMeetingArea = function(req, res, next) {
-    MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function(err) {
+    MeetingArea.findOneAndRemove({ _id: req.params.meetingAreaId }, function(err) {
         if (err) { return next(err); }
         res.sendStatus(200);
     });

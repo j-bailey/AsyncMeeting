@@ -33,7 +33,7 @@ describe('meeting area route', function() {
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
                 .expect(200)
-                .expect(function(res){
+                .expect(function(res) {
                     var result = JSON.parse(res.text);
                     expect(result._id).to.equal(meetingAreaId);
                 })

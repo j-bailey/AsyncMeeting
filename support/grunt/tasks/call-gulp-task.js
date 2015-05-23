@@ -35,7 +35,7 @@ module.exports = function (grunt) {
             console.log('Gulp- ' + task + ' stdout: ' + data);
             if (readyText && !isRunning){
                 console.log('#####  ' + (new RegExp(readyText)).exec(data));
-                if((new RegExp(readyText)).exec(data)){
+                if ((new RegExp(readyText)).exec(data)){
                     console.log('#### Heree');
                     isRunning = true;
                     done();

@@ -12,9 +12,9 @@
             $log.debug($location.path());
             // TODO: Dynamically create list of menu items based on permissions.
             $scope.menuItems = [
-                { name: "My Home", path: "#/"},
-                { name: "Meeting Areas", path: "#/meetingareas"},
-                { name: "Meetings", path: "#/meetings"}
+                { name: "My Home", path: "#/" },
+                { name: "Meeting Areas", path: "#/meetingareas" },
+                { name: "Meetings", path: "#/meetings" }
                 ];
 
             $scope.isCurrentLocation = function(path) {

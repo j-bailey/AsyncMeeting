@@ -12,7 +12,7 @@ var app = module.exports = express();
 // Load models)
 var models_path = __dirname + '/server/models';
 fs.readdirSync(models_path).forEach(function (file) {
-    if (file.indexOf('.js')){
+    if (~file.indexOf('.js')){ /* jshint ignore:line */
         require(models_path + '/' + file);
     }
 });
@@ -33,7 +33,7 @@ var passport = require('passport');
 var expressSession = require('express-session');
 var MongoStore = require('connect-mongo')(expressSession);
 app.use(expressSession({
-    store: new MongoStore({mongooseConnection: mongoose.connection}),
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
     secret: cfg.get('session.secret'),
     resave: false,
     //rolling: true, // TODO: See if this can work somehow even though angular is single page.
@@ -54,7 +54,7 @@ app.use(flash());
 
 // Setup logger using Winston and Morgan.
 var logger = require("./server/utils/logger");
-app.use(require('morgan')(cfg.get('log.morganLogFormat'), {stream: {write: function(str) {logger.info(str);}}}));
+app.use(require('morgan')(cfg.get('log.morganLogFormat'), { stream: { write: function(str) {logger.info(str);} } }));
 
 // Initialize Passport
 var initPassport = require('./server/passport/init');

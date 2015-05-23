@@ -5,5 +5,3 @@ router.post('/', handlers.createTokenForUser);
 
 module.exports = router;
 
-
-

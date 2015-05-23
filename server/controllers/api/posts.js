@@ -8,7 +8,7 @@ var logger = require('winston');
 var sub = false;
 
 router.post('/', function (req, res, next) {
-    var post = new Post({body: req.body.body});
+    var post = new Post({ body: req.body.body });
     post.username = req.auth.username;
     post.save(function (err, post) {
         if (err) {

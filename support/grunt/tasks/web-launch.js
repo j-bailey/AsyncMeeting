@@ -2,7 +2,6 @@
  * Created by jlb on 4/19/15.
  */
 
-
 module.exports = function (grunt) {
 
     grunt.registerTask('web-launch', function (port, cmd, cmdArgs, pause) {

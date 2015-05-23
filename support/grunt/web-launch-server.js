@@ -17,7 +17,6 @@ childProcess = spawn(cmd, cmdArgs, {
     env: process.env
 });
 
-
 var my_http = require("http"),
     url = require("url");
 
@@ -44,7 +43,6 @@ server.listen(port, '127.0.0.1', function () {
 });
 server.on('error', onError);
 server.on('listening', onListening);
-
 
 /**
  * Event listener for HTTP server "error" event.

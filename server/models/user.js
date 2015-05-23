@@ -5,13 +5,13 @@ var versionInfo = require('./plugins/versionInfo');
 var Q = require('q');
 
 var schema = new mongoose.Schema({
-    username: {type: String, required: false},
-    password: {type: String, required: true},
-    email: {type: String, required: true},
+    username: { type: String, required: false },
+    password: { type: String, required: true },
+    email: { type: String, required: true },
     firstName: String,
     lastName: String,
-    permissions: [{type: mongoose.Schema.Types.ObjectId, ref: 'Permission'}],
-    roles: [{type: mongoose.Schema.Types.ObjectId, ref: 'Role'}]
+    permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Permission' }],
+    roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }]
 
 });
 
@@ -24,7 +24,7 @@ schema.statics.findPublicUserById = function (userId) {
 };
 schema.statics.findPublicUserByUserName = function (userName) {
     var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
-    this.findOne({'username': userName}, 'username email permissions roles createdOn modifiedOn firstName lastName')
+    this.findOne({ 'username': userName }, 'username email permissions roles createdOn modifiedOn firstName lastName')
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
@@ -35,7 +35,7 @@ schema.statics.findPublicUserByUserName = function (userName) {
 
 schema.statics.findPublicUserByEmail = function (email) {
     var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
-    this.findOne({'email': email}, 'username email permissions roles createdOn modifiedOn firstName lastName')
+    this.findOne({ 'email': email }, 'username email permissions roles createdOn modifiedOn firstName lastName')
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
@@ -49,7 +49,6 @@ schema.statics.findPublicUserByEmail = function (email) {
 schema.plugin(modifiedOn);
 schema.plugin(createInfo);
 schema.plugin(versionInfo);
-
 
 var User  = mongoose.model('User', schema);
 

@@ -2,13 +2,13 @@
  * Created by jlb on 4/18/15.
  */
 
-module.exports = function(grunt){
+module.exports = function(grunt) {
     grunt.registerTask('e2e', function (testBrowser, proxy) {
         var browser = (testBrowser || 'chrome').toLowerCase();
         var runInjectionProxy = proxy;
 
         process.env.PORT = 3001;
-        process.env.NODE_ENV= 'test';
+        process.env.NODE_ENV = 'test';
 
         grunt.task.run([
             'start-redis-server',

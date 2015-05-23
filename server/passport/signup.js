@@ -5,17 +5,17 @@ var logger = require('winston');
 var acl = require('../security/acl'),
     freeTier = require('../security/resources/free-tier-role');
 
-module.exports = function(passport){
+module.exports = function(passport) {
     passport.use('signup', new LocalStrategy({
-                passReqToCallback : true // allows us to pass back the entire request to the callback
+                passReqToCallback: true // allows us to pass back the entire request to the callback
             },
             function(req, username, password, done) {
-                var findOrCreateUser = function(){
+                var findOrCreateUser = function() {
 // find a user in Mongo with provided username
-                    User.findOne({ 'username' : req.body.username }, function(err, user) {
+                    User.findOne({ 'username': req.body.username }, function(err, user) {
 // In case of any error, return using the done method
                         if (err){
-                            logger.error('Error in SignUp: '+err);
+                            logger.error('Error in SignUp: ' + err);
                             return done(err);
                         }
 // already exists
@@ -47,8 +47,8 @@ module.exports = function(passport){
 // save the user
                                 newUser.save(function(err, savedUser) {
                                     if (err){
-                                        logger.error('Error in Saving user: '+err);
-                                        return done(null, false, {message: "We're sorry, we could not create your account at this time!"});
+                                        logger.error('Error in Saving user: ' + err);
+                                        return done(null, false, { message: "We're sorry, we could not create your account at this time!" });
                                     }
                                     logger.debug('User Registration successful');
                                     acl.getAcl().addUserRoles(savedUser.username, freeTier.object.key);
@@ -64,7 +64,7 @@ module.exports = function(passport){
             })
     );
 // Generates hash using bCrypt
-    var createHash = function(password){
+    var createHash = function(password) {
         return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
     };
 };

@@ -5,7 +5,7 @@ describe('posts.ctrl', function () {
     beforeEach(inject(function ($q) {
         mockPostsSvc.fetch = function () {
             var deferred = $q.defer();
-            deferred.resolve([{username: 'dickeyxxx', body: 'first post'}, {
+            deferred.resolve([{ username: 'dickeyxxx', body: 'first post' }, {
                 username: 'dickeyxxx',
                 body: 'second post'
             }]);
@@ -19,7 +19,7 @@ describe('posts.ctrl', function () {
     }));
     beforeEach(inject(function ($rootScope, $controller) {
         scope = $rootScope.$new();
-        $controller('PostsCtrl', {$scope: scope, PostsSvc: mockPostsSvc})
+        $controller('PostsCtrl', { $scope: scope, PostsSvc: mockPostsSvc })
     }));
     it('loads posts from the service', function () {
         scope.$digest();
@@ -28,10 +28,8 @@ describe('posts.ctrl', function () {
         expect(scope.posts.length).to.eq(2)
     });
     it('sends a new post to the service', function () {
-        scope.post = {body: 'my new post'};
+        scope.post = { body: 'my new post' };
         scope.addPost()
     })
 });
-
-
 

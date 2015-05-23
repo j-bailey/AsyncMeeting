@@ -20,14 +20,14 @@
                 },
                 login = function (username, password) {
                     $log.debug('in login');
-                    return $http.post('/login', {username: username, password: password});
+                    return $http.post('/login', { username: username, password: password });
                 },
                 emailLogin = function (email, password) {
                     $log.debug('in emailLogin');
-                    return $http.post('/email-login', {email: email, password: password});
+                    return $http.post('/email-login', { email: email, password: password });
                 },
                 register = function (username, password, email) {
-                    return $http.post('/signup', {username: username, password: password, email: email});
+                    return $http.post('/signup', { username: username, password: password, email: email });
                 },
                 logout = function () {
                     $log.debug('in logout');
@@ -43,7 +43,5 @@
         }
     ]);
 }(angular, asm));
-
-
 
     

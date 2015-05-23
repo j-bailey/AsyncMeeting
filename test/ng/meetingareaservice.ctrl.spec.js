@@ -95,8 +95,7 @@ describe('meeting area service', function() {
                 meetingAreaService
                     .getChildMeetingAreas("123")
                     .then(
-                        function(res)
-                        {
+                        function(res) {
                             response = res;
                         },
                         function(errRes) {
@@ -120,8 +119,7 @@ describe('meeting area service', function() {
                 meetingAreaService
                     .getChildMeetingAreas("123")
                     .then(
-                        function(res)
-                        {
+                        function(res) {
                             response = res;
                         });
 
@@ -142,7 +140,7 @@ describe('meeting area service', function() {
                     description: "Meeting area 1 description",
                     parentMeetingAreaId: "abc"
                 })
-                .respond(201, {title: "Meeting Area 1"});
+                .respond(201, { title: "Meeting Area 1" });
 
             var response = null;
 

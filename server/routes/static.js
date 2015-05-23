@@ -13,11 +13,11 @@ router.post('/login',
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        var token = jwt.encode({username: req.user.username}, config.secret);
+        var token = jwt.encode({ username: req.user.username }, config.secret);
         User.findPublicUserById(req.user._id).then(function(user) {
 
-            res.json({user:user, token: token,
-                permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']});
+            res.json({ user:user, token: token,
+                permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas'] });
                 // TODO test permissions need to be removed after permissions are fixed
         });
     }
@@ -31,11 +31,11 @@ router.post('/email-login',
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        var token = jwt.encode({username: req.user.username}, config.secret);
+        var token = jwt.encode({ username: req.user.username }, config.secret);
         User.findPublicUserById(req.user._id).then(function(user) {
             logger.debug("Sending response");
-            res.json({user:user, token: token,
-                permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']});
+            res.json({ user:user, token: token,
+                permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas'] });
             // TODO test permissions need to be removed after permissions are fixed
         });
     }
@@ -72,8 +72,6 @@ router.post('/signup', function(req, res, next) {
        });
    })(req, res, next);
 });
-
-
 
 module.exports = router;
 

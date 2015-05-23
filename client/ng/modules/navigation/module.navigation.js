@@ -13,5 +13,4 @@
         'ngRoute', 'ngCookies'
     ]);
 
-
 }(angular, asm));

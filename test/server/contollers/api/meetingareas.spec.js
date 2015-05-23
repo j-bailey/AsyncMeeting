@@ -58,7 +58,7 @@ describe('meeting areas route', function() {
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
                 .expect(200)
-                .expect(function(res){
+                .expect(function(res) {
                     var result = JSON.parse(res.text);
                     expect(result).to.have.length(2);
                     expect(result[0]._id).to.equal(childMeetingAreaId);
@@ -75,7 +75,7 @@ describe('meeting areas route', function() {
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
                 .expect(200)
-                .expect(function(res){
+                .expect(function(res) {
                     var result = JSON.parse(res.text);
                     expect(result).to.have.length(1);
                     expect(result[0]._id).to.equal(parentMeetingAreaId);

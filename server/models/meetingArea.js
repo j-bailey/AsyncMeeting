@@ -4,9 +4,9 @@ var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 
 var schema = new mongoose.Schema({
-    title: {type: String, required: true},
-    description: {type: String, required: false},
-    parentMeetingArea: {type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea'}
+    title: { type: String, required: true },
+    description: { type: String, required: false },
+    parentMeetingArea: { type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea' }
 });
 
 // Add static methods
@@ -16,7 +16,6 @@ var schema = new mongoose.Schema({
 schema.plugin(modifiedOn);
 schema.plugin(createInfo);
 schema.plugin(versionInfo);
-
 
 var MeetingArea  = mongoose.model('MeetingArea', schema);
 

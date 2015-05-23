@@ -36,7 +36,6 @@ function getAcl() {
     return acl;
 }
 
-
 module.exports.init = init;
 module.exports.getAcl = getAcl;
 module.exports.setUpRoles = setUpRoles;

@@ -3,14 +3,14 @@ var User = require('../models/user');
 var bCrypt = require('bcrypt-nodejs');
 var logger = require('winston');
 
-module.exports = function(passport){
+module.exports = function(passport) {
     passport.use('email-login', new LocalStrategy({
                 usernameField: 'email',
-                passReqToCallback : true
+                passReqToCallback: true
             },
             function(req, email, password, done) {
 // check in mongo if a user with email exists or not
-                User.findOne({ 'email' : email },
+                User.findOne({ 'email': email },
                     function(err, user) {
 // In case of any error, return using the done method
                         if (err) {
@@ -18,7 +18,7 @@ module.exports = function(passport){
                         }
 // Username does not exist, log the error and redirect back
                         if (!user){
-                            logger.debug('User Not Found with email '+email);
+                            logger.debug('User Not Found with email ' + email);
                             return done(null, false, req.flash('message', 'User Not found.'));
                         }
 // User exists but wrong password, log the error
@@ -33,7 +33,7 @@ module.exports = function(passport){
                 );
             })
     );
-    var isValidPassword = function(user, password){
+    var isValidPassword = function(user, password) {
         return bCrypt.compareSync(password, user.password);
     };
 };

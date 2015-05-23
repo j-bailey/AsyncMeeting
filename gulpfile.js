@@ -7,6 +7,3 @@ fs.readdirSync(__dirname + '/support/gulp').forEach(function (task) {
 
 gulp.task('dev', ['css', 'images', 'js', 'html', 'watch:css', 'watch:images', 'watch:js', 'watch:html', 'watch:config', 'dev:server']);
 
-
-
-

@@ -4,7 +4,7 @@ var jwt = require('jwt-simple');
 var config = require('../../../../config');
 
 var createTokenForUser = function (req, res, next) {
-    User.findOne({username: req.body.username}).select('password').select('username').exec(function (err, user) {
+    User.findOne({ username: req.body.username }).select('password').select('username').exec(function (err, user) {
         if (err) {
             return next(err);
         }
@@ -18,7 +18,7 @@ var createTokenForUser = function (req, res, next) {
             if (!valid) {
                 return res.send(401);
             }
-            var token = jwt.encode({username: user.username}, config.secret);
+            var token = jwt.encode({ username: user.username }, config.secret);
             res.send(token);
         });
     });
@@ -27,6 +27,4 @@ var createTokenForUser = function (req, res, next) {
 module.exports = {
     createTokenForUser: createTokenForUser
 };
-
-
 

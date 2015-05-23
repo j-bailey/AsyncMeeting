@@ -2,21 +2,24 @@ var db = require('../../server/db');
 var User = require('../../server/models/user');
 var bcrypt = require('bcrypt');
 var chai = require('chai');
-chai.use( require('chai-as-promised'));
+var chaiAsPromised = require('chai-as-promised');
 var expect = chai.expect;
+
+chai.use(chaiAsPromised);
+
 describe('making a post', function () {
 
     beforeEach(function () {
         db.connection.db.dropDatabase();
-        var user = new User({username: 'dickeyxxx'});
+        var user = new User({ username: 'dickeyxxx' });
         bcrypt.hash('pass', 10, function (err, hash) {
             if (err) {
-                return next(err)
+                return next(err);
             }
             user.password = hash;
             user.save(function (err) {
                 if (err) {
-                    return next(err)
+                    return next(err);
                 }
             })
         })
@@ -36,12 +39,6 @@ describe('making a post', function () {
         expect( element.all( by.css('ul.list-group li')). first(). getText()).to.eventually.contain( post)
     })
 });
-
-
-
-
-
-
 
 //
 //

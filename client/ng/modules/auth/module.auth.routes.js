@@ -21,5 +21,4 @@
             $routeProvider.otherwise({ redirectTo: asm.modules.auth.routes.login });
         }]);
 
-
 }(angular, asm));

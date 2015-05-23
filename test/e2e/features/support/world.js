@@ -10,7 +10,6 @@ module.exports = function() {
         path = require('path'),
         promise = require('selenium-webdriver').promise;
 
-
     var testFolder = path.normalize(path.join(__dirname, '..', '..')),
         tmpFolder = path.normalize(path.join(__dirname, '..', '..', '..', 'tmp')),
         testingUtils = require('pg-testing-utils'),
@@ -36,7 +35,6 @@ module.exports = function() {
         );
         return deferred;
     }
-
 
     this.World = function World(callback) {
         this.takeScreenshot = takeScreenshot;

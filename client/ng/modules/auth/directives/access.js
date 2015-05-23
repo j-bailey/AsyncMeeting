@@ -29,7 +29,6 @@
                       },
                       roles = attrs.access.split(',');
 
-
                   if (roles.length > 0) {
                       determineVisibility(true);
                   }

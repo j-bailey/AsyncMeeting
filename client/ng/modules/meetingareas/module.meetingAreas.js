@@ -20,5 +20,4 @@
         'ngRoute', 'rcWizard', 'rcForm', 'rcDisabledBootstrap'
     ]);
 
-
 }(angular, asm));

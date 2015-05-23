@@ -1,14 +1,14 @@
 describe('viewing meeting areas', function() {
-    var $scope;
-    var $routeParams;
-    var $controller;
-    var $cookies;
-    var $q;
-    var meetingAreaService;
-    var meetingAreaCtrl;
-    var childMeetingAreasDeferred;
-    var meetingAreaDeferred;
-    var createMeetingAreaDeferred;
+    var $scope,
+        $routeParams,
+        $controller,
+        $cookies,
+        $q,
+        meetingAreaService,
+        meetingAreaCtrl,
+        childMeetingAreasDeferred,
+        meetingAreaDeferred,
+        createMeetingAreaDeferred;
 
     beforeEach(module(asm.modules.meetingareas.name));
 
@@ -25,8 +25,8 @@ describe('viewing meeting areas', function() {
         $scope.resetForms = function() {};
 
             $controller = _$controller_;
-        $routeParams = {meetingAreaId: '123'};
-        $cookies = {currentUser: "testUser"};
+        $routeParams = { meetingAreaId: '123' };
+        $cookies = { currentUser: "testUser" };
         $q = _$q_;
 
         // Setup mock meetingAreaService
@@ -45,7 +45,7 @@ describe('viewing meeting areas', function() {
             }
          };
 
-        meetingAreaCtrl = $controller(asm.modules.meetingareas.controllers.meetingAreasCtrl, {$scope: $scope, $routeParams: $routeParams, $cookies: $cookies, meetingAreaService: meetingAreaService});
+        meetingAreaCtrl = $controller(asm.modules.meetingareas.controllers.meetingAreasCtrl, { $scope: $scope, $routeParams: $routeParams, $cookies: $cookies, meetingAreaService: meetingAreaService });
     }));
 
     describe("on initialization", function() {
@@ -54,11 +54,11 @@ describe('viewing meeting areas', function() {
             expect($scope.currentUser).to.equal('testUser');
 
             childMeetingAreasDeferred.resolve(
-                {data: [{title: "Child 1", description: ""}, {title: "Child 2", description: ""}]});
+                { data: [{ title: "Child 1", description: "" }, { title: "Child 2", description: "" }] });
             $scope.$digest();
             expect($scope.meetingAreas).to.have.length(2);
 
-            meetingAreaDeferred.resolve({data: {title: "Parent", description: ""}});
+            meetingAreaDeferred.resolve({ data: { title: "Parent", description: "" } });
             $scope.$digest();
             expect($scope.currentMeetingArea.title).to.equal("Parent");
         });
@@ -81,13 +81,13 @@ describe('viewing meeting areas', function() {
         });
 
         it('should create a new meeting area', function() {
-            createMeetingAreaDeferred.resolve({title: "New Meeting Area", description: "New Meeting Area Description", parentMeetingAreaId: "123"});
+            createMeetingAreaDeferred.resolve({ title: "New Meeting Area", description: "New Meeting Area Description", parentMeetingAreaId: "123" });
             $scope.$digest();
             createMeetingAreaSpy.should.have.been.calledOnce;
         });
 
         it('should retrieve the list of child meeting areas', function() {
-            childMeetingAreasDeferred.resolve({data: [{title: "Child 1", description: ""}, {title: "Child 2", description: ""}]});
+            childMeetingAreasDeferred.resolve({ data: [{ title: "Child 1", description: "" }, { title: "Child 2", description: "" }] });
             $scope.$digest();
             expect($scope.meetingAreas).to.have.length(2);
         })

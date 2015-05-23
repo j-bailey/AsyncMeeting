@@ -3,7 +3,7 @@
  */
 var r = require('./acl-resources');
 
-var ENTERPRISE_TIER_USER_ROLE = {key:'EnterpriseTierUserRole', name:'Enterprise Tier User', desc:'',
+var ENTERPRISE_TIER_USER_ROLE = { key:'EnterpriseTierUserRole', name:'Enterprise Tier User', desc:'',
     allows: [
         {
             resources: [
@@ -22,6 +22,6 @@ var ENTERPRISE_TIER_USER_ROLE = {key:'EnterpriseTierUserRole', name:'Enterprise 
                 r.MEETING_AREA_RESOURCE.allowedPermissions.unlimited
             ]
         }
-    ]};
+    ] };
 
 module.exports.object = ENTERPRISE_TIER_USER_ROLE;

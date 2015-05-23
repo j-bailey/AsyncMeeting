@@ -79,7 +79,6 @@
                 rc.summaryForm.reset();
             };
 
-
             // Create a new meeting
             $scope.createMeetingArea = function() {
                 // TODO: Handle saving admins, invitees, etc.

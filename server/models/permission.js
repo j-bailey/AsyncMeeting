@@ -4,17 +4,14 @@ var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 
 var permissionSchema = new mongoose.Schema({
-        name: {type: String, required: true},
-        description: {type: String, required: false}
+        name: { type: String, required: true },
+        description: { type: String, required: false }
     }
 );
-
-
 
 permissionSchema.plugin(modifiedOn);
 permissionSchema.plugin(createInfo);
 permissionSchema.plugin(versionInfo);
-
 
 var Permission = mongoose.model('Permission', permissionSchema);
 

@@ -39,5 +39,4 @@
         asm.modules.core.name
     ]);
 
-
 }(angular, asm));

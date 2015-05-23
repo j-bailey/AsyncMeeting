@@ -1,7 +1,12 @@
-{ "excludeFiles":
-[ "node_modules/**"
-, "coverage"
-]
+{
+  "excludeFiles":
+  [
+    "node_modules/**"
+    , "coverage"
+    , "assets/**"
+    , "logs/**"
+    , "tmp/**"
+  ]
 , "requireLineFeedAtFileEnd": true
 , "disallowMultipleLineBreaks": true
 , "requireMultipleVarDecl": true
@@ -24,12 +29,9 @@
 , "requireSpaceAfterBinaryOperators": [ "+", "-", "/", "*", "=", "==", "===", "!=", "!==" ]
 , "requireSpaceAfterKeywords": [ "if", "else", "for", "while", "do", "switch", "try", "catch" ]
 , "requireSpaceBeforeKeywords": [ "else", "while", "catch" ]
-, "disallowLeftStickedOperators": [ "?", "+", "/", "*", "=", "==", "===", "!=", "!==", ">", ">=", "<", "<=" ]
-, "disallowRightStickedOperators": [ "?", "+", "/", "*", ":", "=", "==", "===", "!=", "!==", ">", ">=", "<", "<=" ]
 , "disallowSpaceAfterPrefixUnaryOperators": [ "++", "--", "+", "-", "~", "!" ]
 , "disallowSpaceBeforePostfixUnaryOperators": [ "++", "--" ]
 , "requireSpaceBeforeBinaryOperators": [ "+", "-", "/", "*", "=", "==", "===", "!=", "!==" ]
-, "requireSpaceAfterBinaryOperators": [ "+", "-", "/", "*", "=", "==", "===", "!=", "!==" ]
 , "requireSpacesInFunctionExpression": { "beforeOpeningCurlyBrace": true }
 , "requireSpaceBetweenArguments": true
 , "requireSpacesInForStatement": true
