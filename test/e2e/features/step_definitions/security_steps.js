@@ -43,14 +43,7 @@ var steps = function () {
     });
 
     this.Given(/^I request to authenticate myself$/, function (next) {
-        //this.imageUtils.createReferenceImageForElement(browser.driver, element(by.css('nav .login')), 'security', 'login').then(
-        this.imageUtils.compareReferenceImageWithElementScreenShot(element(By.css('nav .login')), browser.driver, 'security', 'login', 0).then(
-            function (compareValue) {
-                console.log('compare value = ' + compareValue);
-                element(By.css('nav .login')).click().then(next);
-            }
-        );
-        //element(By.css('nav .login')).click().then(next); // fill out and submit registration form ' +
+        element(By.css('nav .login')).click().then(next); // fill out and submit registration form ' +
     });
 
     this.When(/^I provide my credentials of username (.*), email (.*), and password (.*)$/, function (username, email, password, next) {
