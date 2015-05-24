@@ -6,15 +6,25 @@ var childProcess;
 var spawn = require('child_process').spawn;
 
 var args = process.argv.slice(2);
-var port = args[0];
-var cmd = args[1];
-var cmdArgs = args.slice(2);
+var basePort = args[0];
+var port = args[1];
+var cmd = args[2];
+var cmdArgs = args.slice(3);
 
 console.log('cmdArgs = ' + cmdArgs);
+
 childProcess = spawn(cmd, cmdArgs, {
     detached: false,
     stdio: 'inherit',
     env: process.env
+});
+
+childProcess.on('exit', function (code) {
+    console.log('child process terminated due to receipt of code ' + code);
+    response.statusCode = 200;
+    response.end(function () {
+        process.exit(0);
+    });
 });
 
 var my_http = require("http"),
@@ -26,13 +36,6 @@ var server = my_http.createServer(function (request, response) {
     if (myPath && myPath === '/shutdown') {
         console.log(' ---- Here');
         console.log('Connected');
-        childProcess.on('exit', function (code) {
-            console.log('child process terminated due to receipt of code ' + code);
-            response.statusCode = 200;
-            response.end(function () {
-                process.exit(0);
-            });
-        });
         console.log('Before kill');
 
         childProcess.kill();
@@ -75,3 +78,35 @@ function onError(error) {
 function onListening() {
     console.log('Listening on port ' + server.address().port);
 }
+
+function keepAliveCheck() {
+    var http = require('http'),
+        done = this.async();
+
+    console.log('%%% -- ' + 'http://127.0.0.1:' + basePort + '/checkin');
+
+    http.get('http://127.0.0.1:' + basePort + '/checkin', function (res) {
+        console.log("Got response: " + res.statusCode);
+        if (res.statusCode === 200) {
+            done();
+        } else {
+            done('Not 200, but ' + res.statusCode);
+        }
+    }).on('error', function (e) {
+        console.log("Got error: " + e.message);
+        http.get('http://127.0.0.1:' + basePort + '/checkin', function (res) {
+            console.log("Got response: " + res.statusCode);
+            if (res.statusCode === 200) {
+                return;
+            } else {
+                childProcess.kill();
+            }
+        }).on('error', function (e) {
+            console.log("Got error: " + e.message);
+            childProcess.kill();
+        });
+    });
+
+}
+
+setInterval(keepAliveCheck, 50000);

@@ -2,7 +2,9 @@ module.exports = function(grunt) {
     var config = {
         pkg: grunt.file.readJSON('package.json'),
         seleniumPort: 4444,
-        cucumberTags: '~@proxy_test'
+        cucumberTags: '~@proxy_test',
+        webLaunchBasePort: 4422,
+        webLaunchBaseIsRunning: false
     };
 
     function loadConfig(path) {

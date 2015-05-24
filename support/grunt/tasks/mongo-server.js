@@ -13,8 +13,8 @@ module.exports = function(grunt) {
         grunt.task.run(['web-launch:62626:mongod:[\'--dbpath\', \'' + dbPath + '\']']);
     });
 
-    grunt.registerTask('kill-mongo-server', function() {
-        grunt.task.run(['web-launch-kill:62626']);
-    });
+    //grunt.registerTask('kill-mongo-server', function() {
+    //    grunt.task.run(['web-launch-kill:62626']);
+    //});
 
 };

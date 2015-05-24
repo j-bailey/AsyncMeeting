@@ -12,6 +12,12 @@ module.exports = function (grunt) {
             logPath = path.join('.', 'tmp', 'web-launch'),
             spawn = require('child_process').spawn;
 
+        if (grunt.config.get('webLaunchBaseIsRunning') == null) {
+            grunt.config.set('webLaunchBaseIsRunning', false);
+        }
+        if (grunt.config.get('webLaunchBaseIsRunning')){
+            grunt.task.run(['web-launch-base']);
+        }
         if (!fs.existsSync(logPath)) {
             nodeFs.mkdirSync(logPath, 511, true);
         }
@@ -20,7 +26,7 @@ module.exports = function (grunt) {
             err = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a');
 
         console.log('--' + cmdArgs + '--');
-        var args = ['support/grunt/web-launch-server', port, cmd];
+        var args = ['support/grunt/web-launch-server', grunt.config.get('webLaunchBasePort'), port, cmd];
         if (cmdArgs && typeof cmdArgs === 'string' && cmdArgs.length > 0) {
             cmdArgs = JSON.parse(cmdArgs.replace(/'/g, '"').replace(/\|/g, ':'));
             args.push.apply(args, cmdArgs);
