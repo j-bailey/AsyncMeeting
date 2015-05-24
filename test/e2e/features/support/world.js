@@ -11,7 +11,7 @@ module.exports = function() {
         promise = require('selenium-webdriver').promise;
 
     var testFolder = path.normalize(path.join(__dirname, '..', '..')),
-        tmpFolder = path.normalize(path.join(__dirname, '..', '..', '..', 'tmp')),
+        tmpFolder = path.normalize(path.join(__dirname, '..', '..', '..', '..', 'tmp')),
         testingUtils = require('pg-testing-utils'),
         imageUtils = testingUtils.imageUtils(testFolder, tmpFolder);
 
