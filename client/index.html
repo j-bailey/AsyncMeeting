@@ -26,12 +26,6 @@
             <a class="navbar-brand" href="#/">Productive Gains <span class="productNameHeader">AsyncMeeting</span></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-            <!--<ul ng-if='currentUser' class='nav navbar-nav'>-->
-                <!--<li><a class='posts' href="/"> Home </a></li>-->
-                <!--<li><a access="CanViewMeetingAreas, CanEditMeetingAreas, CanDeleteMeetingAreas"-->
-                       <!--access-permission-type="AtLeastOne" class='meetingareas'-->
-                       <!--ng-href='#/meetingareas'>My Meeting Areas</a></li>-->
-            <!--</ul>-->
             <p ng-if='currentUser' class="navbar-text navbar-right signin">Signed in as {{currentUser.username}}</p>
             <ul ng-if='!currentUser' class=' nav navbar-nav navbar-right'>
                 <li><a class='register' href="#/register"> Register </a></li>

@@ -7,7 +7,6 @@
 var app = require('./app');
 var debug = require('debug')('AsyncMeeting:server');
 var http = require('http');
-var websockets = require('./websockets');
 
 /**
  * Get port from environment and store in Express.
@@ -30,7 +29,6 @@ server.listen(port, function () { console.log('Server listening on', port); });
 server.on('error', onError);
 server.on('listening', onListening);
 
-websockets.connect(server);
 
 /**
  * Event listener for HTTP server "error" event.
