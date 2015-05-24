@@ -1,7 +1,8 @@
 tmp/
 dump.rdb
 *.log
-karma-coverage/
+coverage-server-unit/
+coverage-client-unit/
 coverage/
 
 # Build target area

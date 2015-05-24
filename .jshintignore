@@ -1,5 +1,8 @@
 node_modules
 assets
 coverage
+coverage-server-unit
+coverage-client-unit
 test
+
 

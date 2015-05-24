@@ -22,17 +22,13 @@ module.exports = function (config) {
             'test/ng/**/post*.js'
         ],
         preprocessors: {
-            'client/ng/*.js': 'coverage'
+            'client/ng/**/*.js': 'coverage'
         },
         coverageReporter: {
-            type: 'text-summary',
-            dir: 'coverage/'
+            type: 'html',
+            dir: 'coverage-client-unit/'
         },
         reporters: ['progress', 'coverage'],
-        coverageReporter : {
-            type : 'html',
-            dir : 'karma-coverage/'
-        },
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
