@@ -9,7 +9,7 @@
     "postinstall": "./node_modules/.bin/init-pg-testing-utils.js && bower install --config.interactive=false && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && node ./support/npm/post-install.js",
     "client-unittests": "./node_modules/grunt-cli/bin/grunt karma",
     "server-unittests": "./node_modules/grunt-cli/bin/grunt mocha",
-    "e2e": "./node_modules/grunt-cli/bin/grunt e2e --force",
+    "e2e": "./node_modules/grunt-cli/bin/grunt e2e",
     "lint": "./node_modules/.bin/jshint .",
     "checkStyle": "./node_modules/.bin/jscs .",
     "dev": "node ./support/npm/launch-dev.js"
