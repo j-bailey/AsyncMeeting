@@ -5,7 +5,7 @@
   "scripts": {
     "pretest": "npm run-script lint && ./node_modules/grunt-cli/bin/grunt istanbul-mocha",
     "posttest": "./node_modules/.bin/istanbul check-coverage ",
-    "test": "npm run client-unittests && npm run server-unittests && npm run e2e",
+    "test": "npm run client-unittests && npm run server-unittests && npm run e2e --force",
     "postinstall": "./node_modules/.bin/init-pg-testing-utils.js && bower install --config.interactive=false && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && node ./support/npm/post-install.js",
     "client-unittests": "./node_modules/grunt-cli/bin/grunt karma",
     "server-unittests": "./node_modules/grunt-cli/bin/grunt mocha",
