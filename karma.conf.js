@@ -21,16 +21,23 @@ module.exports = function (config) {
         exclude: [
             'test/ng/**/post*.js'
         ],
+        preprocessors: {
+            'client/ng/*.js': 'coverage'
+        },
         coverageReporter: {
             type: 'text-summary',
             dir: 'coverage/'
         },
         reporters: ['progress', 'coverage'],
+        coverageReporter : {
+            type : 'html',
+            dir : 'karma-coverage/'
+        },
         port: 9876,
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: true,
-        browsers: ['PhantomJS'],
+        browsers: ['Chrome', 'Firefox', 'Safari', 'IE'],
         singleRun: false
     });
 };

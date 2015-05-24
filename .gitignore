@@ -1,6 +1,8 @@
 tmp/
 dump.rdb
 *.log
+karma-coverage/
+coverage/
 
 # Build target area
 assets
@@ -91,3 +93,4 @@ node_modules
 
 
 npm-debug.log
+karma-coverage

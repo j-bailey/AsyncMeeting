@@ -2,3 +2,6 @@ test/server
 --recursive
 --reporter spec
 --ui bdd
+plugins: [
+  'karma-coverage'
+]
