@@ -5,7 +5,7 @@
   "scripts": {
     "pretest": "npm run-script lint && ./node_modules/grunt-cli/bin/grunt start-external-services istanbul-mocha ",
     "posttest": "./node_modules/.bin/istanbul check-coverage && ./node_modules/grunt-cli/bin/grunt kill-external-services",
-    "test": "./node_modules/grunt-cli/bin/grunt karma mocha e2e kill-external-services",
+    "test": "./node_modules/grunt-cli/bin/grunt karma mocha e2e",
     "postinstall": "./node_modules/.bin/init-pg-testing-utils.js && bower install --config.interactive=false && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && node ./support/npm/post-install.js",
     "client-unittests": "./node_modules/grunt-cli/bin/grunt start-external-services karma kill-external-services",
     "server-unittests": "./node_modules/grunt-cli/bin/grunt start-external-services mocha kill-external-services",
