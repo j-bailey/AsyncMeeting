@@ -1,8 +1,6 @@
 tmp/
 dump.rdb
 *.log
-coverage-server-unit/
-coverage-client-unit/
 coverage/
 
 # Build target area

@@ -9,14 +9,14 @@ instrumentation:
     preserve-comments: false
     complete-copy: false
     save-baseline: false
-    baseline-file: ./coverage-server-unit/coverage-baseline.json
+    baseline-file: ./coverage/server-unit/coverage-baseline.json
     include-all-sources: false
     include-pid: false
 reporting:
     print: summary
     reports:
         - lcov
-    dir: ./coverage-server-unit
+    dir: ./coverage/server-unit
     watermarks:
         statements: [50, 80]
         lines: [50, 80]
