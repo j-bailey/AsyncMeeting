@@ -12,9 +12,7 @@ module.exports = function(grunt) {
         grunt.task.run([
             'start-redis-server',
             'start-mongo-server',
-            'launch-istanbul-mocha-process:' + configFile,
-            'start-redis-server',
-            'kill-mongo-server']);
+            'launch-istanbul-mocha-process:' + configFile]);
     });
 
     grunt.registerTask('launch-istanbul-mocha-process', function(configFile) {

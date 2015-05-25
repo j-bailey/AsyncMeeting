@@ -21,11 +21,11 @@ module.exports = function (grunt) {
         // handle specific listen errors with friendly messages
         switch (error.code) {
             case 'EACCES':
-                console.error('Port ' + port + ' requires elevated privileges');
+                console.error('Port ' + grunt.config.get('webLaunchBasePort') + ' requires elevated privileges');
                 process.exit(1);
                 break;
             case 'EADDRINUSE':
-                console.error('Port ' + port + ' is already in use');
+                console.error('Port ' + grunt.config.get('webLaunchBasePort') + ' is already in use');
                 process.exit(1);
                 break;
             default:
@@ -50,8 +50,8 @@ module.exports = function (grunt) {
                 response.end();
             }
         });
-        server.listen(port, '127.0.0.1', function () {
-            console.log('Web launch server listening on', port);
+        server.listen(grunt.config.get('webLaunchBasePort'), '127.0.0.1', function () {
+            console.log('Web launch server listening on', grunt.config.get('webLaunchBasePort'));
         });
         server.on('error', onError);
         server.on('listening', onListening);

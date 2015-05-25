@@ -19,13 +19,6 @@ childProcess = spawn(cmd, cmdArgs, {
     env: process.env
 });
 
-childProcess.on('exit', function (code) {
-    console.log('child process terminated due to receipt of code ' + code);
-    response.statusCode = 200;
-    response.end(function () {
-        process.exit(0);
-    });
-});
 
 var my_http = require("http"),
     url = require("url");
@@ -37,6 +30,14 @@ var server = my_http.createServer(function (request, response) {
         console.log(' ---- Here');
         console.log('Connected');
         console.log('Before kill');
+
+        childProcess.on('exit', function (code) {
+            console.log('child process terminated due to receipt of code ' + code);
+            response.statusCode = 200;
+            response.end(function () {
+                process.exit(0);
+            });
+        });
 
         childProcess.kill();
     }

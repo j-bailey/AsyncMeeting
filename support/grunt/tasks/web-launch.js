@@ -12,7 +12,7 @@ module.exports = function (grunt) {
             logPath = path.join('.', 'tmp', 'web-launch'),
             spawn = require('child_process').spawn;
 
-        if (grunt.config.get('webLaunchBaseIsRunning') == null) {
+        if (grunt.config.get('webLaunchBaseIsRunning') === null) {
             grunt.config.set('webLaunchBaseIsRunning', false);
         }
         if (grunt.config.get('webLaunchBaseIsRunning')){

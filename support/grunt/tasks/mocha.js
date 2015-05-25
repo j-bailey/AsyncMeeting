@@ -9,9 +9,7 @@ module.exports = function(grunt) {
         grunt.task.run([
             'start-redis-server',
             'start-mongo-server',
-            'launch-mocha-process',
-            'start-redis-server',
-            'kill-mongo-server']);
+            'launch-mocha-process']);
     });
 
     grunt.registerTask('launch-mocha-process', function() {

@@ -9,9 +9,7 @@ module.exports = function(grunt) {
         grunt.task.run([
             'start-redis-server',
             'start-mongo-server',
-            'launch-karma-process',
-            'kill-redis-server',
-            'kill-mongo-server']);
+            'launch-karma-process']);
     });
 
     grunt.registerTask('launch-karma-process', function() {
