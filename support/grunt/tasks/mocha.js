@@ -6,10 +6,7 @@ module.exports = function(grunt) {
         process.env.PORT = 3001;
         process.env.NODE_ENV = 'test';
 
-        grunt.task.run([
-            'start-redis-server',
-            'start-mongo-server',
-            'launch-mocha-process']);
+        grunt.task.run(['launch-mocha-process']);
     });
 
     grunt.registerTask('launch-mocha-process', function() {

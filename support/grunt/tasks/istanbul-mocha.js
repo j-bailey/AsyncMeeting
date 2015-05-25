@@ -9,10 +9,7 @@ module.exports = function(grunt) {
         process.env.PORT = 3001;
         process.env.NODE_ENV = 'test';
 
-        grunt.task.run([
-            'start-redis-server',
-            'start-mongo-server',
-            'launch-istanbul-mocha-process:' + configFile]);
+        grunt.task.run(['launch-istanbul-mocha-process:' + configFile]);
     });
 
     grunt.registerTask('launch-istanbul-mocha-process', function(configFile) {

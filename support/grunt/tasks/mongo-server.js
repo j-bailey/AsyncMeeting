@@ -10,11 +10,11 @@ module.exports = function(grunt) {
             nodeFs.mkdirSync(dbPath, 511, true);
         }
 
-        grunt.task.run(['web-launch:62626:mongod:[\'--dbpath\', \'' + dbPath + '\']']);
+        grunt.task.run(['file-launch:mongo:mongod:[\'--dbpath\', \'' + dbPath + '\']']);
     });
 
-    //grunt.registerTask('kill-mongo-server', function() {
-    //    grunt.task.run(['web-launch-kill:62626']);
-    //});
+    grunt.registerTask('kill-mongo-server', function() {
+        grunt.task.run(['file-launch-kill:mongo']);
+    });
 
 };
