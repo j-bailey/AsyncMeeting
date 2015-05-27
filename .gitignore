@@ -2,6 +2,7 @@ tmp/
 dump.rdb
 *.log
 coverage/
+bower_components
 
 # Build target area
 assets

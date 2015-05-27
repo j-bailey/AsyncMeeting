@@ -79,6 +79,7 @@
     "karma-sinon-chai": "^0.3.0",
     "mocha": "^2.2.1",
     "mockery": "^1.4.0",
+    "mockgoose": "^2.0.2",
     "nock": "^2.2.0",
     "pg-testing-utils": "git+ssh://git@bitbucket.org:productivegains/pg-testing-utils.git",
     "rewire": "^2.3.3",
