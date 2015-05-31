@@ -1,12 +1,11 @@
 /**
  * Created by jlb on 4/18/15.
  */
-var redisServer = require('./redis-server'),
-    mongoServer = require('./mongo-server'),
+var mongoServer = require('./mongo-server'),
     spawn = require('child_process').spawnSync;
 
 var calledBeforeExit = 0,
-    serverList = [redisServer, mongoServer];
+    serverList = [mongoServer];
 
 function killProcesses() {
     serverList.forEach(function(process) {

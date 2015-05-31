@@ -1,7 +1,0 @@
-test/server
---recursive
---reporter spec
---ui bdd
---require test/server/support/common
---require test/server/support/node
---require test/server/support/api

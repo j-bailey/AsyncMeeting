@@ -5,10 +5,12 @@
   "scripts": {
     "pretest": "npm run-script lint && ./node_modules/grunt-cli/bin/grunt start-external-services istanbul-mocha ",
     "posttest": "./node_modules/.bin/istanbul check-coverage && ./node_modules/grunt-cli/bin/grunt kill-external-services",
-    "test": "./node_modules/grunt-cli/bin/grunt karma mocha e2e",
+    "test": "./node_modules/grunt-cli/bin/grunt karma mocha",
     "postinstall": "./node_modules/.bin/init-pg-testing-utils.js && bower install --config.interactive=false && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && node ./support/npm/post-install.js",
-    "client-unittests": "./node_modules/grunt-cli/bin/grunt start-external-services karma kill-external-services",
-    "server-unittests": "./node_modules/grunt-cli/bin/grunt start-external-services mocha kill-external-services",
+    "unit-tests:client": "./node_modules/grunt-cli/bin/grunt start-external-services karma kill-external-services",
+    "unit-tests:server": "./node_modules/grunt-cli/bin/grunt start-external-services istanbul-mocha:test/unit/server kill-external-services",
+    "integration-tests:client": "./node_modules/grunt-cli/bin/grunt start-external-services karma kill-external-services",
+    "integration-tests:server": "./node_modules/grunt-cli/bin/grunt start-external-services istanbul-mocha:test/integration/server kill-external-services",
     "e2e": "./node_modules/grunt-cli/bin/grunt start-external-services e2e kill-external-services",
     "lint": "./node_modules/.bin/jshint .",
     "checkStyle": "./node_modules/.bin/jscs .",
@@ -47,7 +49,6 @@
     "passport": "~0.2.1",
     "passport-local": "~1.0.0",
     "q": "~1.2.0",
-    "redis": "^0.12.1",
     "serve-favicon": "~2.2.0",
     "winston": "^0.9.0",
     "ws": "^0.7.1"
