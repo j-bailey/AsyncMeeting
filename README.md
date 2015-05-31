@@ -9,7 +9,6 @@ https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
 
 # Set up
 - install Mongodb
-- install Redis
 - run `npm install`
 
 # Run server for development
@@ -17,17 +16,27 @@ run `npm run dev`
 
 # Testing
 
+This project has three types of tests.
+- Unit tests
+- Integration Tests
+- end-to-end (e2e) tests
+
+Unit tests have no external dependencies to run including the files system, they run super fast, and only set a small unit of the system.  
+Integration tests run locally, have no external dependencies, except for what the project can install add run locally, and tests multiple usnits together.
+e2e tests is a realistic test using systems similar to production, but in some cases can run locally on the developer system.  
+More details are available at [Google Testing Blog: Test Size](http://googletesting.blogspot.com/2010/12/test-sizes.html) or 
+[Google Testing Blog: Just Say No to More End-to-End Tests](http://googletesting.blogspot.com/2015/04/just-say-no-to-more-end-to-end-tests.html)
+
+
 ## Running Tests
-**NOTE:** Grunt tasks starts all external dependencies, so no need to start you own Redis and MongoDB server.
+**NOTE:** Grunt tasks starts all external dependencies, so no need to start you own MongoDB server.
 
 - To use the test configuration change the env to test.  This will do things like use the test.json configuration file
   which will point to a test instance of the database instead of the dev or production one.  `export NODE_ENV=test`
-- For all tests `npm test`
-- For server only tests `grunt mocha`
-  - These tests use supertest which require the express app configured the way it would be if it were actually running.
-    So this test uses test/server/support/api.js to wrap the app in a supertest object which is then use to create
-    requests.
-- e2e tests only `grunt e2e`
+- `npm test` will run unti and if possible integration tests
+- `npm unit-tests:server` to run server unit tests 
+- `npm unit-tests:client` to run client unit tests
+- `npm e2e` to run end-to-end tests
 
 ## e2e Testing
 

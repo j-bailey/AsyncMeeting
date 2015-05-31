@@ -1,12 +1,25 @@
 var expect = require('chai').expect,
-    MeetingArea = require('../../../../server/models/meetingArea'),
-    request = require('../../support/api');
+    MeetingArea = require('../../../../../server/models/meetingArea'),
+    app = require('../../../../../app'),
+    request = require('supertest'),
+    user1 = request.agent(app);
 
 var meetingAreaId = "";
 
 describe('meeting area route', function() {
     beforeEach(function(done) {
         meetingAreaId = "";
+
+        user1
+            .post('http://localhost:3000/email-login')
+            .send({user:{
+                username:'Tom',
+                _id: '1111'
+            }})
+            .end(function(err, res) {
+                // user1 will manage its own cookies
+                // res.redirects contains an Array of redirects
+            });
 
         MeetingArea.remove({}, function(err, removedItem) {
             if ( err ) console.log("remove error: " + error.message);
@@ -28,7 +41,7 @@ describe('meeting area route', function() {
 
     describe('GET \'/\'', function() {
         it('should return a meeting area', function(done) {
-            request
+            user1
                 .get('/api/meetingarea/' + meetingAreaId)
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
@@ -43,7 +56,7 @@ describe('meeting area route', function() {
 
     describe('POST \'/\'', function() {
         it('should create a meeting area', function(done) {
-            request
+            user1
                 .post('/api/meetingarea')
                 .send({
                     parentMeetingAreaId: meetingAreaId,
@@ -66,7 +79,7 @@ describe('meeting area route', function() {
 
     describe('DELETE \'/\'', function() {
         it('should remove a meeting area', function(done) {
-            request
+            user1
                 .delete('/api/meetingarea/' + meetingAreaId)
                 .expect(200)
                 .end(function(err, res) {

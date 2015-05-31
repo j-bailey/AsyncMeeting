@@ -20,6 +20,6 @@ module.exports = function(grunt) {
             grunt.task.run(['protractor:' + browser + 'NoTags']);
         }
 
-        grunt.task.run(['kill-redis-server', 'kill-mongo-server', 'file-launch-kill:gulpTestServer']);
+        grunt.task.run(['kill-mongo-server', 'file-launch-kill:gulpTestServer']);
     });
 };

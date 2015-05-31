@@ -1,6 +1,9 @@
 var expect = require('chai').expect,
     MeetingArea = require('../../../../server/models/meetingArea'),
-    request = require('../../support/api');
+    app = require('../../../../app'),
+    request = require('supertest'),
+    user1 = request.agent(app);
+
 
 var parentMeetingAreaId = "";
 var childMeetingAreaId = "";
@@ -11,6 +14,17 @@ describe('meeting areas route', function() {
         parentMeetingAreaId = "";
         childMeetingAreaId = "";
         child2MeetingAreaId = "";
+
+        user1
+            .post('http://localhost:3000/email-login')
+            .send({user:{
+                username:'Tom',
+                _id: '1111'
+            }})
+            .end(function(err, res) {
+                // user1 will manage its own cookies
+                // res.redirects contains an Array of redirects
+            });
 
         MeetingArea.remove({}, function(err, removedItem) {
             if ( err ) console.log("remove error: " + err.message);
@@ -53,7 +67,7 @@ describe('meeting areas route', function() {
 
     describe('GET \'/\'', function() {
         it('should return meeting areas with the given parent id', function(done) {
-            request
+            user1
                 .get('/api/meetingareas/' + parentMeetingAreaId)
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
@@ -70,7 +84,7 @@ describe('meeting areas route', function() {
 
     describe('GET \'/\'', function() {
         it('should return meeting areas with the no parent meeting area', function(done) {
-            request
+            user1
                 .get('/api/meetingareas')
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)

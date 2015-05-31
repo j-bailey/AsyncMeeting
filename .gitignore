@@ -3,6 +3,7 @@ dump.rdb
 *.log
 coverage/
 bower_components
+dump.rdb
 
 # Build target area
 assets

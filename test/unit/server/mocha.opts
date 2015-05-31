@@ -1,0 +1,6 @@
+test/unit/server
+--recursive
+--reporter spec
+--ui bdd
+--require test/unit/server/support/common
+--require test/unit/server/support/node

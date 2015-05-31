@@ -1,11 +1,10 @@
-var redisServer = require('./redis-server'),
-    mongoServer = require('./mongo-server'),
+var mongoServer = require('./mongo-server'),
     spawn = require('child_process').spawnSync;
 
 // TODO move all NPM JS files to Grunt
 
 var calledBeforeExit = 0,
-    serverList = [redisServer, mongoServer];
+    serverList = [mongoServer];
 
 function killProcesses() {
     serverList.forEach(function(process) {
