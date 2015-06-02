@@ -12,7 +12,7 @@ module.exports = function(grunt) {
     grunt.registerTask('launch-mocha-process', function(testFolder) {
         var childProcess,
             spawnSync = require('child_process').spawnSync;
-console.log('folder ' + testFolder)
+
         childProcess = spawnSync('./node_modules/.bin/mocha', ['--recursive', '-R', 'spec', '-r', 'should', testFolder], {
             detached: false,
             stdio: 'inherit',

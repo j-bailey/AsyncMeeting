@@ -22,7 +22,7 @@ This project has three types of tests.
 - end-to-end (e2e) tests
 
 Unit tests have no external dependencies to run including the files system, they run super fast, and only set a small unit of the system.  
-Integration tests run locally, have no external dependencies, except for what the project can install add run locally, and tests multiple usnits together.
+Integration tests run locally, have no external dependencies, except for what the project can install add run locally, and tests multiple units together.
 e2e tests is a realistic test using systems similar to production, but in some cases can run locally on the developer system.  
 More details are available at [Google Testing Blog: Test Size](http://googletesting.blogspot.com/2010/12/test-sizes.html) or 
 [Google Testing Blog: Just Say No to More End-to-End Tests](http://googletesting.blogspot.com/2015/04/just-say-no-to-more-end-to-end-tests.html)
@@ -33,7 +33,7 @@ More details are available at [Google Testing Blog: Test Size](http://googletest
 
 - To use the test configuration change the env to test.  This will do things like use the test.json configuration file
   which will point to a test instance of the database instead of the dev or production one.  `export NODE_ENV=test`
-- `npm test` will run unti and if possible integration tests
+- `npm test` will run unit and if possible integration tests to include coverage for unit tests
 - `npm unit-tests:server` to run server unit tests 
 - `npm unit-tests:client` to run client unit tests
 - `npm e2e` to run end-to-end tests
