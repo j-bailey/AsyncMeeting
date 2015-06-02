@@ -1,7 +1,7 @@
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-var config = require('../../../config');
-var User = require('../../../server/models/user');
+var config = require('../../../../config');
+var User = require('../../../../server/models/user');
 exports.create = function (username, password, cb) {
     var user = new User({ username: username });
     bcrypt.hash(password, 10, function (err, hash) {

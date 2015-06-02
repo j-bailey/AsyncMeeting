@@ -12,7 +12,7 @@ var sinon = require('sinon'),
     mock = require('mockery');
     //rewire = require("rewire");
 
-chai.should();
+chai.Should();
 chai.use(chaiAsPromised);
 
 global.chaiAsPromised = chaiAsPromised;
