@@ -1,26 +1,23 @@
+var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 
-module.exports = function (providedMongoose) {
-    var mongoose = providedMongoose || require('mongoose');
-
-    var schema = new mongoose.Schema({
-        title: {type: String, required: true},
-        description: {type: String, required: false},
-        parentMeetingArea: {type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea'}
-    });
+var schema = new mongoose.Schema({
+    title: { type: String, required: true },
+    description: { type: String, required: false },
+    parentMeetingArea: { type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea' }
+});
 
 // Add static methods
 
 // Add plugins
 
-    schema.plugin(modifiedOn);
-    schema.plugin(createInfo);
-    schema.plugin(versionInfo);
+schema.plugin(modifiedOn);
+schema.plugin(createInfo);
+schema.plugin(versionInfo);
 
-    var MeetingArea = mongoose.model('MeetingArea', schema);
+var MeetingArea  = mongoose.model('MeetingArea', schema);
 
-    return MeetingArea;
-};
+module.exports = MeetingArea;
 
