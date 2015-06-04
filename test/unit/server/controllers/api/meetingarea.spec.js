@@ -32,7 +32,7 @@ describe('meeting area route', function() {
                     return this
                 },
                 json: function(json) {
-                    expect(jsonSpy.calledWith(meetingArea).to.equal(true));
+                    expect(jsonSpy.calledWith(meetingArea)).to.equal(true);
                     done();
                 }
             };
