@@ -25,7 +25,7 @@ module.exports = function (config) {
         },
         coverageReporter: {
             type: 'html',
-            dir: 'coverage/client-unit/'
+            dir: '../../../coverage/client-unit/'
         },
         reporters: ['progress', 'coverage'],
         port: 9876,
