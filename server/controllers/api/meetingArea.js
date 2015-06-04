@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var handlers = require('./handlers/meetingAreaHandlers');
+var handlers = require('./handlers/meetingAreaHandlers')();
 
 // TODO: add authentication
 router.get('/:meetingAreaId', handlers.getMeetingArea);
