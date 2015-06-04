@@ -92,6 +92,7 @@ build/Release
 node_modules
 
 
-
 npm-debug.log
 karma-coverage
+
+.DS_Store
