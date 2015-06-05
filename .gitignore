@@ -3,7 +3,6 @@ dump.rdb
 *.log
 coverage/
 bower_components
-dump.rdb
 
 # Build target area
 assets
@@ -65,7 +64,6 @@ crashlytics-build.properties
 ### Node template
 # Logs
 logs
-*.log
 
 # Runtime data
 pids

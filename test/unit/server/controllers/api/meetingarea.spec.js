@@ -1,9 +1,5 @@
-var mongoose = require('mongoose');
-//var ObjectId = mongoose.Types.ObjectId;
-var expect = require('chai').expect;
-var sinon = require('sinon');
 var MeetingArea = require('../../../../../server/models/meetingArea');
-var meetingAreaHandler = require('../../../../../server/controllers/api/handlers/meetingAreaHandlers');
+var meetingAreaHandler = require('../../../../../server/controllers/api/handlers/meetingAreasHandler');
 
 describe('meeting area route', function() {
     var sandbox;

@@ -68,7 +68,7 @@ describe('meeting areas route', function() {
     describe('GET \'/\'', function() {
         it('should return meeting areas with the given parent id', function(done) {
             user1
-                .get('/api/meetingareas/' + parentMeetingAreaId)
+                .get('/api/meetingareas?parentId=' + parentMeetingAreaId)
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
                 .expect(200)
@@ -83,9 +83,9 @@ describe('meeting areas route', function() {
     });
 
     describe('GET \'/\'', function() {
-        it('should return meeting areas with the no parent meeting area', function(done) {
+        it('should return meeting areas with no parent meeting area', function(done) {
             user1
-                .get('/api/meetingareas')
+                .get('/api/meetingareas?parentId=null')
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
                 .expect(200)
