@@ -12,7 +12,7 @@ describe('meeting area service', function() {
         context("meeting area for the id given exists", function () {
             it('should return a meeting area', function () {
                 $httpBackend
-                    .expectGET('/api/meetingarea/123')
+                    .expectGET('/api/meetingareas/123')
                     .respond({
                         id: "123"
                     });
@@ -34,7 +34,7 @@ describe('meeting area service', function() {
         context("meeting area for the id given does not exist", function() {
             it('should return an error that the meeting area was not found', function () {
                 $httpBackend
-                    .expectGET('/api/meetingarea/123')
+                    .expectGET('/api/meetingareas/123')
                     .respond(404);
 
                 var response = null;
@@ -134,7 +134,7 @@ describe('meeting area service', function() {
     describe('#createMeetingArea', function() {
         it('should create a meeting area', function() {
             $httpBackend
-                .expectPOST('/api/meetingarea',
+                .expectPOST('/api/meetingareas',
                 {
                     title: "Meeting Area 1",
                     description: "Meeting area 1 description",
@@ -161,7 +161,7 @@ describe('meeting area service', function() {
         context('the meeting area for the given id exists', function() {
             it('should delete a meeting area', function () {
                 $httpBackend
-                    .expectDELETE('/api/meetingarea/123')
+                    .expectDELETE('/api/meetingareas/123')
                     .respond(200);
 
                 var response = null;
@@ -181,7 +181,7 @@ describe('meeting area service', function() {
         context('the meeting area for the given id does not exist', function() {
             it('should return an error that the meeting area was not found', function () {
                 $httpBackend
-                    .expectDELETE('/api/meetingarea/123')
+                    .expectDELETE('/api/meetingareas/123')
                     .respond(404);
 
                 var response = null;
@@ -207,7 +207,7 @@ describe('meeting area service', function() {
         context('the meeting area for the given id exists', function() {
             it('should update a meeting area', function () {
                 $httpBackend
-                    .expectPUT('/api/meetingarea/123', {
+                    .expectPUT('/api/meetingareas/123', {
                         title: "New Title",
                         description: "New Description"
                     })
@@ -230,7 +230,7 @@ describe('meeting area service', function() {
         context('the meeting area for the given id does not exist', function() {
             it('should update a meeting area', function () {
                 $httpBackend
-                    .expectPUT('/api/meetingarea/123', {
+                    .expectPUT('/api/meetingareas/123', {
                         title: "New Title",
                         description: "New Description"
                     })

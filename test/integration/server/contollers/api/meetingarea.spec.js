@@ -42,7 +42,7 @@ describe('meeting area route', function() {
     describe('GET \'/\'', function() {
         it('should return a meeting area', function(done) {
             user1
-                .get('/api/meetingarea/' + meetingAreaId)
+                .get('/api/meetingareas/' + meetingAreaId)
                 .set('Accept', 'application/json')
                 .expect('Content-Type', /json/)
                 .expect(200)
@@ -57,7 +57,7 @@ describe('meeting area route', function() {
     describe('POST \'/\'', function() {
         it('should create a meeting area', function(done) {
             user1
-                .post('/api/meetingarea')
+                .post('/api/meetingareas')
                 .send({
                     parentMeetingAreaId: meetingAreaId,
                     title: "New Meeting Area",
@@ -80,7 +80,7 @@ describe('meeting area route', function() {
     describe('DELETE \'/\'', function() {
         it('should remove a meeting area', function(done) {
             user1
-                .delete('/api/meetingarea/' + meetingAreaId)
+                .delete('/api/meetingareas/' + meetingAreaId)
                 .expect(200)
                 .end(function(err, res) {
                     MeetingArea.find({}, function (err, meetingAreas) {

@@ -2,6 +2,24 @@ var MeetingArea = require('../../../../server/models/meetingArea');
 var ObjectId = require('mongoose').Types.ObjectId;
 var logger = require('winston');
 
+var getMeetingAreasWithParentId = function(req, res, next) {
+    // TODO: add retrieving only meeting areas the user has access to.
+    // Check for parent query parameters.
+    var parentId = req.query.parentId;
+
+    if ( parentId === "null" ) {
+        parentId = null;
+    }
+    else if ( parentId === null ) {
+        return next("Error: query parameter for parentId must be specified!");
+    }
+
+    MeetingArea.find({ parentMeetingArea: (parentId == null ? null : new ObjectId(parentId)) }, function(err, meetingAreas) {
+        if ( err ) { return next(err); }
+        res.status(200).json(meetingAreas);
+    });
+};
+
 var getMeetingArea = function(req, res, next) {
     // TODO: add retrieving only meeting areas the user has access to.
     MeetingArea.findOne({ _id: req.params.meetingAreaId }, function(err, meetingArea) {
@@ -58,5 +76,6 @@ module.exports = {
     getMeetingArea: getMeetingArea,
     createNewMeetingArea: createNewMeetingArea,
     updateMeetingArea: updateMeetingArea,
-    deleteMeetingArea: deleteMeetingArea
+    deleteMeetingArea: deleteMeetingArea,
+    getMeetingAreasWithParentId: getMeetingAreasWithParentId
 };
