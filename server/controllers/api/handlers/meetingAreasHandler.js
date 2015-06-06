@@ -14,7 +14,7 @@ var getMeetingAreasWithParentId = function(req, res, next) {
         return next("Error: query parameter for parentId must be specified!");
     }
 
-    MeetingArea.find({ parentMeetingArea: (parentId == null ? null : new ObjectId(parentId)) }, function(err, meetingAreas) {
+    MeetingArea.find({ parentMeetingArea: (parentId === null ? null : new ObjectId(parentId)) }, function(err, meetingAreas) {
         if ( err ) { return next(err); }
         res.status(200).json(meetingAreas);
     });
