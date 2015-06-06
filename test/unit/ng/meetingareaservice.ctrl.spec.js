@@ -60,7 +60,7 @@ describe('meeting area service', function() {
         context('the meeting area for the given id exists', function() {
             it('should return an array of child meeting areas', function() {
                 $httpBackend
-                    .expectGET('/api/meetingareas/123')
+                    .expectGET('/api/meetingareas?parentId=123')
                     .respond([
                         { id: "111" },
                         { id: "222" },
@@ -87,7 +87,7 @@ describe('meeting area service', function() {
         context('the meeting area for the given id does not exist', function() {
             it('should return an error that the meeting area was not found', function() {
                 $httpBackend
-                    .expectGET('/api/meetingareas/123')
+                    .expectGET('/api/meetingareas?parentId=123')
                     .respond(404);
 
                 var response = null;
@@ -111,7 +111,7 @@ describe('meeting area service', function() {
         context('the meeting area for the given id has no children', function() {
             it('should return no child meeting areas', function() {
                 $httpBackend
-                    .expectGET('/api/meetingareas/123')
+                    .expectGET('/api/meetingareas?parentId=123')
                     .respond(200, []);
 
                 var response = null;
