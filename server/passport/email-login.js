@@ -4,6 +4,10 @@ var bCrypt = require('bcrypt-nodejs');
 var logger = require('winston');
 
 module.exports = function(passport) {
+    var isValidPassword = function(user, password) {
+        return bCrypt.compareSync(password, user.password);
+    };
+
     passport.use('email-login', new LocalStrategy({
                 usernameField: 'email',
                 passReqToCallback: true
@@ -33,7 +37,4 @@ module.exports = function(passport) {
                 );
             })
     );
-    var isValidPassword = function(user, password) {
-        return bCrypt.compareSync(password, user.password);
-    };
 };
