@@ -13,11 +13,13 @@ module.exports = function(grunt) {
     grunt.registerTask('launch-istanbul-mocha-process', function(testFolder) {
         var childProcess,
             spawnSync = require('child_process').spawnSync,
+            cmd = './node_modules/.bin/istanbul',
             cmdArgs = ['cover', './node_modules/.bin/_mocha', '--', '--recursive', '-R', 'spec', '-r', 'should', testFolder];
 
 
         // TODO Remove external dependencies from Mocha server unit tests
-            childProcess = spawnSync('./node_modules/.bin/istanbul', cmdArgs, {
+            console.log('Istanbul command: ' + cmd + ' ' + cmdArgs);
+            childProcess = spawnSync(cmd, cmdArgs, {
             detached: false,
             stdio: 'inherit',
             env: process.env
