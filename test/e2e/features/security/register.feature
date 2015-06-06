@@ -4,6 +4,7 @@ Feature: Register for an account
   so I can use AsyncMeeting
 
 # TODO need to add an account type to the process
+  @WIP
   Scenario Outline: Register with valid credentials
     Given System does not have any registration credentials
     And I am at registration point
@@ -33,6 +34,7 @@ Feature: Register for an account
 #      | field    | value | description           |
 #      | username |       | Number only username |
 
+  @WIP
   Scenario Outline: See password strength and acceptance
     Given System does not have any registration credentials
     And I am at registration point
@@ -46,7 +48,7 @@ Feature: Register for an account
       | P123@#$ds87f | strong   | Strongest password       |
 
 #    TODO Add common bad passwords
-  @negative_test
+  @negative_test @WIP
   Scenario Outline: See passwords fail due to strength
     Given System does not have any registration credentials
     And I am at registration point
