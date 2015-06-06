@@ -32,7 +32,7 @@ module.exports = function (config) {
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: true,
-        browsers: ['Chrome', 'Firefox', 'Safari', 'IE'],
+        browsers: ['Chrome', 'Firefox', 'Safari'],
         singleRun: false
     });
 };

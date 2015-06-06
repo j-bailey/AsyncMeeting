@@ -24,6 +24,9 @@ module.exports = function(grunt) {
             stdio: 'inherit',
             env: process.env
         });
-    });
 
+        if (childProcess.status !== 0) {
+            grunt.fail.warn(new Error('Failed with code: ' + childProcess.status), childProcess.status);
+        }
+    });
 };
