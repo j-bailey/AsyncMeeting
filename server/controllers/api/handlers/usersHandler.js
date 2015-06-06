@@ -1,4 +1,3 @@
-var bcrypt = require('bcrypt');
 var jwt = require('jwt-simple');
 var User = require('../../../../server/models/user');
 var config = require('../../../../config');
@@ -17,19 +16,14 @@ var getUserFromXAuthHeader = function (req, res, next) {
 };
 
 var createUser = function (req, res, next) {
-
-    var user = new User({ username: req.body.username });
-    bcrypt.hash(req.body.password, 10, function (err, hash) {
+    var user = new User({ username: req.body.username }),
+       hashedPassword = User.hashPassword(req.body.password); /* jshint ignore:line */
+    user.password = hashedPassword;
+    user.save(function (err) {
         if (err) {
             return next(err);
         }
-        user.password = hash;
-        user.save(function (err) {
-            if (err) {
-                return next(err);
-            }
-            res.send(201);
-        });
+        res.send(201);
     });
 };
 

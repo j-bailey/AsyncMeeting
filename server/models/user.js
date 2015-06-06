@@ -3,6 +3,8 @@ var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 var Q = require('q');
+var bcrypt = require('bcrypt');
+
 
 var schema = new mongoose.Schema({
     username: { type: String, required: false },
@@ -42,6 +44,10 @@ schema.statics.findPublicUserByEmail = function (email) {
             defer.resolve(user);
         });
     return defer.promise;
+};
+
+schema.statics.hashPassword = function(password){
+    return bcrypt.hashSync(password, 10);
 };
 
 // Add plugins
