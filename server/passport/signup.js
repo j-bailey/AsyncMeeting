@@ -1,6 +1,5 @@
 var LocalStrategy = require('passport-local').Strategy,
     User = require('../models/user'),
-    bCrypt = require('bcrypt-nodejs'),
     logger = require('winston'),
     acl = require('../security/acl'),
     freeTier = require('../security/resources/free-tier-role');
@@ -8,7 +7,7 @@ var LocalStrategy = require('passport-local').Strategy,
 module.exports = function(passport) {
     // Generates hash using bCrypt
     var createHash = function(password) {
-        return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
+        return User.hashPassword(password);
     };
 
     passport.use('signup', new LocalStrategy({
