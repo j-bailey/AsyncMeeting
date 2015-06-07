@@ -1,11 +1,16 @@
-var LocalStrategy = require('passport-local').Strategy;
-var User = require('../models/user');
-var bCrypt = require('bcrypt-nodejs');
-var logger = require('winston');
-var acl = require('../security/acl'),
+var LocalStrategy = require('passport-local').Strategy,
+    User = require('../models/user'),
+    bCrypt = require('bcrypt-nodejs'),
+    logger = require('winston'),
+    acl = require('../security/acl'),
     freeTier = require('../security/resources/free-tier-role');
 
 module.exports = function(passport) {
+    // Generates hash using bCrypt
+    var createHash = function(password) {
+        return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
+    };
+
     passport.use('signup', new LocalStrategy({
                 passReqToCallback: true // allows us to pass back the entire request to the callback
             },
@@ -63,8 +68,4 @@ module.exports = function(passport) {
                 process.nextTick(findOrCreateUser);
             })
     );
-// Generates hash using bCrypt
-    var createHash = function(password) {
-        return bCrypt.hashSync(password, bCrypt.genSaltSync(10), null);
-    };
 };
