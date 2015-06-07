@@ -4,16 +4,20 @@ var bCrypt = require('bcrypt-nodejs');
 var logger = require('winston');
 
 module.exports = function(passport) {
+    var isValidPassword = function(user, password) {
+        return bCrypt.compareSync(password, user.password);
+    };
+
     passport.use('login', new LocalStrategy({
                 passReqToCallback: true
             },
             function(req, username, password, done) {
 // check in mongo if a user with username exists or not
-                console.log('searching for user ' + username);
+                logger.log('searching for user ' + username);
                 User.findOne({ 'username': username },
                     function(err, user) {
 // In case of any error, return using the done method
-                        console.log('found user = ' + JSON.stringify(user));
+                        logger.log('found user = ' + JSON.stringify(user));
                         if (err) {
                             return done(err);
                         }
@@ -34,8 +38,4 @@ module.exports = function(passport) {
                 );
             })
     );
-
-    var isValidPassword = function(user, password) {
-        return bCrypt.compareSync(password, user.password);
-    };
 };
