@@ -45,7 +45,9 @@ describe('email-login', function() {
             require('../../../../server/passport/email-login')(passport);
         });
         it('should return an error while looking for a user', function(done) {
-            var req = {},
+            var flashSpy = sandbox.spy(),
+                winstomSpy = sandbox.spy(),
+                req = { flash: flashSpy},
                 error = new Error('Error while searching'),
                 email = 'myemail@email.com',
                 password = 'password123',
@@ -58,7 +60,7 @@ describe('email-login', function() {
 
             var doneFunc = function(one, two, three) {
                 expect(one).to.deep.equal(error);
-                expect(two).to.deep.equal(undefined);
+                expect(two).to.equal(false);
                 expect(three).to.equal(undefined);
                 done();
             };
@@ -70,7 +72,7 @@ describe('email-login', function() {
                     expect(strategy._usernameField).to.equal('email');
                     expect(strategy.name).to.equal('local');
                     expect(strategy._passReqToCallback).to.equal(true);
-                    strategy._verify(null, email, password, doneFunc);
+                    strategy._verify(req, email, password, doneFunc);
                 }
             };
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});

@@ -18,7 +18,9 @@ module.exports = function(passport) {
                     function(err, user) {
 // In case of any error, return using the done method
                         if (err) {
-                            return done(err);
+                            logger.error('email-login: Error searching for user via email: ' + email);
+                            return done(err, false, req.flash('message', 'Sorry about that.  You are unable to login you ' +
+                                'in right now, please try again in few.  We are working hard to resolve the error.'));
                         }
 // Username does not exist, log the error and redirect back
                         if (!user){
