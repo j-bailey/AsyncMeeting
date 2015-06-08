@@ -16,6 +16,7 @@ module.exports = function(passport) {
 // check in mongo if a user with email exists or not
                 User.findOne({ 'email': email },
                     function(err, user) {
+                        logger.error('Here');
 // In case of any error, return using the done method
                         if (err) {
                             logger.error('email-login: Error searching for user via email: ' + email);
