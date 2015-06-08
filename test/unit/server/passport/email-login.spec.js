@@ -62,6 +62,10 @@ describe('email-login', function() {
                 expect(one).to.deep.equal(error);
                 expect(two).to.equal(false);
                 expect(three).to.equal(undefined);
+                flashSpy.args[0][0].should.equal('message');
+                flashSpy.args[0][1].should.equal('Sorry about that.  You are unable to login you in right now, please ' +
+                    'try again in few.  We are working hard to resolve the error.');
+                winstomSpy.args[0][0].should.equal('email-login: Error searching for user via email: ' + email);
                 done();
             };
 
@@ -75,6 +79,7 @@ describe('email-login', function() {
                     strategy._verify(req, email, password, doneFunc);
                 }
             };
+            sandbox.stub(require('winston'), 'error', winstomSpy);
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
             sandbox.stub(User.base.Model, 'findOne').yields(error, null);
             require('../../../../server/passport/email-login')(passport);
@@ -93,8 +98,9 @@ describe('email-login', function() {
                 expect(one).to.equal(null);
                 expect(two).to.equal(false);
                 expect(three).to.equal(undefined);
-                flashSpy.calledWith('message', 'User Not found.');
-                winstomSpy.calledWith('User Not Found with email ' + email);
+                flashSpy.args[0][0].should.equal('message');
+                flashSpy.args[0][1].should.equal('User Not found.');
+                winstomSpy.args[0][0].should.equal('User Not Found with email ' + email);
                 done();
             };
 
@@ -130,8 +136,9 @@ describe('email-login', function() {
                 expect(one).to.equal(null);
                 expect(two).to.equal(false);
                 expect(three).to.equal(undefined);
-                flashSpy.calledWith('message', 'Invalid Password');
-                winstomSpy.calledWith('Invalid Password');
+                flashSpy.args[0][0].should.equal('message');
+                flashSpy.args[0][1].should.equal('Invalid Password');
+                winstomSpy.args[0][0].should.equal('Invalid Password');
                 done();
             };
 
