@@ -1,5 +1,4 @@
-var express = require('express');
-var router = express.Router();
+var router = require('express').Router();
 var passport = require('passport');
 var jwt = require('jwt-simple');
 var config = require('../../config');
@@ -70,7 +69,7 @@ router.post('/signup', function(req, res, next) {
            // TODO user is missing roles and permissions need to fix in passport signup code
            return res.json(user);
        });
-   })(req, res, next);
+   });
 });
 
 module.exports = router;

@@ -21,7 +21,7 @@ describe('signup', function() {
 
             var req = {
                 body:{
-                    username:'slydog',
+                    username:'slyDog',
                     email: email
                 }
             };
@@ -41,18 +41,18 @@ describe('signup', function() {
             };
 
             var savedUser = {
-                username: 'slydog'
+                username: 'slyDog'
             };
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            var winstonDebugStub = sandbox.stub(require('winston'), 'debug');
+            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            sandbox.stub(require('winston'), 'debug');
             sandbox.stub(User, 'hashPassword', function(password){return password});
             var findOneStub = sandbox.stub(User.base.Model, 'findOne');
             findOneStub.onCall(0).yields(null, null);
             findOneStub.onCall(1).yields(null, null);
             var saveStub = sandbox.stub(User.prototype, 'save');
             saveStub.yields(null, savedUser);
-            var addUserRolesStub = sandbox.stub(acl.prototype, 'addUserRoles');
+            sandbox.stub(acl.prototype, 'addUserRoles');
             var getAclStub = sandbox.stub(aclSetup, 'getAcl');
             getAclStub.returns({addUserRoles:function(a,b) {
                 expect(a).to.equal(savedUser.username);
@@ -70,7 +70,7 @@ describe('signup', function() {
 
             var req = {
                 body:{
-                    username:'slydog',
+                    username:'slyDog',
                     email: email
                 }
             };
@@ -78,7 +78,7 @@ describe('signup', function() {
                 expect(one).to.equal(signUpError);
                 expect(two).to.deep.equal(undefined);
                 expect(three).to.equal(undefined);
-                expect(winstonErrorStub.withArgs('Error in SignUp: ' + signUpError).calledOnce).to.equal(true);
+                winstonErrorStub.args[0][0].should.equal('Error in SignUp: ' + signUpError);
                 done();
             };
 
@@ -91,8 +91,8 @@ describe('signup', function() {
             };
 
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            var winstonDebugStub = sandbox.stub(require('winston'), 'debug');
+            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
             var findOneStub = sandbox.stub(User.base.Model, 'findOne');
@@ -104,7 +104,7 @@ describe('signup', function() {
             var email = 'myemail@email.com',
                 password = 'password123',
                 hashPassword = password,
-                username = 'slydog';
+                username = 'slyDog';
 
             var req = {
                 body:{
@@ -130,11 +130,11 @@ describe('signup', function() {
             };
 
             var savedUser = {
-                username: 'slydog'
+                username: 'slyDog'
             };
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            var winstonDebugStub = sandbox.stub(require('winston'), 'debug');
+            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
             var findOneStub = sandbox.stub(User.base.Model, 'findOne');
@@ -150,7 +150,7 @@ describe('signup', function() {
 
             var req = {
                 body:{
-                    username:'slydog',
+                    username:'slyDog',
                     email: email
                 }
             };
@@ -171,8 +171,8 @@ describe('signup', function() {
             };
 
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            var winstonDebugStub = sandbox.stub(require('winston'), 'debug');
+            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
             var findOneStub = sandbox.stub(User.base.Model, 'findOne');
@@ -185,7 +185,7 @@ describe('signup', function() {
             var email = 'myemail@email.com',
                 password = 'password123',
                 hashPassword = password,
-                username = 'slydog';
+                username = 'slyDog';
 
             var req = {
                 body:{
@@ -211,11 +211,11 @@ describe('signup', function() {
             };
 
             var savedUser = {
-                username: 'slydog'
+                username: 'slyDog'
             };
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            var winstonDebugStub = sandbox.stub(require('winston'), 'debug');
+            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
             var findOneStub = sandbox.stub(User.base.Model, 'findOne');
@@ -232,7 +232,7 @@ describe('signup', function() {
 
             var req = {
                 body:{
-                    username:'slydog',
+                    username:'slyDog',
                     email: email
                 }
             };
@@ -241,7 +241,7 @@ describe('signup', function() {
                 expect(two).to.deep.equal(false);
                 expect(three).to.deep.equal({ message: "We're sorry, we could not create your account at this time!" });
                 expect(four).to.equal(undefined);
-                expect(winstonErrorStub.withArgs('Error in Saving user: ' + saveError).calledOnce).to.equal(true);
+                winstonErrorStub.args[0][0].should.equal('Error in Saving user: ' + saveError);
                 done();
             };
 
@@ -254,11 +254,10 @@ describe('signup', function() {
             };
 
             var savedUser = {
-                username: 'slydog'
+                username: 'slyDog'
             };
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            var winstonDebugStub = sandbox.stub(require('winston'), 'debug');
+            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
             var findOneStub = sandbox.stub(User.base.Model, 'findOne');
@@ -266,7 +265,7 @@ describe('signup', function() {
             findOneStub.onCall(1).yields(null, null);
             var saveStub = sandbox.stub(User.prototype, 'save');
             saveStub.yields(saveError, savedUser);
-            var addUserRolesStub = sandbox.stub(acl.prototype, 'addUserRoles');
+            sandbox.stub(acl.prototype, 'addUserRoles');
             var getAclStub = sandbox.stub(aclSetup, 'getAcl');
             getAclStub.returns({addUserRoles:function(a,b) {
                 expect(a).to.equal(savedUser.username);
