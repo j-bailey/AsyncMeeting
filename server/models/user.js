@@ -18,15 +18,16 @@ var schema = new mongoose.Schema({
 });
 
 // Add static methods
+var publicFields = 'username email permissions roles createdOn modifiedOn firstName lastName';
 schema.statics.findPublicUserById = function (userId) {
-    return this.findById(userId, 'username email permissions roles createdOn modifiedOn firstName lastName')
+    return this.findById(userId, publicFields)
         .populate('permissions')
         .populate('roles')
         .exec();
 };
 schema.statics.findPublicUserByUserName = function (userName) {
     var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
-    this.findOne({ 'username': userName }, 'username email permissions roles createdOn modifiedOn firstName lastName')
+    this.findOne({ 'username': userName }, publicFields)
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
@@ -37,7 +38,7 @@ schema.statics.findPublicUserByUserName = function (userName) {
 
 schema.statics.findPublicUserByEmail = function (email) {
     var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
-    this.findOne({ 'email': email }, 'username email permissions roles createdOn modifiedOn firstName lastName')
+    this.findOne({ 'email': email }, publicFields)
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
