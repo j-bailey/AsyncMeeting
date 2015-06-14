@@ -34,6 +34,67 @@ describe('meeting area route', function () {
             findStub.args[0][0].should.not.be.null;
             resSpy.status.args[0][0].should.equal(200);
             resSpy.json.args[0][0].should.deep.equal(meetingArea);
+
+            done();
+        });
+        it('should return find error via promise ', function (done) {
+            var meetingArea = new MeetingArea({
+                title: "Meeting Area Title",
+                description: "Meeting Area Description"
+            });
+            var req = {query:{parentId: 1}},
+                resSpy = {status: sinon.stub(), json: sinon.spy()},
+                nextStub = sandbox.stub(),
+                findStub = sandbox.stub(MeetingArea.base.Model, 'find');
+
+            findStub.yields({message:"error while trying to find item"}, meetingArea);
+            resSpy.status.returns(resSpy);
+            meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
+
+            nextStub.args[0][0].should.deep.equal({message:"error while trying to find item"});
+            findStub.args[0][0].should.not.be.null;
+            expect(resSpy.status.args[0]).to.be.undefined;
+            expect(resSpy.json.args[0]).to.be.undefined;
+            done();
+        });
+        it('should return error via promise for null', function (done) {
+            var meetingArea = new MeetingArea({
+                title: "Meeting Area Title",
+                description: "Meeting Area Description"
+            });
+            var req = {query:{parentId: null}},
+                resSpy = {status: sinon.stub(), json: sinon.spy()},
+                nextStub = sandbox.stub(),
+                findStub = sandbox.stub(MeetingArea.base.Model, 'find');
+
+            findStub.yields(null, meetingArea);
+            resSpy.status.returns(resSpy);
+            meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
+
+            nextStub.args[0][0].should.equal("Error: query parameter for parentId must be specified!");
+
+            done();
+        });
+        it('should return error via promise for null in string', function (done) {
+            var meetingArea = new MeetingArea({
+                title: "Meeting Area Title",
+                description: "Meeting Area Description"
+            });
+            var req = {query:{parentId: 'null'}},
+                resSpy = {status: sinon.stub(), json: sinon.spy()},
+                nextStub = sandbox.stub(),
+                findStub = sandbox.stub(MeetingArea.base.Model, 'find');
+
+            findStub.yields(null, meetingArea);
+            resSpy.status.returns(resSpy);
+            meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
+
+            // TODO fix objectId issue
+            //findStub.args[0][0].parentMeetingArea.should.equal({ parentMeetingArea: new ObjectId(1) });
+            findStub.args[0][0].should.be.deep.equal({ parentMeetingArea: null });
+            resSpy.status.args[0][0].should.equal(200);
+            resSpy.json.args[0][0].should.deep.equal(meetingArea);
+
             done();
         });
     });
