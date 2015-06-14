@@ -3,7 +3,7 @@ var router = express.Router();
 var handlers = require('./handlers/meetingAreasHandler');
 
 // TODO: add authentication
-router.get("/", handlers.getMeetingAreasWithParentId);
+router.get("/", handlers.getMeetingAreasWithParentId);  // takes query parameter of parentId, either id or null string.
 
 // TODO: add authentication
 router.get('/:meetingAreaId', handlers.getMeetingArea);
