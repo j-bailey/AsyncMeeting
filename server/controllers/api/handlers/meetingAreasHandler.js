@@ -55,12 +55,13 @@ var updateMeetingArea = function(req, res, next) {
         meetingArea.title = req.params.title;
         meetingArea.description = req.params.description;
 
-        meetingArea.save(function(err) {
+        meetingArea.save(function(err, savedMeetingArea) {
             if (err) {
                 logger.error("Error updating meeting area: " + err.message);
                 return next(err);
             }
-            res.status(200);
+
+            res.status(200).json(savedMeetingArea);
         });
     });
 };
