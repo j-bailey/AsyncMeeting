@@ -236,6 +236,7 @@ describe('meeting area route', function () {
 
             findOneStub.yields(undefined, meetingArea);
             saveStub.yields(undefined);
+            resSpy.status.returns(resSpy);
 
             meetingAreaHandler.updateMeetingArea(req, resSpy, nextStub);
 
