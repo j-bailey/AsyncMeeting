@@ -91,6 +91,31 @@ describe('model/user', function () {
             done();
         });
     });
+    describe('quickFind', function () {
+        it('should limited user data based on search criteria', function (done) {
+            var userObj = {_id:1, username: "myName"},
+                populateStub1 = sandbox.stub(),
+                populateStub2 = sandbox.stub(),
+                findByIdStub  = sandbox.stub(user.base.Model, 'findOne');
+            var execStub = sandbox.stub(require('mongoose').__proto__.Query.prototype, 'exec');
+            findByIdStub.returns({populate:populateStub1});
+            populateStub1.returns({populate:populateStub2});
+            populateStub2.returns({exec:execStub});
+
+            execStub.yields(undefined, userObj);
+
+            var findPromise = user.findPublicUserByEmail('MyEmail@email.com');
+
+            findByIdStub.args[0][0].should.deep.equal({email:'MyEmail@email.com'});
+            findByIdStub.args[0][1].should.equal('username email permissions roles createdOn modifiedOn firstName lastName');
+            populateStub1.args[0][0].should.equal('permissions');
+            populateStub2.args[0][0].should.equal('roles');
+            expect(findPromise).to.eventually.deep.equal(userObj);
+
+            done();
+        });
+    });
+
 });
 
 

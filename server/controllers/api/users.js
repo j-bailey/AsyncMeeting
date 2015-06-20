@@ -5,5 +5,7 @@ router.get('/', handlers.getUserFromXAuthHeader);
 
 router.post('/', handlers.createUser);
 
+router.get('/', handlers.quickSearchForUser);
+
 module.exports = router;
 

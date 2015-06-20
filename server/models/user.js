@@ -26,7 +26,7 @@ schema.statics.findPublicUserById = function (userId) {
         .exec();
 };
 schema.statics.findPublicUserByUserName = function (userName) {
-    var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
+    var defer = Q.defer();
     this.findOne({ 'username': userName }, publicFields)
         .populate('permissions')
         .populate('roles')
@@ -37,7 +37,7 @@ schema.statics.findPublicUserByUserName = function (userName) {
 };
 
 schema.statics.findPublicUserByEmail = function (email) {
-    var defer = Q.defer();  //TODO Bug need to figure out how to do a Promise in NodeJS or Mongoose
+    var defer = Q.defer();
     this.findOne({ 'email': email }, publicFields)
         .populate('permissions')
         .populate('roles')
@@ -49,6 +49,18 @@ schema.statics.findPublicUserByEmail = function (email) {
 
 schema.statics.hashPassword = function(password){
     return bcrypt.hashSync(password, 10);
+};
+
+schema.static.quickFind = function(searchCriteria) {
+    var defer = Q.defer();
+    this.find().or([
+        { 'username': { $regex: searchCriteria }},
+        { 'firstName': { $regex: searchCriteria }},
+        { 'lastName': { $regex: searchCriteria }}
+    ], ['_id', 'username', 'firstName', 'lastName']).sort('firstName', 1).exec(function(err, users) {
+        defer.resolve(user);
+    });
+    return defer.promise;
 };
 
 // Add plugins

@@ -1,6 +1,8 @@
 var jwt = require('jwt-simple');
 var User = require('../../../../server/models/user');
 var config = require('../../../../config');
+var logger = require('winston');
+
 
 var getUserFromXAuthHeader = function (req, res, next) {
     if (!req.headers['x-auth']) {
@@ -27,7 +29,18 @@ var createUser = function (req, res, next) {
     });
 };
 
+var quickSearchForUser = function (req, res, next) {
+    var serachCriteria = req.body.searchCriteria; /* jshint ignore:line */
+    User.quickFind(serachCriteria).then(function(users){
+        res.json(JSON.stringify(users));
+    }).catch(function(err){
+        logger.error('Error trying to do a quick search for user with search criteria: ' + serachCriteria + ' with error: ' + err);
+        return next(err);
+    });
+};
+
 module.exports = {
     getUserFromXAuthHeader: getUserFromXAuthHeader,
-    createUser: createUser
+    createUser: createUser,
+    quickSearchForUser: quickSearchForUser
 };
