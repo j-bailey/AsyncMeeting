@@ -7,3 +7,4 @@ if (!fs.existsSync('./logs')){
 if (!fs.existsSync('./tmp')){
     fs.mkdirSync('./tmp');
 }
+

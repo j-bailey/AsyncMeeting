@@ -25,8 +25,8 @@ module.exports = function (grunt) {
         }
 
         fs.writeSync(fs.openSync(processFile, 'w', 511), '', 0,0);
-        var out = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a'),
-            err = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a');
+        var out = fs.openSync(path.join(logPath, processId + '-server.log'), 'a'),
+            err = fs.openSync(path.join(logPath, processId + '-server.log'), 'a');
 
 
         var args = ['support/grunt/file-launch-server', processFile, cmd];

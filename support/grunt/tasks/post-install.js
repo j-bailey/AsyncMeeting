@@ -10,5 +10,6 @@ module.exports = function(grunt) {
         if (!fs.existsSync('./tmp')) {
             fs.mkdirSync('./tmp');
         }
+        grunt.task.run(['redis-install']);
     });
 };
