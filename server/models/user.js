@@ -4,6 +4,7 @@ var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 var Q = require('q');
 var bcrypt = require('bcrypt');
+var logger = require('winston');
 
 
 var schema = new mongoose.Schema({
@@ -31,6 +32,10 @@ schema.statics.findPublicUserByUserName = function (userName) {
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
+            if (err){
+                logger.error('error in findPublicUserByUserName with with ' + err);
+                defer.reject(err);
+            }
             defer.resolve(user);
         });
     return defer.promise;
@@ -42,6 +47,10 @@ schema.statics.findPublicUserByEmail = function (email) {
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
+            if (err){
+                logger.error('error in findPublicUserByEmail with with ' + err);
+                defer.reject(err);
+            }
             defer.resolve(user);
         });
     return defer.promise;
@@ -58,7 +67,11 @@ schema.static.quickFind = function(searchCriteria) {
         { 'firstName': { $regex: searchCriteria }},
         { 'lastName': { $regex: searchCriteria }}
     ], ['_id', 'username', 'firstName', 'lastName']).sort('firstName', 1).exec(function(err, users) {
-        defer.resolve(user);
+        if (err){
+            logger.error('error in quickFind with with ' + err);
+            defer.reject(err);
+        }
+        defer.resolve(users);
     });
     return defer.promise;
 };
