@@ -4,6 +4,7 @@ var config = require('config'),
     app = require(__dirname + '/../../../../../app'),
     jwt = require('jwt-simple'),
     request = require('supertest'),
+    logger = require('winston'),
     user1 = request.agent(app);
 
 var meetingAreaId = "",
@@ -15,14 +16,18 @@ describe('meeting area route', function() {
 
         user1
             .post('http://localhost:3000/email-login')
-            .send({user:{
-                username:'Tom',
-                _id: '1111'
-            }})
+            .set('Accept', 'application/json, text/plain, */*')
+            .set('Accept-encoding', 'gzip, deflate')
+            .set('Content-type', 'application/json;charset=UTF-8')
+            .send({
+                email:'tom@tom.com',
+                password: 'password123'
+            })
             .end(function(err, res) {
                 // user1 will manage its own cookies
                 // res.redirects contains an Array of redirects
-                //accessToken = res.access_token;
+                logger.info('err = ' + err);
+                accessToken = res.access_token;
             });
 
         MeetingArea.remove({}, function(err, removedItem) {
