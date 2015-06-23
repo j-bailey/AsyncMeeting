@@ -25,9 +25,9 @@ var steps = function () {
         });
     });
 
-    this.Given(/^I am logged into the sysyetm$/, function (callback) {
+    this.Given(/^I am logged into the sysyetm$/, function (next) {
         // Write code here that turns the phrase above into concrete actions
-        callback.pending();
+        next.pending();
     });
 
     this.Given(/^I am logged out of the system$/, function (next) {
@@ -37,9 +37,9 @@ var steps = function () {
         expect(element(By.css('nav .login')).isPresent()).to.eventually.be.true.and.notify(next);
     });
 
-    this.When(/^I logout$/, function (callback) {
+    this.When(/^I logout$/, function (next) {
         // Write code here that turns the phrase above into concrete actions
-        callback.pending();
+        next.pending();
     });
 
     this.Given(/^I request to authenticate myself$/, function (next) {
@@ -148,21 +148,29 @@ var steps = function () {
         next.pending();
     });
 
-    this.Given(/^I see no message of being an unacceptable password$/, function (callback) {
+    this.Given(/^I see no message of being an unacceptable password$/, function (next) {
         // Write code here that turns the phrase above into concrete actions
-        callback.pending();
+        next.pending();
     });
 
-    this.Then(/^I see logout message stating "([^"]*)"$/, function (arg1, callback) {
+    this.Then(/^I see logout message stating "([^"]*)"$/, function (arg1, next) {
         // Write code here that turns the phrase above into concrete actions
-        callback.pending();
+        next.pending();
     });
 
-    this.Then(/^I see a link to log back in$/, function (callback) {
+    this.Then(/^I see a link to log back in$/, function (next) {
         // Write code here that turns the phrase above into concrete actions
-        callback.pending();
+        next.pending();
     });
 
+
+    this.Then(/^I am offered to login to the system$/, function (next) {
+        browser.waitForAngular();
+        expect(element(By.className('form-signin-heading')).getText()).to.eventually.equal('Please sign in');
+        expect(element(By.className('register')).getText()).to.eventually.equal('Register');
+        expect(element(By.className('login')).getText()).to.eventually.equal('Login');
+        next();
+    });
 };
 
 module.exports = steps;

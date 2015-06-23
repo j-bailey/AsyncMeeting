@@ -11,15 +11,16 @@ Feature: Register for an account
     When I provide my username <username> for registration
     And I provide my email <email> for registration
     And I provide my password <password> for registration
-    And I reconfirm my password <password> for registration
+#    And I reconfirm my password <password> for registration
     And I submit for registration
-    Then I see a registration confirmation
+#    Then I see a registration confirmation
+    Then I am offered to login to the system
 
     Examples:
       | username                      | email                                                   | password                      | description                   |
       | u                             | u@u.c                                                   | u                             | shortest values               |
       | abcdefghijklmnopqrstuvxyz     | abcdefghijklmnopqrstuvxyz@abcdefghijklmnopqrstuvxyz.com | abcdefghijklmnopqrstuvxyz     | longest values                |
-      | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | u!@#$%^&*()\|\]}[{'";:/>?<,`~@user.com                  | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | acceptable special characters |
+      | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | u!$%^&*\|}{'/?`~@user.com                               | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | acceptable special characters |
 
 #      TODO Figure out how to handle HTML 5 validation messages
 #  @negative_test
