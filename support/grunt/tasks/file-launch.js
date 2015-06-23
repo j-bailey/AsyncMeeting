@@ -34,7 +34,6 @@ module.exports = function (grunt) {
             cmdArgs = JSON.parse(cmdArgs.replace(/'/g, '"').replace(/\|/g, ':'));
             args.push.apply(args, cmdArgs);
         }
-        console.log('### 1');
         console.log('args = ' + JSON.stringify(args));
         processFileServer = spawn('node', args, {
             detached: true,
@@ -57,9 +56,18 @@ module.exports = function (grunt) {
         var processFile = path.join(processFileDir, processId + '.prc'),
             done = this.async(),
             rimraf = require('rimraf');
-        rimraf(processFile, function(err){
-            if (err) {done(err);}
-            done();
+        console.log('Killing process for process ID: ' + processId);
+        fs.appendFile(processFile, 'kill command', function (err) {
+            if (err){
+                console.error('Error sending kill command to file');
+            }
+            setTimeout(function() {
+                    rimraf(processFile, function(err){
+                        if (err) {done(err);}
+                        done();
+                    });
+                }, 5000
+            );
         });
         return done;
     });
