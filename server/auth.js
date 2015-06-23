@@ -1,10 +1,13 @@
-var jwt = require('jwt-simple');
-var config = require('./../config');
+var config = require('config'),
+    jwt = require('jwt-simple'),
+    logger = require('winston');
 
 module.exports = function (req, res, next) {
-    // TODO SECURITY ISSUE: fix code or logger, since an error here will only show up in the response and not the server log
     if (req.headers['x-auth']) {
-        req.auth = jwt.decode(req.headers['x-auth'], config.secret);
+        req.auth = jwt.decode(req.headers['x-auth'], config.get('accessToken.secret'));
+    } else {
+        logger.error('Removed auth token');
+        req.auth = undefined;
     }
     next();
 };

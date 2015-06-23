@@ -16,9 +16,9 @@
             function login(email, password) {
                 var defer = $q.defer();
                 userSvc.emailLogin(email, password).then(function (response) {
-                    userSvc.token = response.data.token;
+                    userSvc.access_token = response.data.access_token;
                     $log.debug('in userSvc login');
-                    $http.defaults.headers.common['X-Auth'] = response.data.token;
+                    $http.defaults.headers.common['X-Auth'] = response.data.access_token;
                     currentUser = response.data.user;
                     currentUser.permissions = response.data.permissions;
                     eventbus.broadcast(asm.modules.auth.events.userLoggedIn, currentUser);
@@ -38,7 +38,7 @@
                 $log.debug("in userSvc logout");
                 userSvc.logout().then(function () {
                     $log.debug("User " + currentUser.username + " logout on server successful");
-                    userSvc.token = null;
+                    userSvc.access_token = null;
                     currentUser = undefined;
                     delete $http.defaults.headers.common['X-Auth'];
                     eventbus.broadcast(asm.modules.auth.events.userLoggedOut);

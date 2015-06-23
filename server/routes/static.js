@@ -1,9 +1,9 @@
-var router = require('express').Router();
-var passport = require('passport');
-var jwt = require('jwt-simple');
-var config = require('../../config');
-var User = require('../../server/models/user');
-var logger = require('winston');
+var router = require('express').Router(),
+    passport = require('passport'),
+    securityUtils = require('../security/securityUtils'),
+    User = require('../../server/models/user'),
+    logger = require('winston');
+
 
 /* Handle Login POST */
 router.post('/login',
@@ -12,10 +12,9 @@ router.post('/login',
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        var token = jwt.encode({ username: req.user.username }, config.secret);
         User.findPublicUserById(req.user._id).then(function(user) {
-
-            res.json({ user:user, token: token,
+            var accessToken = securityUtils.generateAccessToken(user.username);
+            res.json({ user:user, access_token: accessToken,
                 permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas'] });
                 // TODO test permissions need to be removed after permissions are fixed
         });
@@ -30,10 +29,10 @@ router.post('/email-login',
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        var token = jwt.encode({ username: req.user.username }, config.secret);
         User.findPublicUserById(req.user._id).then(function(user) {
             logger.debug("Sending response");
-            res.json({ user:user, token: token,
+            var accessToken = securityUtils.generateAccessToken(user.username);
+            res.json({ user:user, access_token: accessToken,
                 permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas'] });
             // TODO test permissions need to be removed after permissions are fixed
         });
@@ -42,6 +41,7 @@ router.post('/email-login',
 
 router.delete('/logout', function(req, res) {
         logger.debug("User logged out!");
+        securityUtils.releaseAccessToken(req.access_token);
         req.logout(); // Passport logout
         req.session.destroy(); // Destroy session associated with user.
         res.sendStatus(200);
@@ -69,7 +69,7 @@ router.post('/signup', function(req, res, next) {
            // TODO user is missing roles and permissions need to fix in passport signup code
            return res.json(user);
        });
-   });
+   })(req, res, next);
 });
 
 module.exports = router;

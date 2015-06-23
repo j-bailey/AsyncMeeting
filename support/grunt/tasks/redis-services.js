@@ -3,7 +3,6 @@ module.exports = function (grunt) {
         var fs = require('fs');
         var url = require('url');
         var http = require('http');
-        var zlib = require('zlib');
         var done = this.async(),
             redisVer = 'redis-3.0.2',
             fileName = redisVer + '.tar.gz',
@@ -43,10 +42,9 @@ module.exports = function (grunt) {
             });
         });
         return done;
-    })
+    });
     grunt.registerTask('start-redis-server', function() {
-        var fs = require('fs'),
-            path = require('path');
+        var path = require('path');
 
         var redisCmd = path.normalize(path.join(__dirname, '..', '..', '..', 'node_modules', 'redis-install', 'redis-3.0.2', 'src', 'redis-server'));
         grunt.task.run(['file-launch:redis:' + redisCmd + ':']);

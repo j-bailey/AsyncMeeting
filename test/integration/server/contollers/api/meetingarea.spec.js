@@ -1,10 +1,13 @@
-var expect = require('chai').expect,
+var config = require('config'),
+    expect = require('chai').expect,
     MeetingArea = require(__dirname + '/../../../../../server/models/meetingArea'),
     app = require(__dirname + '/../../../../../app'),
+    jwt = require('jwt-simple'),
     request = require('supertest'),
     user1 = request.agent(app);
 
-var meetingAreaId = "";
+var meetingAreaId = "",
+    accessToken;
 
 describe('meeting area route', function() {
     beforeEach(function(done) {
@@ -19,6 +22,7 @@ describe('meeting area route', function() {
             .end(function(err, res) {
                 // user1 will manage its own cookies
                 // res.redirects contains an Array of redirects
+                accessToken = res.access_token;
             });
 
         MeetingArea.remove({}, function(err, removedItem) {
@@ -44,6 +48,7 @@ describe('meeting area route', function() {
             user1
                 .get('/api/meetingareas/' + meetingAreaId)
                 .set('Accept', 'application/json')
+                .set('access_token', accessToken)
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .expect(function(res) {
@@ -64,6 +69,7 @@ describe('meeting area route', function() {
                     description: "New Meeting Area Description"
                 })
                 .set('Accept', 'application/json')
+                .set('access_token', accessToken)
                 .expect('Content-Type', /json/)
                 .expect(201)
                 .end(function(err, res) {
@@ -81,6 +87,7 @@ describe('meeting area route', function() {
         it('should remove a meeting area', function(done) {
             user1
                 .delete('/api/meetingareas/' + meetingAreaId)
+                .set('access_token', accessToken)
                 .expect(200)
                 .end(function(err, res) {
                     MeetingArea.find({}, function (err, meetingAreas) {

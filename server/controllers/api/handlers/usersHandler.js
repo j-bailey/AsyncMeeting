@@ -1,6 +1,6 @@
 var jwt = require('jwt-simple');
 var User = require('../../../../server/models/user');
-var config = require('../../../../config');
+var config = require('config');
 var logger = require('winston');
 
 
@@ -8,7 +8,7 @@ var getUserFromXAuthHeader = function (req, res, next) {
     if (!req.headers['x-auth']) {
         return res.send(401);
     }
-    var auth = jwt.decode(req.headers['x-auth'], config.secret);
+    var auth = jwt.decode(req.headers['x-auth'], config.get('accessToken.secret'));
     User.findOne({ username: auth.username }, function (err, user) {
         if (err) {
             return next(err);

@@ -19,7 +19,7 @@
     "e2e-all": "./node_modules/grunt-cli/bin/grunt start-external-services e2e kill-external-services",
     "lint": "./node_modules/.bin/jshint .",
     "checkStyle": "./node_modules/.bin/jscs .",
-    "dev": "node ./support/npm/launch-dev.js",
+    "dev": "./node_modules/grunt-cli/bin/grunt start-external-services && node ./support/npm/launch-dev.js",
     "cleanup-services": "./node_modules/grunt-cli/bin/grunt kill-external-services"
   },
   "dependencies": {
@@ -52,8 +52,11 @@
     "morgan": "~1.5.2",
     "node-fs": "^0.1.7",
     "passport": "~0.2.1",
+    "passport-http-bearer": "^1.0.1",
     "passport-local": "~1.0.0",
+    "proxyquire": "^1.5.0",
     "q": "~1.2.0",
+    "redis": "^0.12.1",
     "serve-favicon": "~2.2.0",
     "winston": "^0.9.0",
     "ws": "^0.7.1"

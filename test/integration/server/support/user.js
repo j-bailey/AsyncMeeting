@@ -1,7 +1,8 @@
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-var config = require('../../../../config');
+var config = require('config');
 var User = require('../../../../server/models/user');
+var securityUtils = require('../../../../server/security/securityUtils');
 exports.create = function (username, password, cb) {
     var user = new User({ username: username });
     bcrypt.hash(password, 10, function (err, hash) {
@@ -9,7 +10,7 @@ exports.create = function (username, password, cb) {
         user.password = hash;
         user.save(function (err) {
             if (err) return cb(err);
-            user.token = jwt.sign({ username: user.username }, config.secret);
+            user.token = securityUtils.getAuthToken(user.username);
             cb(null, user)
         })
     })
