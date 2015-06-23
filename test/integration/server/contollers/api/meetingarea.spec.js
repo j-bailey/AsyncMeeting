@@ -22,7 +22,7 @@ describe('meeting area route', function() {
             .end(function(err, res) {
                 // user1 will manage its own cookies
                 // res.redirects contains an Array of redirects
-                accessToken = res.access_token;
+                //accessToken = res.access_token;
             });
 
         MeetingArea.remove({}, function(err, removedItem) {
