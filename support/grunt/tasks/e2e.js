@@ -10,7 +10,7 @@ module.exports = function(grunt) {
         process.env.PORT = 3001;
         process.env.NODE_ENV = 'test';
 
-        grunt.task.run(['file-launch:gulpTestServer:gulp:[\'test|server\']']);
+        grunt.task.run(['start-external-services', 'file-launch:gulpTestServer:gulp:[\'test|server\']']);
 
         if (runInjectionProxy) {
             grunt.task.run(['run-injection-proxy']);
@@ -24,6 +24,6 @@ module.exports = function(grunt) {
             grunt.task.run(['protractor:' + browser + 'NoTags']);
         }
 
-        grunt.task.run(['kill-mongo-server', 'file-launch-kill:gulpTestServer']);
+        grunt.task.run(['file-launch-kill:gulpTestServer', 'kill-external-services']);
     });
 };

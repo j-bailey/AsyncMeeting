@@ -33,6 +33,6 @@ fs.watch(path.dirname(processFile), function(event){
     if (!fs.existsSync(processFile)){
         console.log('killing process');
         childProcess.kill();
-        setTimeout(process.exit(0), 5000);
+        setTimeout(process.exit(0), 3000);
     }
 });
