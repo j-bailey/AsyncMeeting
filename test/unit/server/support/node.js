@@ -8,9 +8,7 @@ var chai = require("chai");
 var chaiAsPromised = require("chai-as-promised");
 var Q = require("q");
 
-var sinon = require('sinon'),
-    mock = require('mockery');
-    //rewire = require("rewire");
+var sinon = require('sinon');
 
 chai.Should();
 chai.use(chaiAsPromised);
@@ -27,5 +25,3 @@ global.defer = Q.defer;
 global.waitAll = Q.all;
 
 global.sinon = sinon;
-global.mockery = mock;
-//global.rewire = rewire;

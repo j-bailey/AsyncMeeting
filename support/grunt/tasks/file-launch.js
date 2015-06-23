@@ -66,7 +66,7 @@ module.exports = function (grunt) {
                         if (err) {done(err);}
                         done();
                     });
-                }, 5000
+                }, 1500
             );
         });
         return done;

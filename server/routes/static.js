@@ -8,38 +8,68 @@ var router = require('express').Router(),
 /* Handle Login POST */
 router.post('/login',
     passport.authenticate('login'),
-    function(req, res) {
+    function (req, res) {
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        User.findPublicUserById(req.user._id).then(function(user) {
-            var accessToken = securityUtils.generateAccessToken(user.username);
-            res.json({ user:user, access_token: accessToken,
-                permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas'] });
+        User.findPublicUserById(req.user._id).then(function (user) {
+            securityUtils.generateAccessToken(user.username).then(function (accessToken) {
+                res.json({
+                    user: user, access_token: accessToken,
+                    permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
+                });
                 // TODO test permissions need to be removed after permissions are fixed
+            }).catch(function (err) {
+                if (err) {
+                    logger.debug('Error getting token. ' + err);
+                }
+                res.status(500);
+                res.json({
+                    status: "error",
+                    message: "Cannot login into the system right now. Please come back shierly.",
+                    code: "00001"
+                });
+            });
+
         });
     }
 );
 
 router.post('/email-login',
     passport.authenticate('email-login'),
-    function(req, res) {
+    function (req, res) {
         //console.log("in email-logi POST");
         logger.debug("in email-login POST");
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        User.findPublicUserById(req.user._id).then(function(user) {
+        User.findPublicUserById(req.user._id).then(function (user) {
             logger.debug("Sending response");
-            var accessToken = securityUtils.generateAccessToken(user.username);
-            res.json({ user:user, access_token: accessToken,
-                permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas'] });
-            // TODO test permissions need to be removed after permissions are fixed
+            logger.debug("Getting accessToken");
+            logger.debug('User = ' + JSON.stringify(user));
+            securityUtils.generateAccessToken(user.username).then(function (accessToken) {
+                logger.debug('Logged in and I am sending token: ' + accessToken);
+                res.json({
+                    user: user, access_token: accessToken,
+                    permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
+                });
+                // TODO test permissions need to be removed after permissions are fixed
+            }).catch(function (err) {
+                if (err) {
+                    logger.debug('Error getting token. ' + err);
+                }
+                res.status(500);
+                res.json({
+                    status: "error",
+                    message: "Cannot login into the system right now. Please come back shierly.",
+                    code: "00001"
+                });
+            });
         });
     }
 );
 
-router.delete('/logout', function(req, res) {
+router.delete('/logout', function (req, res) {
         logger.debug("User logged out!");
         securityUtils.releaseAccessToken(req.access_token);
         req.logout(); // Passport logout
@@ -49,27 +79,29 @@ router.delete('/logout', function(req, res) {
 );
 
 /* Handle Registration POST */
-router.post('/signup', function(req, res, next) {
-   passport.authenticate('signup', function(err, user, info) {
-       if ( err ) {
-           return next(err);
-       }
+router.post('/signup', function (req, res, next) {
+    passport.authenticate('signup', function (err, user, info) {
+        if (err) {
+            return next(err);
+        }
 
-       logger.debug("info is " + info);
-       logger.debug(info);
+        logger.debug("info is " + info);
+        logger.debug(info);
 
-       if ( !user ) {
-           logger.debug("res is " + res);
-           return res.status(400).json(info);
-       }
+        if (!user) {
+            logger.debug("res is " + res);
+            return res.status(400).json(info);
+        }
 
-       req.login(user, function(err) {
-           if (err) { return next(err); }
+        req.login(user, function (err) {
+            if (err) {
+                return next(err);
+            }
 
-           // TODO user is missing roles and permissions need to fix in passport signup code
-           return res.json(user);
-       });
-   })(req, res, next);
+            // TODO user is missing roles and permissions need to fix in passport signup code
+            return res.json(user);
+        });
+    })(req, res, next);
 });
 
 module.exports = router;

@@ -1,7 +1,7 @@
 var login = require('./login'),
     emailLogin = require('./email-login'),
     signup = require('./signup'),
-    //bearer = require('./bearerAuthorization'),
+    bearer = require('./bearerAuthorization'),
     serialization = require('./serialization');
 
 module.exports = function(passport) {
@@ -10,5 +10,5 @@ module.exports = function(passport) {
     login(passport);
     emailLogin(passport);
     signup(passport);
-    //bearer(passport);
+    bearer(passport);
 };

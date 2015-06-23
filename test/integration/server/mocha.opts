@@ -1,6 +1,8 @@
 test/integration/server
 --recursive
---reporter spec
---ui bdd
 --require test/integration/server/support/common
 --require test/integration/server/support/node
+--timeout 2000
+--ui bdd
+--reporter spec
+-R spec

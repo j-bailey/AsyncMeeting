@@ -1,4 +1,5 @@
 var BearerStrategy = require('passport-http-bearer').Strategy,
+    logger = require('winston'),
     securityUtils = require('../security/securityUtils');
 
 module.exports = function (passport) {
@@ -12,11 +13,18 @@ module.exports = function (passport) {
             // the user to `false` to indicate failure.  Otherwise, return the
             // authenticated `user`.  Note that in a production-ready application, one
             // would want to validate the token for authenticity.
-            if (securityUtils.isValidToken(token)) {
-                return done(null, true);
-            } else {
-                return done(null, false);
-            }
+            logger.debug('Bearer token check: ' + token);
+            securityUtils.isValidToken(token).then(function(exists) {
+                if (exists) {
+                    logger.debug('found a token');
+                    done(null, true);
+                } else {
+                    logger.debug('No token found');
+                    done(null, false);
+                }
+            }).catch(function(err){
+                done(err, 'error');
+            });
         }
     ));
 };

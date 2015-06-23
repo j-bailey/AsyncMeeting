@@ -20,7 +20,8 @@
     "lint": "./node_modules/.bin/jshint .",
     "checkStyle": "./node_modules/.bin/jscs .",
     "dev": "./node_modules/grunt-cli/bin/grunt start-external-services && node ./support/npm/launch-dev.js",
-    "cleanup-services": "./node_modules/grunt-cli/bin/grunt kill-external-services"
+    "start-services": "./node_modules/grunt-cli/bin/grunt start-external-services",
+    "kill-services": "./node_modules/grunt-cli/bin/grunt kill-external-services"
   },
   "dependencies": {
     "acl": "^0.4.7",

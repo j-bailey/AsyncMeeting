@@ -7,9 +7,16 @@ module.exports = function(grunt) {
         process.env.PORT = 3001;
         process.env.NODE_ENV = 'test';
 
-        grunt.task.run(['start-external-services', 'file-launch:gulpTestServer:gulp:[\'test|server\']:5']);
+        if (configFile.indexOf('integration') > -1) {
+            grunt.task.run(['start-external-services', 'file-launch:gulpTestServer:gulp:[\'test|server\']:5']);
+        }
+
         grunt.task.run(['launch-karma-process:' + configFile]);
-        grunt.task.run(['file-launch-kill:gulpTestServer', 'kill-external-services', 'check-karma-status']);
+
+        if (configFile.indexOf('integration') > -1) {
+            grunt.task.run(['file-launch-kill:gulpTestServer', 'kill-external-services']);
+        }
+        grunt.task.run(['check-karma-status']);
     });
 
     grunt.registerTask('launch-karma-process', function(configFile) {
@@ -29,6 +36,6 @@ module.exports = function(grunt) {
         if (processStatus !== 0) {
             grunt.fail.warn(new Error('Failed with code: ' + processStatus), processStatus);
         }
-    })
+    });
 
 };
