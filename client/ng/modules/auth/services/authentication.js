@@ -18,7 +18,7 @@
                 userSvc.emailLogin(email, password).then(function (response) {
                     userSvc.access_token = response.data.access_token;
                     $log.debug('in userSvc login');
-                    $http.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access_token;
+                    $http.defaults.headers.common.Authorization = 'Bearer ' + response.data.access_token;
                     currentUser = response.data.user;
                     currentUser.permissions = response.data.permissions;
                     eventbus.broadcast(asm.modules.auth.events.userLoggedIn, currentUser);

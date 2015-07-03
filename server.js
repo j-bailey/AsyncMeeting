@@ -4,6 +4,9 @@
  * Module dependencies.
  */
 
+var acl = require('./server/security/acl');
+acl.init();
+
 var app = require('./app');
 var debug = require('debug')('AsyncMeeting:server');
 var http = require('http');

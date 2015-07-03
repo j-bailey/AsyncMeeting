@@ -1,5 +1,4 @@
 var mongoose = require('mongoose');
-var acl =  require('./security/acl');
 var logger = require('winston');
 var cfg = require('config');
 
@@ -11,7 +10,6 @@ mongoose.connect(dbUrl, function (err) {
         throw err;
     }
     logger.info('Mongoose is connected to ' + dbUrl);
-    acl.init();
 });
 
 module.exports = mongoose;

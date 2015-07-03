@@ -36,6 +36,7 @@ module.exports = {
         var defer = Q.defer();
         var redisClient = redis.getRedisClient();
         redisClient.keys('*', function (err, items) {
+            logger.debug('Looking for = ' + token);
             items.forEach(function (item) {
                 logger.debug('Keys = ' + item);
             });

@@ -53,7 +53,7 @@ describe('security/acl', function () {
             var dbErr = 'cannot connect to DB';
             mongoStub.yields(dbErr, dbObj);
 
-            expect(acl.init.bind()).to.throw(dbErr);
+            expect(acl.init()).to.eventually.throw(dbErr);
 
             // TODO fix winston issue
             //loggerError.args[0][0].should.equal('Error connecting to database for ACL set up.  ' + dbErr);
@@ -70,11 +70,11 @@ describe('security/acl', function () {
 
             done();
         });
-        it('should get current instance when not initialized', function(done){
+        it('should get null when not initialized', function(done){
             var dbObj = {bdid:'test'};
             mongoStub.yields(undefined, dbObj);
             //noinspection BadExpressionStatementJS
-            expect(acl.getAcl()).not.to.be.null;
+            expect(acl.getAcl()).to.be.null;
             done();
         });
     });
