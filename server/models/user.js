@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
+var uuid = require('./plugins/uuid');
 var Q = require('q');
 var bcrypt = require('bcrypt');
 var logger = require('winston');
@@ -80,6 +81,7 @@ schema.static.quickFind = function(searchCriteria) {
 
 schema.plugin(modifiedOn);
 schema.plugin(createInfo);
+schema.plugin(uuid);
 schema.plugin(versionInfo);
 
 var User  = mongoose.model('User', schema);
