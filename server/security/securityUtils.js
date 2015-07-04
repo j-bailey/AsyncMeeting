@@ -4,16 +4,17 @@ var logger = require('winston'),
     Q = require('q'),
     redis = require('../redis');
 
+var prefix = 'ACCESS-TOKEN:';
 
 module.exports = {
     generateAccessToken: function (identity) {
         var defer = Q.defer();
         var now = new Date();
-        var token = jwt.encode({"identity": identity, "now": now}, config.get('accessToken.secret'));
+        var token = jwt.encode({"now": now, "identity": identity}, config.get('accessToken.secret'));
         var redisClient = redis.getRedisClient();
 
         logger.debug('Ready to add access token to Redis');
-        redisClient.setex(token, config.get('accessToken.timeout'), identity, function (err) {
+        redisClient.setex(prefix + token, config.get('accessToken.timeout'), identity, function (err) {
             if (err) {
                 logger.error('Error putting access token in Redis.  ' + err);
                 defer.reject(err);
@@ -26,26 +27,52 @@ module.exports = {
     releaseAccessToken: function (token) {
         if (token) {
             var redisClient = redis.getRedisClient();
-            redisClient.del(token);
+            redisClient.del(prefix + token);
         } else {
             logger.error('Require token to release a token.');
             throw new Error('Require token to release a token.');
         }
     },
+    clearAllAccessTokens: function () {
+        var defer = Q.defer();
+        var redisClient = redis.getRedisClient();
+        redisClient.keys(prefix + '*', function (err, items) {
+            var keys = [];
+            items.forEach(function (item) {
+                keys.push(item);
+            });
+            redisClient.del(keys);
+
+            defer.resolve();
+        });
+        return defer.promise;
+    },
     isValidToken: function (token) {
         var defer = Q.defer();
         var redisClient = redis.getRedisClient();
-        redisClient.keys('*', function (err, items) {
-            logger.debug('Looking for = ' + token);
-            items.forEach(function (item) {
-                logger.debug('Keys = ' + item);
-            });
-        });
-        redisClient.exists(token, function (err, item) {
+        //redisClient.keys(prefix + '*', function (err, items) {
+        //    logger.debug('Looking for = ' + token);
+        //    items.forEach(function (item) {
+        //        logger.debug('Keys = ' + item);
+        //    });
+        //});
+        redisClient.exists(prefix + token, function (err, item) {
             if (err) {
                 defer.reject(err);
             }
             defer.resolve(item === 1);
+        });
+
+        return defer.promise;
+    },
+    getIdentity: function(token) {
+        var defer = Q.defer();
+        var redisClient = redis.getRedisClient();
+        redisClient.get(prefix + token, function (err, item) {
+            if (err) {
+                defer.reject(err);
+            }
+            defer.resolve(item);
         });
 
         return defer.promise;

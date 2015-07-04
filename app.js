@@ -71,6 +71,7 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+    console.error('Error logged: ' + err);
     res.status(err.status || 500);
     res.render(cfg.get('errors.view'), {
         message: err.message,

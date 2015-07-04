@@ -1,6 +1,6 @@
 var expect = require('chai').expect,
     MeetingArea = require('../../../../../server/models/meetingArea'),
-    app = require('../../../../../app'),
+    //app = require('../../../../../app'),
     request = require('supertest'),
     //user1 = request.agent(app),
     User = require('../../../../../server/models/user'),

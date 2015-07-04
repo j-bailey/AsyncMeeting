@@ -24,7 +24,7 @@
     "kill-external-services": "./node_modules/grunt-cli/bin/grunt kill-external-services"
   },
   "dependencies": {
-    "acl": "^0.4.7",
+    "acl": "git+https://github.com/OptimalBits/node_acl.git",
     "bcrypt": "^0.8.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.12.2",

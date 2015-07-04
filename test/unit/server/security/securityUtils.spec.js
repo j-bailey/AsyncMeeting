@@ -61,7 +61,7 @@ describe('security/securityUtils', function () {
             var securityUtils = require('../../../../server/security/securityUtils');
             securityUtils.releaseAccessToken(accessToken);
 
-            redisClientSpies.del.args[0][0].should.equal(accessToken);
+            redisClientSpies.del.args[0][0].should.equal('ACCESS-TOKEN:' + accessToken);
 
             done();
         });
