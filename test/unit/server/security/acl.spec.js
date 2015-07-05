@@ -1,3 +1,5 @@
+var logger = require('winston');
+
 describe('security/acl', function () {
     var sandbox;
     var acl;
@@ -61,7 +63,7 @@ describe('security/acl', function () {
             AclAllowStub.args[3][0].should.equal('MidTierUserRole');
             done();
         });
-        it.only('should throw and error due to db issue', function (done) {
+        it('should throw and error due to db issue', function (done) {
             var dbObj = {bdid:'test'};
             var dbErr = 'cannot connect to DB';
             mongoStub.yields(dbErr, dbObj);

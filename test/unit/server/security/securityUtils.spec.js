@@ -4,8 +4,8 @@ var redis = require('../../../../server/redis'),
 
 describe('security/securityUtils', function () {
     var sandbox,
-        prevError,
         clock,
+        prevError,
         errorLogSpy;
 
     beforeEach(function () {

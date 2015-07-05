@@ -1,6 +1,7 @@
 var User = require('../../../../server/models/user'),
     acl = require('acl'),
-    aclSetup = require('../../../../server/security/acl');
+    aclSetup = require('../../../../server/security/acl'),
+    logger = require('winston');
 
 describe('routes/static', function () {
     var sandbox;
@@ -13,9 +14,23 @@ describe('routes/static', function () {
         securityUtilsReleaseTokenStub;
     var UserStub,
         UserThenSpy;
+
+    var prevError,
+        errorLogSpy,
+        prevDebug,
+        debugLogSpy;
+
     var loggerStub;
     before(function () {
         sandbox = sinon.sandbox.create();
+
+        prevError = logger.error;
+        errorLogSpy = sandbox.stub();
+        logger.error = errorLogSpy;
+
+        prevDebug = logger.debug;
+        debugLogSpy = sandbox.stub();
+        logger.debug = debugLogSpy;
 
         delete require.cache[require.resolve('../../../../server/routes/static')];
 
@@ -41,6 +56,8 @@ describe('routes/static', function () {
 
     after(function () {
         sandbox.restore();
+        logger.error = prevError;
+        logger.debug = prevDebug;
     });
 
     describe('/login', function () {
@@ -77,7 +94,10 @@ describe('routes/static', function () {
             // TODO Need to fix
             //UserThenSpy.args[1][0](userObj);
             //securityUtilsGetTokenStub.args[0][0].should.equal(userObj.username);
-            //loggerStub.args[1][0].should.equal("Sending response");
+            debugLogSpy.args[0][0].should.equal("in email-login POST");
+            //debugLogSpy.args[0][1].should.equal("Sending response");
+            //debugLogSpy.args[0][2].should.equal("Getting accessToken");
+            //debugLogSpy.args[0][3].should.equal('User = ' + JSON.stringify(userObj));
             //resSpy.json.args[0][0].should.deep.equal({ user:userObj, access_token: 'bigToken',
             //    permissions:['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas'] });
             done();

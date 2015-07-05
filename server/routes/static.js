@@ -20,9 +20,7 @@ router.post('/login',
                 });
                 // TODO test permissions need to be removed after permissions are fixed
             }).catch(function (err) {
-                if (err) {
-                    logger.debug('Error getting token. ' + err);
-                }
+                logger.error('Error getting token. ' + err);
                 res.status(500);
                 res.json({
                     status: "error",
@@ -48,16 +46,13 @@ router.post('/email-login',
             logger.debug("Getting accessToken");
             logger.debug('User = ' + JSON.stringify(user));
             securityUtils.generateAccessToken(user.username).then(function (accessToken) {
-                logger.debug('Logged in and I am sending token: ' + accessToken);
                 res.json({
                     user: user, access_token: accessToken,
                     permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
                 });
                 // TODO test permissions need to be removed after permissions are fixed
             }).catch(function (err) {
-                if (err) {
-                    logger.debug('Error getting token. ' + err);
-                }
+                logger.error('Error getting token. ' + err);
                 res.status(500);
                 res.json({
                     status: "error",

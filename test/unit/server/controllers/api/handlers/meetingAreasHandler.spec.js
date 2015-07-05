@@ -1,17 +1,24 @@
-var MeetingArea = require('../../../../../../server/models/meetingArea');
-var meetingAreaHandler = require('../../../../../../server/controllers/api/handlers/meetingAreasHandler');
-var ObjectId = require('mongoose').Types.ObjectId;
+var logger = require('winston'),
+    MeetingArea = require('../../../../../../server/models/meetingArea'),
+    meetingAreaHandler = require('../../../../../../server/controllers/api/handlers/meetingAreasHandler');
 
 
 describe('meeting area route', function () {
-    var sandbox;
+    var sandbox,
+        prevError,
+        errorLogSpy;
 
     beforeEach(function () {
         sandbox = sinon.sandbox.create();
+        prevError = logger.error;
+        errorLogSpy = sandbox.stub();
+        logger.error = errorLogSpy;
+
     });
 
     afterEach(function () {
         sandbox.restore();
+        logger.error = prevError;
     });
 
     describe('getMeetingAreasWithParentId', function () {
