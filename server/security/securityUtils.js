@@ -18,9 +18,10 @@ module.exports = {
             if (err) {
                 logger.error('Error putting access token in Redis.  ' + err);
                 defer.reject(err);
+            } else {
+                logger.debug('Saved access token to Redis with timeout: ' + config.get('accessToken.timeout'));
+                defer.resolve(token);
             }
-            logger.debug('Saved access token to Redis with timeout: ' + config.get('accessToken.timeout'));
-            defer.resolve(token);
         });
         return defer.promise;
     },
@@ -36,14 +37,14 @@ module.exports = {
     clearAllAccessTokens: function () {
         var defer = Q.defer();
         var redisClient = redis.getRedisClient();
-        redisClient.keys(prefix + '*', function (err, items) {
-            var keys = [];
-            items.forEach(function (item) {
-                keys.push(item);
-            });
-            redisClient.del(keys);
-
-            defer.resolve();
+        redisClient.keys(prefix + '*', function (err, keys) {
+            if(err){
+                logger.error('Unable to delete access tokens from Redis, due to: ' + err);
+                defer.reject(err);
+            } else {
+                redisClient.del(keys);
+                defer.resolve();
+            }
         });
         return defer.promise;
     },
@@ -56,11 +57,17 @@ module.exports = {
         //        logger.debug('Keys = ' + item);
         //    });
         //});
+        if (!token){
+            logger.error('Need a token for isValidToken');
+            defer.reject('Need a token for isValidToken');
+        }
         redisClient.exists(prefix + token, function (err, item) {
             if (err) {
+                logger.error('Error when trying to find if an access token exists in Redis: ' + err);
                 defer.reject(err);
+            } else {
+                defer.resolve(item === 1);
             }
-            defer.resolve(item === 1);
         });
 
         return defer.promise;
@@ -71,8 +78,9 @@ module.exports = {
         redisClient.get(prefix + token, function (err, item) {
             if (err) {
                 defer.reject(err);
+            } else {
+                defer.resolve(item);
             }
-            defer.resolve(item);
         });
 
         return defer.promise;
