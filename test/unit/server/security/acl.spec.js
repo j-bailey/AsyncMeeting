@@ -6,10 +6,21 @@ describe('security/acl', function () {
         fsStub,
         cfgStub,
         mongoDbUrl,
+        prevError,
+        errorLogSpy,
+        prevInfo,
+        infoLogSpy,
         mongoStub;
 
     beforeEach(function () {
         sandbox = sinon.sandbox.create();
+
+        prevError = logger.error;
+        errorLogSpy = sandbox.stub();
+        logger.error = errorLogSpy;
+        prevInfo = logger.info;
+        infoLogSpy = sandbox.stub();
+        logger.info = infoLogSpy;
 
         AclAllowStub = sandbox.stub(require('acl').prototype, 'allow');
         // TODO fix winston stub
@@ -28,6 +39,8 @@ describe('security/acl', function () {
 
     afterEach(function () {
         sandbox.restore();
+        logger.error = prevError;
+        logger.info = prevInfo;
     });
 
     describe('init and setup roles', function () {
@@ -48,15 +61,14 @@ describe('security/acl', function () {
             AclAllowStub.args[3][0].should.equal('MidTierUserRole');
             done();
         });
-        it('should throw and error due to db issue', function (done) {
+        it.only('should throw and error due to db issue', function (done) {
             var dbObj = {bdid:'test'};
             var dbErr = 'cannot connect to DB';
             mongoStub.yields(dbErr, dbObj);
 
             expect(acl.init()).to.eventually.throw(dbErr);
 
-            // TODO fix winston issue
-            //loggerError.args[0][0].should.equal('Error connecting to database for ACL set up.  ' + dbErr);
+            errorLogSpy.args[0][0].should.equal('Error connecting to database for ACL set up.  ' + dbErr);
             done();
         });
     });
