@@ -1,13 +1,5 @@
 var logger = require('winston');
 
-var secureTokenCheck = function (req, res, next){
-    if (!req.auth) {
-        logger.error('Require auth token to continue');
-        next('Requires auth token to continue.');
-    }
-    next();
-};
-
 var logErrors = function(err, req, res, next) {
     logger.error(err.stack);
     next(err);
@@ -28,7 +20,6 @@ var errorHandler = function(err, req, res, next) {
 };
 
 module.exports = {
-    secureTokenCheck: secureTokenCheck,
     logErrors: logErrors,
     clientErrorHandler: clientErrorHandler,
     errorHandler: errorHandler

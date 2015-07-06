@@ -130,7 +130,7 @@ describe('meeting area route', function () {
             var statusSpy = sandbox.spy(res, 'status');
             var jsonSpy = sandbox.spy(res, 'json');
 
-            meetingAreaHandler.getMeetingArea(req, res);
+            meetingAreaHandler.getMeetingAreaByUuid(req, res);
 
 
         });
@@ -145,7 +145,7 @@ describe('meeting area route', function () {
 
             sandbox.stub(MeetingArea.base.Model, 'findOne').yields('Big error during search', meetingArea);
 
-            meetingAreaHandler.getMeetingArea(req, resSpy, nextStub);
+            meetingAreaHandler.getMeetingAreaByUuid(req, resSpy, nextStub);
 
             nextStub.args[0][0].should.equal('Big error during search');
 
@@ -245,7 +245,7 @@ describe('meeting area route', function () {
             saveStub.yields(undefined);
             resSpy.status.returns(resSpy);
 
-            meetingAreaHandler.updateMeetingArea(req, resSpy, nextStub);
+            meetingAreaHandler.updateMeetingAreaByUuid(req, resSpy, nextStub);
 
             resSpy.status.args[0][0].should.equal(200);
 
@@ -271,7 +271,7 @@ describe('meeting area route', function () {
             findOneStub.yields({message:"error finding item"}, meetingArea);
             saveStub.yields(undefined);
 
-            meetingAreaHandler.updateMeetingArea(req, resSpy, nextStub);
+            meetingAreaHandler.updateMeetingAreaByUuid(req, resSpy, nextStub);
 
             nextStub.args[0][0].should.deep.equal({message:"error finding item"});
             expect(resSpy.status.args[0]).to.be.undefined;
@@ -298,7 +298,7 @@ describe('meeting area route', function () {
             findOneStub.yields(undefined, meetingArea);
             saveStub.yields({message:"error saving item"});
 
-            meetingAreaHandler.updateMeetingArea(req, resSpy, nextStub);
+            meetingAreaHandler.updateMeetingAreaByUuid(req, resSpy, nextStub);
 
             nextStub.args[0][0].should.deep.equal({message:"error saving item"});
             expect(resSpy.status.args[0]).to.be.undefined;
@@ -316,7 +316,7 @@ describe('meeting area route', function () {
 
             findOneAndRemoveStub.yields(undefined);
 
-            meetingAreaHandler.deleteMeetingArea(req, resSpy, nextStub);
+            meetingAreaHandler.deleteMeetingAreaByUuid(req, resSpy, nextStub);
 
             resSpy.sendStatus.args[0][0].should.equal(200);
 
@@ -330,7 +330,7 @@ describe('meeting area route', function () {
 
             findOneAndRemoveStub.yields({message:"error trying to remove item"});
 
-            meetingAreaHandler.deleteMeetingArea(req, resSpy, nextStub);
+            meetingAreaHandler.deleteMeetingAreaByUuid(req, resSpy, nextStub);
 
             nextStub.args[0][0].should.deep.equal({message:"error trying to remove item"});
             expect(resSpy.sendStatus.args[0]).to.be.undefined;
