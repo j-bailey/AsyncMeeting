@@ -117,16 +117,17 @@ describe('meeting area route', function () {
                 })
                 .end(done);
         });
-        it.skip('should return an error', function (done) {
+        it('should return a forbidden error', function (done) {
             user2
                 .get('/api/meetingareas/' + meetingAreaId)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect('Content-Type', /json/)
-                .expect(200)
+                .expect(403)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.uuid).to.equal(meetingAreaId);
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal(403);
                 })
                 .end(done);
         });
@@ -154,6 +155,25 @@ describe('meeting area route', function () {
                     });
                 });
         });
+        it('should return a forbidden error', function (done) {
+            user2
+                .post('/api/meetingareas')
+                .send({
+                    parentMeetingAreaId: meetingAreaId,
+                    title: "New Meeting Area",
+                    description: "New Meeting Area Description"
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect('Content-Type', /json/)
+                .expect(403)
+                .end(function (err, res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal(403);
+                    done();
+                });
+        });
     });
 
     describe('DELETE \'/\'', function () {
@@ -161,12 +181,26 @@ describe('meeting area route', function () {
             user1
                 .delete('/api/meetingareas/' + meetingAreaId)
                 .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
                 .expect(200)
                 .end(function (err, res) {
                     MeetingArea.find({}, function (err, meetingAreas) {
                         expect(meetingAreas).to.be.empty;
                         done();
                     });
+                });
+        });
+        it('should return a forbidden error', function (done) {
+            user2
+                .delete('/api/meetingareas/' + meetingAreaId)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect(403)
+                .end(function (err, res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal(403);
+                    done();
                 });
         });
     });

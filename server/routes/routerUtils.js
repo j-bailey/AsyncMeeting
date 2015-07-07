@@ -1,27 +1,39 @@
 var logger = require('winston');
+var cfg = require('config');
 
-var logErrors = function(err, req, res, next) {
-    logger.error(err.stack);
-    next(err);
-};
 
-var clientErrorHandler = function(err, req, res, next) {
-    if (req.xhr) {
-        res.status(500).send({ error: 'Something blew up!' });
+function handleJsonErrorResponse(err, req, res, next){
+    if(err.msg && err.errorCode){
+        res.status(err.errorCode || 500).json({status:err.errorCode, msg:err.msg});
     } else {
-        next(err);
+        res.status(err.status || 500).json({status:500, msg:'Unknown error, please try agian later'});
     }
-};
-
-var errorHandler = function(err, req, res, next) {
-    res.status(500);
-    res.render('error', { error: err });
     next();
-};
+}
 
-module.exports = {
-    logErrors: logErrors,
-    clientErrorHandler: clientErrorHandler,
-    errorHandler: errorHandler
-};
 
+module.exports.handleErrors = function (err, req, res, next) {
+        if (!err) {
+            next();
+        }
+        if (err.message) {
+            logger.error(err.message);
+        }
+        if (err.msg){
+            logger.error(err.msg);
+        }
+        if (err.stack){
+            logger.error(err.stack);
+        }
+        if (req.headers.accept === 'application/json') {
+            handleJsonErrorResponse(err, req, res, next);
+        } else if (req.headers.accept === 'text/html'){
+            res.status(err.status || 500);
+            res.render(cfg.get('errors.view'), {
+                message: err.message,
+                error: err
+            });
+        }
+        next();
+
+    };

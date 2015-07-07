@@ -62,28 +62,5 @@ initPassport(passport);
 var routes = require('./server/routes/index');
 app.use('/', routes);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
-//function handleJsonErrorResponse(err, req, res, next){
-//    next();
-//}
-// error handler
-app.use(function(err, req, res, next) {
-    console.error('Error logged: ' + err);
-    //if (req.headers.accept === 'application/json') {
-    //    handleJsonErrorResponse(err, req, res, next);
-    //}
-    res.status(err.status || 500);
-    res.render(cfg.get('errors.view'), {
-        message: err.message,
-        error: err
-    });
-    next();
-});
 
 module.exports = app;

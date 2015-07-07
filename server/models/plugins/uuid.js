@@ -5,7 +5,6 @@ module.exports = exports = function uuid(schema) {
     schema.pre('validate', function(next) {
         if (!this.uuid || this.uuid === null) {
             var uuid = nodeUuid.v4();
-            console.log('uuid = ' + uuid);
             this.uuid = uuid;
         }
         //this.count({ 'uuid': uuid}, function (err, count) {

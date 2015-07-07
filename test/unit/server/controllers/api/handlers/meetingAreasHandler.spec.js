@@ -168,6 +168,7 @@ describe('meeting area route', function () {
             meetingArea.parentMeetingArea = parentMeetingArea._id;
 
             sandbox.stub(MeetingArea.prototype, 'save').yields(null, meetingArea);
+            sandbox.stub(MeetingArea.base.Model, 'findOne').yields(null, {_id:'123456789012'});
 
             var req = {
                 body: {

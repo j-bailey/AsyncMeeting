@@ -66,5 +66,8 @@ acl.init().then(function() {
     function onListening() {
         debug('Listening on port ' + server.address().port);
     }
+}).catch(function(err){
+    console.error('Errored at start up: ' + err);
+    console.error(err.stack);
 });
 
