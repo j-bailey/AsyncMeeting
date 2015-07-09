@@ -1,3 +1,5 @@
+"use strict";
+
 var gulp = require('gulp');
 
 gulp.task('css', function() {gulp.src('client/css/**/*.css').pipe( gulp.dest('assets')); });

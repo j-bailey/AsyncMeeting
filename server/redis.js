@@ -1,3 +1,5 @@
+"use strict";
+
 var redis = require("redis"),
     config = require('config'),
     logger = require('winston');

@@ -1,3 +1,4 @@
+"use strict";
 var MeetingArea = require('../../../../server/models/meetingArea');
 var ObjectId = require('mongoose').Types.ObjectId;
 var logger = require('winston');

@@ -1,8 +1,14 @@
 #!/usr/bin/env node
+"use strict";
 
-/**
- * Module dependencies.
- */
+process.on('unacaughtException', function(err){
+    if (err) {
+        console.error(err);
+        if (err.stack) {
+            console.error(err.stack);
+        }
+    }
+});
 
 var acl = require('./server/security/acl');
 acl.init().then(function() {

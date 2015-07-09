@@ -1,3 +1,5 @@
+"use strict";
+
 var BearerStrategy = require('passport-http-bearer').Strategy,
     logger = require('winston'),
     securityUtils = require('../security/securityUtils');

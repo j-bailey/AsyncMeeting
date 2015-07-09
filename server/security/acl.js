@@ -1,3 +1,5 @@
+"use strict";
+
 var Acl = require('acl'),
     logger = require('winston'),
     fs = require('fs'),
@@ -18,7 +20,7 @@ function setUpRoles() {
     });
 }
 
-function init() {
+var init = function () {
     var defer = Q.defer();
     var dbUrl = cfg.get("database.url");
     var self = this;
@@ -34,7 +36,7 @@ function init() {
         defer.resolve(acl);
     });
     return defer.promise;
-}
+};
 
 function getAcl() {
     return acl;

@@ -1,6 +1,5 @@
-/**
- * Created by jlb on 4/18/15.
- */
+"use strict";
+
 var mongoServer = require('./mongo-server'),
     spawn = require('child_process').spawnSync;
 

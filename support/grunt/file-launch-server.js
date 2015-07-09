@@ -1,6 +1,4 @@
-/**
- * Created by jlb on 4/19/15.
- */
+"use strict";
 
 var fs = require("fs"),
     path = require('path'),

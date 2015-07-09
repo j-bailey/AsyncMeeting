@@ -1,6 +1,4 @@
-/**
- * Created by jlb on 4/19/15.
- */
+"use strict";
 
 var childProcess;
 var spawn = require('child_process').spawn;
@@ -80,7 +78,7 @@ function onListening() {
     console.log('Listening on port ' + server.address().port);
 }
 
-function keepAliveCheck() {
+var keepAliveCheck = function () {
     var http = require('http'),
         done = this.async();
 
@@ -108,6 +106,6 @@ function keepAliveCheck() {
         });
     });
 
-}
+};
 
 setInterval(keepAliveCheck, 50000);

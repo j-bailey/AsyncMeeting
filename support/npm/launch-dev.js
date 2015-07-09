@@ -1,3 +1,5 @@
+"use strict";
+
 var spawn = require('child_process').spawnSync;
 
 // TODO move from NPM

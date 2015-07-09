@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = exports = function creationInfo(schema) {
     schema.add({ createdOn: { type: Date, default: Date.now } });
     // TODO add user reference to createInfo schema element

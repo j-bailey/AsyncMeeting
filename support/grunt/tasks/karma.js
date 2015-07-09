@@ -1,6 +1,5 @@
-/**
- * Created by jlb on 4/19/15.
- */
+"use strict";
+
 module.exports = function(grunt) {
     var processStatus;
     grunt.registerTask('karma', function (configFile) {

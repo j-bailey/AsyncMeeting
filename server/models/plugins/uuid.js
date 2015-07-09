@@ -1,3 +1,5 @@
+"use strict";
+
 var nodeUuid = require('node-uuid');
 
 module.exports = exports = function uuid(schema) {

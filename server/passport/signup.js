@@ -1,3 +1,5 @@
+"use strict";
+
 var LocalStrategy = require('passport-local').Strategy,
     User = require('../models/user'),
     logger = require('winston'),

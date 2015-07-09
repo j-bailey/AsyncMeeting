@@ -1,3 +1,5 @@
+"use strict";
+
 var jwt = require('jwt-simple');
 var User = require('../../../../server/models/user');
 var config = require('config');

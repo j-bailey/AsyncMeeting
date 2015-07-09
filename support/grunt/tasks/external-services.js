@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = function (grunt) {
     grunt.registerTask('start-external-services', function () {
         grunt.task.run([

@@ -1,3 +1,5 @@
+"use strict";
+
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var ngAnnotate = require('gulp-ng-annotate');

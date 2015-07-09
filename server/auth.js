@@ -1,3 +1,5 @@
+"use strict";
+
 var config = require('config'),
     jwt = require('jwt-simple'),
     logger = require('winston'),

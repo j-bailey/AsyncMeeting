@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = exports = function modifyInfo(schema) {
     schema.add({ modifiedOn: { type: Date, default: Date.now } });
     // TODO add user reference to modifiedOn schema element

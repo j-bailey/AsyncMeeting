@@ -1,6 +1,4 @@
-/**
- * Created by jlb on 4/18/15.
- */
+"use strict";
 
 module.exports = function (grunt) {
     var gulpTask = null;

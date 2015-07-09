@@ -1,3 +1,5 @@
+"use strict";
+
 var mongoose = require('mongoose');
 var logger = require('winston');
 var cfg = require('config');

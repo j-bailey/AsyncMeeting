@@ -1,3 +1,5 @@
+"use strict";
+
 var login = require('./login'),
     emailLogin = require('./email-login'),
     signup = require('./signup'),

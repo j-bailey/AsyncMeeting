@@ -1,6 +1,4 @@
-/**
- * Created by jlb on 6/7/15.
- */
+"use strict";
 
 module.exports = function(passport) {
 
