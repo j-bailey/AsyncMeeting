@@ -16,7 +16,7 @@
   },
   "accessToken":{
     "secret": "supersecretkey",
-    "timeout": 1800
+    "timeout": 240
   },
   "log": {
     "directory": "logs",

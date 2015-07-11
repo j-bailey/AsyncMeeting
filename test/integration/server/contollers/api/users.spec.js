@@ -54,37 +54,35 @@ describe('controller/api/users', function () {
                         return next(err)
                     }
                     userUuid2 = userObj.uuid;
-                    secUtil.clearAllAccessTokens().then(function () {
 
 
-                        user1
-                            .post('/email-login')
-                            .set('Accept', 'application/json, text/plain, */*')
-                            .set('Accept-encoding', 'gzip, deflate')
-                            .set('Content-type', 'application/json;charset=UTF-8')
-                            .send({email: email1, password: pass1})
-                            .end(function (err, res) {
-                                // user1 will manage its own cookies
-                                // res.redirects contains an Array of redirects
-                                if (err) console.error('err = ' + err);
+                    user1
+                        .post('/email-login')
+                        .set('Accept', 'application/json, text/plain, */*')
+                        .set('Accept-encoding', 'gzip, deflate')
+                        .set('Content-type', 'application/json;charset=UTF-8')
+                        .send({email: email1, password: pass1})
+                        .end(function (err, res) {
+                            // user1 will manage its own cookies
+                            // res.redirects contains an Array of redirects
+                            if (err) console.error('err = ' + err);
 
-                                accessToken1 = res.body.access_token;
-                                user2
-                                    .post('/email-login')
-                                    .set('Accept', 'application/json, text/plain, */*')
-                                    .set('Accept-encoding', 'gzip, deflate')
-                                    .set('Content-type', 'application/json;charset=UTF-8')
-                                    .send({email: email2, password: pass2})
-                                    .end(function (err, res) {
-                                        // user1 will manage its own cookies
-                                        // res.redirects contains an Array of redirects
-                                        if (err) console.error('err = ' + err);
+                            accessToken1 = res.body.access_token;
+                            user2
+                                .post('/email-login')
+                                .set('Accept', 'application/json, text/plain, */*')
+                                .set('Accept-encoding', 'gzip, deflate')
+                                .set('Content-type', 'application/json;charset=UTF-8')
+                                .send({email: email2, password: pass2})
+                                .end(function (err, res) {
+                                    // user1 will manage its own cookies
+                                    // res.redirects contains an Array of redirects
+                                    if (err) console.error('err = ' + err);
 
-                                        accessToken2 = res.body.access_token;
-                                        done();
-                                    });
-                            });
-                    });
+                                    accessToken2 = res.body.access_token;
+                                    done();
+                                });
+                        });
                 });
             })
         });

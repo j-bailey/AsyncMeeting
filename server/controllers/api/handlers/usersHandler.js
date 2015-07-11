@@ -1,23 +1,9 @@
 "use strict";
 
-var jwt = require('jwt-simple');
 var User = require('../../../../server/models/user');
-var config = require('config');
 var logger = require('winston');
 
 module.exports = {
-    getUserFromXAuthHeader: function (req, res, next) {
-        if (!req.headers['x-auth']) {
-            return res.send(401);
-        }
-        var auth = jwt.decode(req.headers['x-auth'], config.get('accessToken.secret'));
-        User.findOne({username: auth.username}, function (err, user) {
-            if (err) {
-                return next(err);
-            }
-            res.json(user);
-        });
-    },
     createUser: function (req, res, next) {
         var user = new User(req.body),
             hashedPassword = User.hashPassword(req.body.password);

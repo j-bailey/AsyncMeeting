@@ -2,89 +2,71 @@
 
 var logger = require('winston'),
     config = require('config'),
-    jwt = require('jwt-simple'),
-    Q = require('q'),
-    redis = require('../redis');
+    jwt = require('jsonwebtoken'),
+    Q = require('q');
 
-var prefix = 'ACCESS-TOKEN:';
+var releaseTokenCache = {};
 
 module.exports = {
-    generateAccessToken: function (identity) {
+    generateAccessToken: function (identity, basePermissions, clientIp) {
         var defer = Q.defer();
-        var now = new Date();
-        var token = jwt.encode({"now": now, "identity": identity}, config.get('accessToken.secret'));
-        var redisClient = redis.getRedisClient();
-
-        logger.debug('Ready to add access token to Redis');
-        redisClient.setex(prefix + token, config.get('accessToken.timeout'), identity, function (err) {
-            if (err) {
-                logger.error('Error putting access token in Redis.  ' + err);
-                defer.reject(err);
-            } else {
-                logger.debug('Saved access token to Redis with timeout: ' + config.get('accessToken.timeout'));
-                defer.resolve(token);
-            }
-        });
+        var jwtOptions = {
+            algorithm: "HS512",
+            expiresInMinutes: config.get('accessToken.timeout'),
+            audience: clientIp,
+            issuer: 'https://productivegains.com',
+            subject: "productivegains:" + identity
+        };
+        var jwtPayload = {
+            username: identity,
+            permissions: basePermissions,
+            clientIp: clientIp
+        };
+        try {
+            var token = jwt.sign(jwtPayload, config.get('accessToken.secret'), jwtOptions);
+            defer.resolve(token);
+        } catch (e)
+        {
+            logger.error('Failed to create JWT token');
+            defer.reject(new Error('Unable to create token'));
+        }
         return defer.promise;
     },
     releaseAccessToken: function (token) {
-        if (token) {
-            var redisClient = redis.getRedisClient();
-            redisClient.del(prefix + token);
-        } else {
-            logger.error('Require token to release a token.');
-            throw new Error('Require token to release a token.');
-        }
+        releaseTokenCache[token] = token;
     },
-    clearAllAccessTokens: function () {
+    isValidToken: function (token, clientIp) {
         var defer = Q.defer();
-        var redisClient = redis.getRedisClient();
-        redisClient.keys(prefix + '*', function (err, keys) {
-            if(err){
-                logger.error('Unable to delete access tokens from Redis, due to: ' + err);
-                defer.reject(err);
-            } else {
-                redisClient.del(keys);
-                defer.resolve();
-            }
-        });
-        return defer.promise;
-    },
-    isValidToken: function (token) {
-        var defer = Q.defer();
-        var redisClient = redis.getRedisClient();
-        //redisClient.keys(prefix + '*', function (err, items) {
-        //    logger.debug('Looking for = ' + token);
-        //    items.forEach(function (item) {
-        //        logger.debug('Keys = ' + item);
-        //    });
-        //});
-        if (!token){
+        var decoded;
+        if (!token) {
             logger.error('Need a token for isValidToken');
             defer.reject('Need a token for isValidToken');
+            return defer.promise;
         }
-        redisClient.exists(prefix + token, function (err, item) {
-            if (err) {
-                logger.error('Error when trying to find if an access token exists in Redis: ' + err);
-                defer.reject(err);
-            } else {
-                defer.resolve(item === 1);
-            }
-        });
-
+        try {
+            decoded = jwt.verify(token, config.get('accessToken.secret'));
+        } catch (e) {
+            logger.error('Failed to verify token for clientIp ' + clientIp);
+            defer.reject(new Error('Failed to verify token'));
+            return defer.promise;
+        }
+        if (releaseTokenCache.token){
+            defer.resolve(false);
+        } else if (decoded && decoded.clientIp === clientIp){
+            defer.resolve(true);
+        } else {
+            defer.resolve(false);
+        }
         return defer.promise;
     },
-    getIdentity: function(token) {
+    getIdentity: function(token, clientIp) {
         var defer = Q.defer();
-        var redisClient = redis.getRedisClient();
-        redisClient.get(prefix + token, function (err, item) {
-            if (err) {
-                defer.reject(err);
-            } else {
-                defer.resolve(item);
-            }
-        });
-
+        if (this.isValidToken(token, clientIp)) {
+            var decoded = jwt.verify(token, config.get('accessToken.secret'));
+            defer.resolve(decoded.username);
+        } else {
+            defer.reject(new Error('Could not find the identity'));
+        }
         return defer.promise;
     }
 };
