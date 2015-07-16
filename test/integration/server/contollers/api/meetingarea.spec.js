@@ -129,6 +129,20 @@ describe('meeting area route', function () {
                 })
                 .end(done);
         });
+        it('should return a 403 for an injection attack', function (done) {
+            user1
+                .get('/api/meetingareas/' + meetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(403)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(res.error.message).to.equal('cannot GET /api/meetingareas/' + meetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                })
+                .end(done);
+        });
     });
 
     describe('POST \'/\'', function () {
@@ -200,6 +214,72 @@ describe('meeting area route', function () {
                     expect(result.status).to.equal(403);
                     done();
                 });
+        });
+        it('should return a 403 for an injection attack', function (done) {
+            user1
+                .delete('/api/meetingareas/' + meetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(403)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(res.error.message).to.equal('cannot DELETE /api/meetingareas/' + meetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                })
+                .end(done);
+        });
+    });
+    describe('PUT \'/\'', function () {
+        it('should update a meeting area', function (done) {
+            user1
+                .put('/api/meetingareas/' + meetingAreaId)
+                .send({
+                    title: "New Updated Meeting Area",
+                    description: "New Updated Meeting Area Description"
+                })
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(200)
+                .end(function (err, res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.title).to.equal("New Updated Meeting Area");
+                    expect(result.description).to.equal("New Updated Meeting Area Description");
+                    MeetingArea.find({
+                        title: "New Updated Meeting Area",
+                        description: "New Updated Meeting Area Description"
+                    }, function (err, meetingAreas) {
+                        expect(meetingAreas).to.not.be.empty;
+                        expect(meetingAreas[0].title).to.equal("New Updated Meeting Area");
+                        expect(meetingAreas[0].description).to.equal("New Updated Meeting Area Description");
+                        done();
+                    });
+                });
+        });
+        it('should return a forbidden error', function (done) {
+            user2
+                .put('/api/meetingareas/' + meetingAreaId)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect(403)
+                .end(function (err, res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal(403);
+                    done();
+                });
+        });
+        it('should return a 403 for an injection attack', function (done) {
+            user1
+                .put('/api/meetingareas/' + meetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(403)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(res.error.message).to.equal('cannot PUT /api/meetingareas/' + meetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                })
+                .end(done);
         });
     });
 });

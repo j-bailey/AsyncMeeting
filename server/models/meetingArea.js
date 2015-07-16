@@ -8,7 +8,7 @@ var uuid = require('./plugins/uuid');
 var schema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: false },
-    parentMeetingArea: { type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea' }
+    parentMeetingArea: { type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea' },
 });
 
 // Add static methods

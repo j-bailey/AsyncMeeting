@@ -4,7 +4,7 @@ var handlers = require('./handlers/meetingAreasHandler');
 var acl = require('../../security/acl').getAcl();
 
 // TODO add authorization
-router.get("/", handlers.getMeetingAreasWithParentId);  // takes query parameter of parentId, either id or null string.
+router.get("/", acl.middleware(), handlers.getMeetingAreasWithParentId);  // takes query parameter of parentId, either id or null string.
 
 router.get('/:meetingAreaId', acl.middleware(), handlers.getMeetingAreaByUuid);
 

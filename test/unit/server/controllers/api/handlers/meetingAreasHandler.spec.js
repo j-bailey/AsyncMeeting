@@ -23,62 +23,32 @@ describe('meeting area route', function () {
 
     describe('getMeetingAreasWithParentId', function () {
         it('should return a meeting area', function (done) {
+            var parentMeetingArea = new MeetingArea({
+                title: "Parent Meeting Area Title",
+                description: "Parent Meeting Area Description"
+            });
             var meetingArea = new MeetingArea({
                 title: "Meeting Area Title",
                 description: "Meeting Area Description"
             });
-            var req = {query:{parentId: 1}},
+
+            var req = {query:{parentId: '332b624f-ccd0-4bf8-ba1b-64aa326314ec'}},
                 resSpy = {status: sinon.stub(), json: sinon.spy()},
                 nextStub = sandbox.stub(),
+                findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),
                 findStub = sandbox.stub(MeetingArea.base.Model, 'find');
 
+            findOneStub.yields(null, parentMeetingArea);
             findStub.yields(null, meetingArea);
             resSpy.status.returns(resSpy);
             meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
 
             // TODO fix objectId issue
             //findStub.args[0][0].parentMeetingArea.should.equal({ parentMeetingArea: new ObjectId(1) });
+            findOneStub.args[0][0].should.deep.equal({uuid: '332b624f-ccd0-4bf8-ba1b-64aa326314ec'});
             findStub.args[0][0].should.not.be.null;
             resSpy.status.args[0][0].should.equal(200);
             resSpy.json.args[0][0].should.deep.equal(meetingArea);
-
-            done();
-        });
-        it('should return find error via promise ', function (done) {
-            var meetingArea = new MeetingArea({
-                title: "Meeting Area Title",
-                description: "Meeting Area Description"
-            });
-            var req = {query:{parentId: 1}},
-                resSpy = {status: sinon.stub(), json: sinon.spy()},
-                nextStub = sandbox.stub(),
-                findStub = sandbox.stub(MeetingArea.base.Model, 'find');
-
-            findStub.yields({message:"error while trying to find item"}, meetingArea);
-            resSpy.status.returns(resSpy);
-            meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
-
-            nextStub.args[0][0].should.deep.equal({message:"error while trying to find item"});
-            findStub.args[0][0].should.not.be.null;
-            expect(resSpy.status.args[0]).to.be.undefined;
-            expect(resSpy.json.args[0]).to.be.undefined;
-            done();
-        });
-        it('should return error via promise for null', function (done) {
-            var meetingArea = new MeetingArea({
-                title: "Meeting Area Title",
-                description: "Meeting Area Description"
-            });
-            var req = {query:{parentId: null}},
-                resSpy = {status: sinon.stub(), json: sinon.spy()},
-                nextStub = sandbox.stub(),
-                findStub = sandbox.stub(MeetingArea.base.Model, 'find');
-
-            findStub.yields(null, meetingArea);
-            resSpy.status.returns(resSpy);
-            meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
-
-            nextStub.args[0][0].should.equal("Error: query parameter for parentId must be specified!");
 
             done();
         });
@@ -234,7 +204,7 @@ describe('meeting area route', function () {
                 title: "Parent Meeting Area Title",
                 description: "Parent Meeting Area Description"
             });
-            var req = {params:{meetingAreaId: 1, title:"My Title", description:"My desc"}},
+            var req = {params: {meetingAreaId: '332b624f-ccd0-4bf8-ba1b-64aa326314ec'}, body:{title:"My Title", description:"My desc"}},
                 resSpy = {status: sinon.stub(), json: sinon.spy()},
                 saveStub = sandbox.stub(meetingArea, 'save'),
                 findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),
@@ -288,7 +258,7 @@ describe('meeting area route', function () {
                 title: "Parent Meeting Area Title",
                 description: "Parent Meeting Area Description"
             });
-            var req = {params:{meetingAreaId: 1, title:"My Title", description:"My desc"}},
+            var req = {body:{meetingAreaId: 1}, params:{ title:"My Title", description:"My desc"}},
                 resSpy = {status: sinon.stub(), json: sinon.spy()},
                 saveStub = sandbox.stub(meetingArea, 'save'),
                 findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),

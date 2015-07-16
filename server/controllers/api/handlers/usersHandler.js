@@ -36,7 +36,7 @@ module.exports = {
     },
     updateByUuid: function(req, res, next){
         var uuid = req.params.uuid;
-        var userObj = req.params;
+        var userObj = req.body;
         delete userObj._id;
         delete userObj.uuid;
         User.update({uuid: uuid}, userObj, function(err, raw){

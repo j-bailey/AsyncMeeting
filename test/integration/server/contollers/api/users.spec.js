@@ -116,6 +116,20 @@ describe('controller/api/users', function () {
                     done();
                 });
         });
+        it('should return a user after a query injection attack', function (done) {
+            user1
+                .get('/api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(403)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(res.error.message).to.equal('cannot GET /api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                })
+                .end(done);
+        });
     });
 
     describe('POST \'/\'', function () {
@@ -192,6 +206,68 @@ describe('controller/api/users', function () {
                     done();
                 });
         });
+        it('should fail during query injection attack', function (done) {
+            user1
+                .delete('/api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect(403)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(res.error.message).to.equal('cannot DELETE /api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                })
+                .end(done);
+        });
     });
-})
-;
+    describe('PUT \'/\'', function () {
+        it('should update a user', function (done) {
+            user1
+                .put('/api/users/' + userUuid1)
+                .send({
+                    firstName: 'Kelly2',
+                    lastName: 'Thomas2'
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect(200)
+                .end(function (err, res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.firstName).to.equal('Kelly2');
+                    expect(result.lastName).to.equal('Thomas2');
+                    User.find({uuid: userUuid1}, function (err, user) {
+                        expect(user).to.not.be.empty;
+                        expect(user[0].firstName).to.equal('Kelly2');
+                        expect(user[0].lastName).to.equal('Thomas2');
+                        done();
+                    });
+                });
+        });
+        it('should return a 403 error and associated JSON', function (done) {
+            user2
+                .put('/api/users/' + userUuid2)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect(200)
+                .end(function (err, res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal(403);
+                    done();
+                });
+        });
+        it('should fail during query injection attack', function (done) {
+            user1
+                .put('/api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect(403)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(res.error.message).to.equal('cannot PUT /api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(result.msg).to.equal('Insufficient permissions to access resource');
+                })
+                .end(done);
+        });
+    });
+});
