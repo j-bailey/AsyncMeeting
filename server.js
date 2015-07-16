@@ -2,6 +2,7 @@
 "use strict";
 
 process.on('unacaughtException', function(err){
+    console.error('##### Uncaught Exception ######');
     if (err) {
         console.error(err);
         if (err.stack) {
@@ -16,6 +17,10 @@ acl.init().then(function() {
     var app = require('./app');
     var debug = require('debug')('AsyncMeeting:server');
     var http = require('http');
+    var https = require('https');
+    var logger = require('winston');
+    var config = require('config');
+    var fs = require('fs');
 
     /**
      * Get port from environment and store in Express.
@@ -28,7 +33,19 @@ acl.init().then(function() {
      * Create HTTP server.
      */
 
-    var server = http.createServer(app);
+    var server;
+
+    if (!(process.env.NODE_ENV)  || process.env.NODE_ENV === 'development') {
+        logger.info('Server is running in development mode!');
+        server = http.createServer(app);
+    } else {
+        logger.info('Server is running in ' + process.env.NODE_ENV + ' mode!');
+        var options = {
+            key: fs.readFileSync(config.get('server.https.keyFile')),
+            cert: fs.readFileSync(config.get('server.https.certFile'))
+        };
+        server = https.createServer(options, app);
+    }
 
     /**
      * Listen on provided port, on all network interfaces.
@@ -44,7 +61,6 @@ acl.init().then(function() {
     /**
      * Event listener for HTTP server "error" event.
      */
-
     function onError(error) {
         if (error.syscall !== 'listen') {
             throw error;
