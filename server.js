@@ -43,6 +43,13 @@ acl.init().then(function() {
         server = http.createServer(app);
     } else {
         logger.info('Server is running in ' + process.env.NODE_ENV + ' mode!');
+        app.use(function (req, res, next) {
+            var aYear = 60 * 60 * 24 * 365;
+// Set the Strict Transport Security header for a year
+// Also include subdomains
+            res.set('Strict-Transport-Security', 'max-age=' + aYear + ';includeSubdomains');
+            next();
+        });
         var options = {
             key: fs.readFileSync(nconf.get('server:https:keyFile')),
             cert: fs.readFileSync(nconf.get('server:https:certFile'))
