@@ -2,9 +2,9 @@
 
 var mongoose = require('mongoose');
 var logger = require('winston');
-var cfg = require('config');
+var nconf = require('nconf');
 
-var dbUrl = cfg.get("database.url");
+var dbUrl = nconf.get("database:url");
 
 mongoose.connect(dbUrl, function (err) {
     if (err) {

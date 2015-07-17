@@ -2,9 +2,10 @@
  * Created by jlb on 4/12/15.
  */
 module.exports = function() {
+    require('../../../../config/configSetup');
     var mongodb = require('mongodb'),
-        cfg = require('config'),
-        dbUrl = cfg.get("database.url"),
+        nconf = require('nconf'),
+        dbUrl = nconf.get("database:url"),
         fs = require('fs'),
         nodeFs = require('node-fs'),
         path = require('path'),

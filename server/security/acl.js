@@ -3,7 +3,7 @@
 var Acl = require('acl'),
     logger = require('winston'),
     fs = require('fs'),
-    cfg = require('config'),
+    nconf = require('nconf'),
     mongodb = require('mongodb'),
     Q = require('q');
 
@@ -22,7 +22,7 @@ function setUpRoles() {
 
 var init = function () {
     var defer = Q.defer();
-    var dbUrl = cfg.get("database.url");
+    var dbUrl = nconf.get("database:url");
     var self = this;
     mongodb.connect(dbUrl, function (error, db) {
         if (error) {

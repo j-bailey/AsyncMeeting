@@ -1,7 +1,7 @@
 "use strict";
 
 var redis = require("redis"),
-    config = require('config'),
+    nconf = require('nconf'),
     logger = require('winston');
 
 var redisClient;
@@ -11,10 +11,10 @@ module.exports = {
         if (redisClient) {
             return redisClient;
         } else {
-            if (config.get('redis.connectionType') === 'tcp') {
-                redisClient = redis.createClient(config.get('redis.port'), config.get('redis.host'), config.get('redis.options'));
-            } else if (config.get('redis.connectionType') === 'unix-socket') {
-                redisClient = redis.createClient(config.get('redis.socketName'), config.get('redis.options'));
+            if (nconf.get('redis:connectionType') === 'tcp') {
+                redisClient = redis.createClient(nconf.get('redis:port'), nconf.get('redis:host'), nconf.get('redis:options'));
+            } else if (nconf.get('redis:connectionType') === 'unix-socket') {
+                redisClient = redis.createClient(nconf.get('redis:socketName'), nconf.get('redis:options'));
             } else {
                 logger.error('Unable to find redis settings to set up connection.  Please add redis settings to config file');
                 throw new Error('Unable to find redis settings to set up connection.  Please add redis settings to config file');

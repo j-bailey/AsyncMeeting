@@ -5,7 +5,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var mongoose = require('mongoose');
 var fs = require('fs');
-var cfg = require('config');
+var nconf = require('nconf');
 
 //var favicon = require('serve-favicon');
 
@@ -28,7 +28,7 @@ app.set('view engine', 'jade');
 app.use(express.static(__dirname + '/assets'));
 
 // Cookie-Parser Note: ensure cookie secret is the same as session secret
-app.use(cookieParser(cfg.get('session.secret')));
+app.use(cookieParser(nconf.get('session:secret')));
 
 // Configuring Passport
 var passport = require('passport');
@@ -36,11 +36,11 @@ var expressSession = require('express-session');
 var MongoStore = require('connect-mongo')(expressSession);
 app.use(expressSession({
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
-    secret: cfg.get('session.secret'),
+    secret: nconf.get('session:secret'),
     resave: false,
     //rolling: true, // TODO: See if this can work somehow even though angular is single page.
     saveUninitialized: false,
-    name: cfg.get('session.sessionIdName')
+    name: nconf.get('session:sessionIdName')
     //cookie : { maxAge: 1800000 }
 }));
 app.use(passport.initialize());
@@ -56,7 +56,7 @@ app.use(flash());
 
 // Setup logger using Winston and Morgan.
 var logger = require("./server/utils/logger");
-app.use(require('morgan')(cfg.get('log.morganLogFormat'), { stream: { write: function(str) {logger.info(str);} } }));
+app.use(require('morgan')(nconf.get('log:morganLogFormat'), { stream: { write: function(str) {logger.info(str);} } }));
 
 // Initialize Passport
 var initPassport = require('./server/passport/init');

@@ -11,6 +11,10 @@ process.on('unacaughtException', function(err){
     }
 });
 
+require('./config/configSetup');
+var nconf = require('nconf');
+
+
 var acl = require('./server/security/acl');
 acl.init().then(function() {
 
@@ -19,7 +23,6 @@ acl.init().then(function() {
     var http = require('http');
     var https = require('https');
     var logger = require('winston');
-    var config = require('config');
     var fs = require('fs');
 
     /**
@@ -35,14 +38,14 @@ acl.init().then(function() {
 
     var server;
 
-    if (!(process.env.NODE_ENV)  || process.env.NODE_ENV === 'development') {
+    if (!(process.env.NODE_ENV)  || process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev-test') {
         logger.info('Server is running in development mode!');
         server = http.createServer(app);
     } else {
         logger.info('Server is running in ' + process.env.NODE_ENV + ' mode!');
         var options = {
-            key: fs.readFileSync(config.get('server.https.keyFile')),
-            cert: fs.readFileSync(config.get('server.https.certFile'))
+            key: fs.readFileSync(nconf.get('server:https:keyFile')),
+            cert: fs.readFileSync(nconf.get('server:https:certFile'))
         };
         server = https.createServer(options, app);
     }

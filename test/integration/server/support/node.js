@@ -7,10 +7,14 @@
 var chai = require("chai");
 var chaiAsPromised = require("chai-as-promised");
 var Q = require("q");
+var path = require('path');
 
 var sinon = require('sinon'),
     mock = require('mockery');
     //rewire = require("rewire");
+
+
+require('../../../../config/configSetup');
 
 chai.Should();
 chai.use(chaiAsPromised);

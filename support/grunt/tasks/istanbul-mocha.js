@@ -1,9 +1,16 @@
 "use strict";
 
+var path = require('path');
+
 module.exports = function(grunt) {
     grunt.registerTask('istanbul-mocha', function (testFolder) {
         process.env.PORT = 3001;
-        process.env.NODE_ENV = 'test';
+        if(!process.env.NODE_ENV) {
+            process.env.NODE_ENV = 'dev-test';
+        }
+        process.env.configOverrideFile = path.normalize(path.join(__dirname, '../../../config/test.json'));
+
+        console.log('configOverrideFile = ' + process.env.configOverrideFile);
 
         grunt.task.run(['launch-istanbul-mocha-process:' + testFolder]);
     });

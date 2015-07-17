@@ -1,6 +1,5 @@
 //var bcrypt = require('bcrypt');
 //var jwt = require('jsonwebtoken');
-//var config = require('config');
 //var User = require('../../../../server/models/user');
 //var securityUtils = require('../../../../server/security/securityUtils');
 //exports.create = function (username, password, cb) {

@@ -1,12 +1,17 @@
 "use strict";
 
+var path = require('path');
+
 module.exports = function(grunt) {
     grunt.registerTask('e2e', function (testBrowser, proxy, cucumberTags) {
         var browser = (testBrowser || 'chrome').toLowerCase();
         var runInjectionProxy = proxy;
 
         process.env.PORT = 3001;
-        process.env.NODE_ENV = 'test';
+        if(!process.env.NODE_ENV) {
+            process.env.NODE_ENV = 'dev-test';
+        }
+        process.env.configOverrideFile = path.normalize(path.join(__dirname, '../../../config/test.json'));
 
         grunt.task.run(['start-external-services', 'file-launch:gulpTestServer:gulp:[\'test|server\']']);
 

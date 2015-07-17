@@ -1,7 +1,7 @@
 "use strict";
 
 var logger = require('winston');
-var cfg = require('config');
+var nconf = require('nconf');
 
 
 function handleJsonErrorResponse(err, req, res, next){
@@ -31,7 +31,7 @@ module.exports.handleErrors = function (err, req, res, next) {
             handleJsonErrorResponse(err, req, res, next);
         } else if (req.headers.accept === 'text/html'){
             res.status(err.status || 500);
-            res.render(cfg.get('errors.view'), {
+            res.render(nconf.get('errors:view'), {
                 message: err.message,
                 error: err
             });

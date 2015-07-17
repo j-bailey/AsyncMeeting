@@ -1,10 +1,15 @@
 "use strict";
 
+var path = require('path');
+
 module.exports = function(grunt) {
     var processStatus;
     grunt.registerTask('karma', function (configFile) {
         process.env.PORT = 3001;
-        process.env.NODE_ENV = 'test';
+        if(!process.env.NODE_ENV) {
+            process.env.NODE_ENV = 'dev-test';
+        }
+        process.env.configOverrideFile = path.normalize(path.join(__dirname, '../../../config/test.json'));
 
         if (configFile.indexOf('integration') > -1) {
             grunt.task.run(['start-external-services', 'file-launch:gulpTestServer:gulp:[\'test|server\']:5']);

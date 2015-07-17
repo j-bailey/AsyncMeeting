@@ -1,14 +1,4 @@
 {
-  "database": {
-    "url": "mongodb://localhost/asyncmeeting_dev"
-  },
-  "redis": {
-    "connectionType": "tcp",
-    "host": "localhost",
-    "port": 6379,
-    "password": "",
-    "options":{}
-  },
   "session": {
     "secret": "b1bce56042e44bb7c491e03d4142b652",
     "timeout": "1800000",

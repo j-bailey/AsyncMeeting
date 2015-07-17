@@ -1,22 +1,22 @@
 var winston = require('winston');
-var cfg = require('config');
+var nconf = require('nconf');
 
 winston.remove(winston.transports.Console);
 
 winston.add(winston.transports.Console, {
-    level: cfg.get("log.consoleLogLevel"),
+    level: nconf.get("log:consoleLogLevel"),
     handleExceptions: true,
     json: false,
     colorize: true
 });
 
 winston.add(winston.transports.File, {
-    level: cfg.get("log.fileLogLevel"),
-    filename: cfg.get('log.directory') + "/" + cfg.get('log.fileName'),
+    level: nconf.get("log:fileLogLevel"),
+    filename: nconf.get('log:directory') + "/" + nconf.get('log:fileName'),
     handleExceptions: true,
     json: true,
-    maxsize: cfg.get('log.maxFileSize'), //5MB
-    maxFiles: cfg.get('log.maxFiles'),
+    maxsize: nconf.get('log:maxFileSize'), //5MB
+    maxFiles: nconf.get('log:maxFiles'),
     colorize: false
 });
 

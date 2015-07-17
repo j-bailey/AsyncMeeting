@@ -31,7 +31,7 @@ describe('security/acl', function () {
         fsStub = sandbox.stub(require('fs'), 'readdirSync');
         var fileList = ['free-tier-role.js', 'mid-tier-role.js', 'NotARole.js'];
         fsStub.returns(fileList);
-        cfgStub = sandbox.stub(require('config'), 'get');
+        cfgStub = sandbox.stub(require('nconf'), 'get');
         mongoDbUrl = 'mongodb://test/test';
         cfgStub.returns(mongoDbUrl);
         mongoStub = sandbox.stub(require('mongodb'), 'connect');

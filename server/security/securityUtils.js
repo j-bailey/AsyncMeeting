@@ -1,7 +1,7 @@
 "use strict";
 
 var logger = require('winston'),
-    config = require('config'),
+    nconf = require('nconf'),
     jwt = require('jsonwebtoken'),
     Q = require('q');
 
@@ -12,7 +12,7 @@ module.exports = {
         var defer = Q.defer();
         var jwtOptions = {
             algorithm: "HS512",
-            expiresInMinutes: config.get('accessToken.timeout'),
+            expiresInMinutes: nconf.get('accessToken:timeout'),
             audience: clientIp,
             issuer: 'https://productivegains.com',
             subject: "productivegains:" + identity
@@ -23,7 +23,7 @@ module.exports = {
             clientIp: clientIp
         };
         try {
-            var token = jwt.sign(jwtPayload, config.get('accessToken.secret'), jwtOptions);
+            var token = jwt.sign(jwtPayload, nconf.get('accessToken:secret'), jwtOptions);
             defer.resolve(token);
         } catch (e)
         {
@@ -44,7 +44,7 @@ module.exports = {
             return defer.promise;
         }
         try {
-            decoded = jwt.verify(token, config.get('accessToken.secret'));
+            decoded = jwt.verify(token, nconf.get('accessToken:secret'));
         } catch (e) {
             logger.error('Failed to verify token for clientIp ' + clientIp);
             defer.reject(new Error('Failed to verify token'));
@@ -62,7 +62,7 @@ module.exports = {
     getIdentity: function(token, clientIp) {
         var defer = Q.defer();
         if (this.isValidToken(token, clientIp)) {
-            var decoded = jwt.verify(token, config.get('accessToken.secret'));
+            var decoded = jwt.verify(token, nconf.get('accessToken:secret'));
             defer.resolve(decoded.username);
         } else {
             defer.reject(new Error('Could not find the identity'));

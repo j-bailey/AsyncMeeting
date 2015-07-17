@@ -1,7 +1,7 @@
 var redis = require('../../../../server/redis'),
     logger = require('winston'),
     jwt = require('jsonwebtoken'),
-    config = require('config');
+    nconf = require('nconf');
 
 describe('security/securityUtils', function () {
     var sandbox,
@@ -27,15 +27,15 @@ describe('security/securityUtils', function () {
 
     describe('generateAccessToken', function () {
         it('should create a token, store it in redis and return a copy', function (done) {
-            var configGetStub = sandbox.stub(config, 'get'),
+            var nconfGetStub = sandbox.stub(nconf, 'get'),
                 //redisGetClientStub = sandbox.stub(redis, 'getRedisClient'),
                 //setexStub = sandbox.stub(),
                 //redisClientSpies = {set: sandbox.spy(), setex: setexStub},
                 identity = 'tomBlank';
 
 
-            configGetStub.withArgs('accessToken.secret').returns('supersecretkey');
-            configGetStub.withArgs('accessToken.timeout').returns(1800);
+            nconfGetStub.withArgs('accessToken:secret').returns('supersecretkey');
+            nconfGetStub.withArgs('accessToken:timeout').returns(1800);
             //redisGetClientStub.returns(redisClientSpies);
 
 
@@ -58,15 +58,15 @@ describe('security/securityUtils', function () {
             //setexStub.callArg(3);
         });
         it('should log the error and reject the promise', function (done) {
-            var configGetStub = sandbox.stub(config, 'get'),
+            var nconfGetStub = sandbox.stub(nconf, 'get'),
                 //redisGetClientStub = sandbox.stub(redis, 'getRedisClient'),
                 //setexStub = sandbox.stub(),
                 //redisClientSpies = {set: sandbox.spy(), setex: setexStub},
                 jwtStub = sandbox.stub(jwt, 'sign'),
                 identity = 'tomBlank';
 
-            configGetStub.withArgs('accessToken.secret').returns('supersecretkey');
-            configGetStub.withArgs('accessToken.timeout').returns(1800);
+            nconfGetStub.withArgs('accessToken:secret').returns('supersecretkey');
+            nconfGetStub.withArgs('accessToken:timeout').returns(1800);
             jwtStub.throws(new Error('Dummy error'));
             //redisGetClientStub.returns(redisClientSpies);
 
