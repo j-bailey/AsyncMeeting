@@ -43,7 +43,7 @@ describe('security/securityUtils', function () {
             new Date(); //=> return the fake Date 'Sat Oct 01 2011 00:00:00'
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.generateAccessToken(identity).then(function (accessToken, err) {
+            securityUtils.generateAccessToken(identity, [], '127.0.0.1').then(function (accessToken, err) {
                 expect(err).to.be.undefined;
                 new Date(); //=> will return the real time again (now)
 
@@ -51,7 +51,7 @@ describe('security/securityUtils', function () {
                 //redisClientSpies.setex.args[0][1].should.equal(1800);
                 //redisClientSpies.setex.args[0][2].should.equal(identity);
 
-                accessToken.should.equal('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6InRvbUJsYW5rIiwiaWF0IjoxMzE3NDUyNDAwLCJleHAiOjEzMTc1NjA0MDAsImlzcyI6Imh0dHBzOi8vcHJvZHVjdGl2ZWdhaW5zLmNvbSIsInN1YiI6InByb2R1Y3RpdmVnYWluczp0b21CbGFuayJ9.83jb47K7X2MZ7ZTYYET501Urp8MaU_icJ-726EsaYE_-8QGr9hRBh9kJ1j0t1dzZH-eRWomZKn5HA4oTecI6QQ');
+                expect(accessToken).to.equal('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6InRvbUJsYW5rIiwicGVybWlzc2lvbnMiOltdLCJjbGllbnRJcCI6IjEyNy4wLjAuMSIsImlhdCI6MTMxNzQ1MjQwMCwiZXhwIjoxMzE3NTYwNDAwLCJhdWQiOiIxMjcuMC4wLjEiLCJpc3MiOiJodHRwczovL3Byb2R1Y3RpdmVnYWlucy5jb20iLCJzdWIiOiJwcm9kdWN0aXZlZ2FpbnM6dG9tQmxhbmsifQ.4dtJ9khy9vAlvapV-zuHPfc2guESCQyL-AcGhMUjPXrJlSlVsnw6hXho5L0ua5ijPpBCI7ed1hNQpSXCQxPPzQ');
 
                 done();
             });
@@ -75,7 +75,7 @@ describe('security/securityUtils', function () {
             new Date(); //=> return the fake Date 'Sat Oct 01 2011 00:00:00'
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.generateAccessToken(identity).catch(function (err) {
+            securityUtils.generateAccessToken(identity, [], '127.0.0.1').catch(function (err) {
                 expect(err.message).to.equal('Unable to create token');
                 errorLogSpy.args[0][0].should.equal('Failed to create JWT token');
 
@@ -121,7 +121,7 @@ describe('security/securityUtils', function () {
             var token = undefined;
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.isValidToken(token).catch(function (err) {
+            securityUtils.isValidToken(token, '1.1.1.1').catch(function (err) {
                 expect(err).to.equal('Need a token for isValidToken');
                 errorLogSpy.args[0][0].should.equal('Need a token for isValidToken');
                 done();

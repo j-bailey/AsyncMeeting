@@ -2,6 +2,7 @@
 
 var BearerStrategy = require('passport-http-bearer').Strategy,
     logger = require('winston'),
+    requestIp = require('request-ip'),
     securityUtils = require('../security/securityUtils');
 
 module.exports = function (passport) {
@@ -9,14 +10,15 @@ module.exports = function (passport) {
 //   Strategies in Passport require a `validate` function, which accept
 //   credentials (in this case, a token), and invoke a callback with a user
 //   object.
-    passport.use(new BearerStrategy({},
-        function (token, done) {
+    passport.use(new BearerStrategy({passReqToCallback: true},
+        function (req, token, done) {
             // Find the user by token.  If there is no user with the given token, set
             // the user to `false` to indicate failure.  Otherwise, return the
             // authenticated `user`.  Note that in a production-ready application, one
             // would want to validate the token for authenticity.
             logger.debug('Bearer token check: ' + token);
-            securityUtils.isValidToken(token).then(function(exists) {
+            var clientIp = requestIp.getClientIp(req);
+            securityUtils.isValidToken(token, clientIp).then(function(exists) {
                 if (exists) {
                     logger.debug('found a token');
                     done(null, true);

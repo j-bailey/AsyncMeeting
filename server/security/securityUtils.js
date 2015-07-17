@@ -10,6 +10,12 @@ var releaseTokenCache = {};
 module.exports = {
     generateAccessToken: function (identity, basePermissions, clientIp) {
         var defer = Q.defer();
+        // TODO figure out how to get supertest to pass client IPs
+        //if (!clientIp || clientIp === null || clientIp === '') {
+        //    logger.error('Need a client IP for generateAccessToken');
+        //    defer.reject('Need a client IP for generateAccessToken');
+        //    return defer.promise;
+        //}
         var jwtOptions = {
             algorithm: "HS512",
             expiresInMinutes: nconf.get('accessToken:timeout'),
@@ -38,6 +44,12 @@ module.exports = {
     isValidToken: function (token, clientIp) {
         var defer = Q.defer();
         var decoded;
+        // TODO figure out how to get supertest to pass client IPs
+        //if (!clientIp || clientIp === null || clientIp === '') {
+        //    logger.error('Need a client IP for isValidToken');
+        //    defer.reject('Need a client IP for isValidToken');
+        //    return defer.promise;
+        //}
         if (!token) {
             logger.error('Need a token for isValidToken');
             defer.reject('Need a token for isValidToken');
@@ -61,6 +73,17 @@ module.exports = {
     },
     getIdentity: function(token, clientIp) {
         var defer = Q.defer();
+        // TODO figure out how to get supertest to pass client IPs
+        //if (!clientIp || clientIp === null || clientIp === '') {
+        //    logger.error('Need a client IP for getIdentity');
+        //    defer.reject('Need a client IP for getIdentity');
+        //    return defer.promise;
+        //}
+        if (!token) {
+            logger.error('Need a token for getIdentity');
+            defer.reject('Need a token for getIdentity');
+            return defer.promise;
+        }
         if (this.isValidToken(token, clientIp)) {
             var decoded = jwt.verify(token, nconf.get('accessToken:secret'));
             defer.resolve(decoded.username);
