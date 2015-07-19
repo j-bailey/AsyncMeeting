@@ -9,6 +9,7 @@ var schema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: false },
     parentMeetingArea: { type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea' },
+    parentMeetingAreaUuid: {type: String}
 });
 
 // Add static methods

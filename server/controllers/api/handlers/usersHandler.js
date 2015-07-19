@@ -39,18 +39,16 @@ module.exports = {
         var userObj = req.body;
         delete userObj._id;
         delete userObj.uuid;
-        User.update({uuid: uuid}, userObj, function(err, raw){
+
+        var search = {uuid: uuid};
+        var update = userObj;
+        var options = {new: true};
+
+        User.findOneAndUpdate(search, update, options, function(err, updatedUser){
             if (err){
-                logger.error('User update error: ' + raw);
                 next(err);
-            } else {
-                User.findOne({uuid: uuid}, function(err, user){
-                    if (err) {
-                        return next(err);
-                    }
-                    res.status(200).json(user);
-                });
             }
+            res.status(200).json(updatedUser);
         });
     },
     deleteByUuid: function(req, res, next){

@@ -89,22 +89,20 @@ var updateMeetingAreaByUuid = function (req, res, next) {
         return next();
     }
 
-    MeetingArea.findOne({uuid: req.params.meetingAreaId}, function (err, meetingArea) {
+    var meetingAreaObj = req.body;
+    delete meetingAreaObj.parentMeetingArea;
+    delete meetingAreaObj.parentMeetingAreaUuid;
+    delete meetingAreaObj.__id;
+    delete meetingAreaObj.uuid;
+    var search = {uuid: req.params.meetingAreaId};
+    var update = meetingAreaObj;
+    var options = {new: true};
+
+    MeetingArea.findOneAndUpdate(search, update, options, function (err, meetingArea) {
         if (err) {
             return next(err);
         }
-
-        meetingArea.title = req.body.title;
-        meetingArea.description = req.body.description;
-
-        meetingArea.save(function (err, savedMeetingArea) {
-            if (err) {
-                logger.error("Error updating meeting area: " + err.message);
-                return next(err);
-            }
-
-            res.status(200).json(savedMeetingArea);
-        });
+        res.status(200).json(meetingArea);
     });
 };
 

@@ -206,14 +206,12 @@ describe('meeting area route', function () {
             });
             var req = {params: {meetingAreaId: '332b624f-ccd0-4bf8-ba1b-64aa326314ec'}, body:{title:"My Title", description:"My desc"}},
                 resSpy = {status: sinon.stub(), json: sinon.spy()},
-                saveStub = sandbox.stub(meetingArea, 'save'),
-                findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),
+                findOneAndUpdateStub = sandbox.stub(MeetingArea.base.Model, 'findOneAndUpdate'),
                 nextStub = sandbox.stub();
 
             meetingArea.parentMeetingArea = parentMeetingArea._id;
 
-            findOneStub.yields(undefined, meetingArea);
-            saveStub.yields(undefined);
+            findOneAndUpdateStub.yields(undefined, meetingArea);
             resSpy.status.returns(resSpy);
 
             meetingAreaHandler.updateMeetingAreaByUuid(req, resSpy, nextStub);
@@ -231,16 +229,14 @@ describe('meeting area route', function () {
                 title: "Parent Meeting Area Title",
                 description: "Parent Meeting Area Description"
             });
-            var req = {params:{meetingAreaId: 1, title:"My Title", description:"My desc"}},
+            var req = {params:{meetingAreaId: 1}, body:{title:"My Title", description:"My desc"}},
                 resSpy = {status: sinon.stub(), json: sinon.spy()},
-                saveStub = sandbox.stub(meetingArea, 'save'),
-                findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),
+                findOneAndUpdateStub = sandbox.stub(MeetingArea.base.Model, 'findOneAndUpdate'),
                 nextStub = sandbox.stub();
 
             meetingArea.parentMeetingArea = parentMeetingArea._id;
 
-            findOneStub.yields({message:"error finding item"}, meetingArea);
-            saveStub.yields(undefined);
+            findOneAndUpdateStub.yields({message:"error finding item"}, meetingArea);
 
             meetingAreaHandler.updateMeetingAreaByUuid(req, resSpy, nextStub);
 
@@ -249,37 +245,10 @@ describe('meeting area route', function () {
 
             done();
         });
-        it('should throw and error via promise on save', function (done) {
-            var meetingArea = new MeetingArea({
-                title: "Meeting Area Title",
-                description: "Meeting Area Description"
-            });
-            var parentMeetingArea = new MeetingArea({
-                title: "Parent Meeting Area Title",
-                description: "Parent Meeting Area Description"
-            });
-            var req = {body:{meetingAreaId: 1}, params:{ title:"My Title", description:"My desc"}},
-                resSpy = {status: sinon.stub(), json: sinon.spy()},
-                saveStub = sandbox.stub(meetingArea, 'save'),
-                findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),
-                nextStub = sandbox.stub();
-
-            meetingArea.parentMeetingArea = parentMeetingArea._id;
-
-            findOneStub.yields(undefined, meetingArea);
-            saveStub.yields({message:"error saving item"});
-
-            meetingAreaHandler.updateMeetingAreaByUuid(req, resSpy, nextStub);
-
-            nextStub.args[0][0].should.deep.equal({message:"error saving item"});
-            expect(resSpy.status.args[0]).to.be.undefined;
-
-            done();
-        });
     });
 
     describe('deleteMeetingArea', function () {
-        it('should update a meeting area', function (done) {
+        it('should delete a meeting area', function (done) {
             var req = {params:{meetingAreaId: 1, title:"My Title", description:"My desc"}},
                 resSpy = {sendStatus: sinon.stub(), json: sinon.spy()},
                 findOneAndRemoveStub = sandbox.stub(MeetingArea.base.Model, 'findOneAndRemove'),
@@ -293,7 +262,7 @@ describe('meeting area route', function () {
 
             done();
         });
-        it('should update a meeting area', function (done) {
+        it('should delete a meeting area', function (done) {
             var req = {params:{meetingAreaId: 1, title:"My Title", description:"My desc"}},
                 resSpy = {sendStatus: sinon.stub(), json: sinon.spy()},
                 findOneAndRemoveStub = sandbox.stub(MeetingArea.base.Model, 'findOneAndRemove'),
