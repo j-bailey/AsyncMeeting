@@ -23,7 +23,8 @@
   "server": {
     "reservedCPUs": 0,
     "singleProcess": false,
-    "port": 3000,
+    "PORT": 3000,
+    "NODE_ENV": "development",
     "https": {
       "keyFile": "",
       "certFile": ""

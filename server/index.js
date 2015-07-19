@@ -75,19 +75,19 @@ acl.init().then(function() {
     /**
      * Get port from environment and store in Express.
      */
-    var port = parseInt(process.env.PORT, 10) || 3000;
+    var port = parseInt(nconf.get('PORT'), 10);
     app.set('port', port);
 
     /**
      * Create HTTP server.
      */
-    var server;
-
-    if (!(process.env.NODE_ENV)  || process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev-test') {
+    var server,
+        nEnv = nconf.get('NODE_ENV');
+    if (nEnv === 'development' || nEnv === 'dev-test') {
         logger.info('Server is running in development mode!');
         server = http.createServer(domainProcessor);
     } else {
-        logger.info('Server is running in ' + process.env.NODE_ENV + ' mode!');
+        logger.info('Server is running in ' + nEnv + ' mode!');
         app.use(function (req, res, next) {
             var aYear = 60 * 60 * 24 * 365;
 // Set the Strict Transport Security header for a year
