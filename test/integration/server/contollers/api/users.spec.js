@@ -99,6 +99,7 @@ describe('controller/api/users', function () {
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
                     expect(result._id).to.equal(userId1.toString());
+                    expect(result.password).to.be.empty;
                 })
                 .end(done);
         });
@@ -113,6 +114,7 @@ describe('controller/api/users', function () {
                     var result = JSON.parse(res.text);
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                     expect(result.status).to.equal(403);
+                    expect(result.password).to.be.empty;
                     done();
                 });
         });
@@ -127,6 +129,7 @@ describe('controller/api/users', function () {
                     var result = JSON.parse(res.text);
                     expect(res.error.message).to.equal('cannot GET /api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
+                    expect(result.password).to.be.empty;
                 })
                 .end(done);
         });
@@ -150,6 +153,7 @@ describe('controller/api/users', function () {
                 .end(function (err, res) {
                     var result = JSON.parse(res.text);
                     expect(result._id).to.not.be.null;
+                    expect(result.password).to.be.empty;
                     User.find({_id: userId1}, function (err, user) {
                         expect(user).to.have.length(1);
                         done();
@@ -174,6 +178,7 @@ describe('controller/api/users', function () {
                     var result = JSON.parse(res.text);
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                     expect(result.status).to.equal(403);
+                    expect(result.password).to.be.empty;
                     done();
                 });
         });
@@ -187,6 +192,8 @@ describe('controller/api/users', function () {
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect(200)
                 .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res.status).to.equal(200);
                     User.find({id: userId1}, function (err, user) {
                         expect(user).to.be.empty;
                         done();
@@ -203,6 +210,7 @@ describe('controller/api/users', function () {
                     var result = JSON.parse(res.text);
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                     expect(result.status).to.equal(403);
+                    expect(result.password).to.be.empty;
                     done();
                 });
         });
@@ -216,6 +224,7 @@ describe('controller/api/users', function () {
                     var result = JSON.parse(res.text);
                     expect(res.error.message).to.equal('cannot DELETE /api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
+                    expect(result.password).to.be.empty;
                 })
                 .end(done);
         });
@@ -236,8 +245,7 @@ describe('controller/api/users', function () {
                     var result = JSON.parse(res.text);
                     expect(result.firstName).to.equal('Kelly2');
                     expect(result.lastName).to.equal('Thomas2');
-                    // FIXME need to get it working
-                    //expect(result.password).to.be.empty;
+                    expect(result.password).to.be.empty;
                     User.find({_id: userId1}, function (err, user) {
                         expect(user).to.not.be.empty;
                         expect(user[0].firstName).to.equal('Kelly2');
@@ -256,6 +264,7 @@ describe('controller/api/users', function () {
                     var result = JSON.parse(res.text);
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                     expect(result.status).to.equal(403);
+                    expect(result.password).to.be.empty;
                     done();
                 });
         });
@@ -269,6 +278,7 @@ describe('controller/api/users', function () {
                     var result = JSON.parse(res.text);
                     expect(res.error.message).to.equal('cannot PUT /api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
+                    expect(result.password).to.be.empty;
                 })
                 .end(done);
         });

@@ -13,7 +13,14 @@ module.exports = {
             if (err) {
                 return next(err);
             }
-            res.status(201).json(savedUser);
+            User.findOne({_id: savedUser._id})
+                .select(User.publicFields)
+                .exec(function(err, newUser) {
+                    if (err) {
+                        return next(err);
+                    }
+                    res.status(201).json(newUser);
+                });
         });
     },
     quickSearchForUser: function (req, res, next) {
@@ -27,7 +34,9 @@ module.exports = {
         });
     },
     findById: function(req, res, next){
-        User.findOne({_id: req.params.id}, function (err, user) {
+        User.findOne({_id: req.params.id})
+            .select(User.publicFields)
+            .exec(function (err, user) {
             if (err) {
                 return next(err);
             }
@@ -44,7 +53,9 @@ module.exports = {
         var update = userObj;
         var options = {new: true};
 
-        User.findOneAndUpdate(search, update, options, function(err, updatedUser){
+        User.findOneAndUpdate(search, update, options)
+            .select(User.publicFields)
+            .exec(function(err, updatedUser){
             if (err){
                 next(err);
             }
