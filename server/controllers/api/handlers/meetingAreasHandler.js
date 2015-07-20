@@ -13,20 +13,24 @@ var getMeetingAreasWithParentId = function (req, res, next) {
         //}
         //else if (parentId === null) {
         //    return next("Error: query parameter for parentId must be specified!");
-    } else if (parentId && parentId.length !== 36) {
+    } else if (parentId && parentId.length !== 24) {
         res.status(400).json(new Error("Error: parentId is not correct!"));
         return next();
     }
     if (parentId === null) {
-        MeetingArea.find({parentMeetingArea: null}, function (err, meetingAreas) {
+        MeetingArea.find({parentMeetingArea: null})
+            .select(MeetingArea.publicFields)
+            .exec(function (err, meetingAreas) {
             if (err) {
                 return next(err);
             }
             res.status(200).json(meetingAreas);
         });
     } else {
-        MeetingArea.findOne({uuid: parentId}, function (err, meetingArea) {
-            MeetingArea.find({parentMeetingArea: (new ObjectId(meetingArea._id))}, function (err, meetingAreas) {
+        MeetingArea.findOne({_id: parentId}, function (err, meetingArea) {
+            MeetingArea.find({parentMeetingArea: (new ObjectId(meetingArea._id))})
+                .select(MeetingArea.publicFields)
+                .exec(function (err, meetingAreas) {
                 if (err) {
                     return next(err);
                 }
@@ -36,14 +40,16 @@ var getMeetingAreasWithParentId = function (req, res, next) {
     }
 };
 
-var getMeetingAreaByUuid = function (req, res, next) {
-    if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 36) {
+var getMeetingAreaById = function (req, res, next) {
+    if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
         res.status(400).json(new Error("Error: meetingAreaId is not valid or is missing!"));
         return next();
     }
 
     // TODO: add retrieving only meeting areas the user has access to.
-    MeetingArea.findOne({uuid: req.params.meetingAreaId}, function (err, meetingArea) {
+    MeetingArea.findOne({_id: req.params.meetingAreaId})
+        .select(MeetingArea.publicFields)
+        .exec(function (err, meetingArea) {
         if (err) {
             return next(err);
         }
@@ -54,7 +60,7 @@ var getMeetingAreaByUuid = function (req, res, next) {
 
 var createNewMeetingArea = function (req, res, next) {
     var parentId;
-    if (req.body && req.body.parentMeetingAreaId && req.body.parentMeetingAreaId === 36) {
+    if (req.body && req.body.parentMeetingAreaId && req.body.parentMeetingAreaId === 24) {
         res.status(400).json(new Error("Error: parentMeetingAreaId is not valid or is missing!"));
         return next();
     } else {
@@ -62,7 +68,7 @@ var createNewMeetingArea = function (req, res, next) {
     }
 
 
-    MeetingArea.findOne({uuid: parentId}, function (err, parentMeetingArea) {
+    MeetingArea.findOne({_id: parentId}, function (err, parentMeetingArea) {
         if (err) {
             return next(err);
         }
@@ -83,18 +89,16 @@ var createNewMeetingArea = function (req, res, next) {
     });
 };
 
-var updateMeetingAreaByUuid = function (req, res, next) {
-    if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 36) {
+var updateMeetingAreaById = function (req, res, next) {
+    if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
         res.status(400).json(new Error("Error: meetingAreaId is not valid or is missing!"));
         return next();
     }
 
     var meetingAreaObj = req.body;
     delete meetingAreaObj.parentMeetingArea;
-    delete meetingAreaObj.parentMeetingAreaUuid;
     delete meetingAreaObj.__id;
-    delete meetingAreaObj.uuid;
-    var search = {uuid: req.params.meetingAreaId};
+    var search = {_id: req.params.meetingAreaId};
     var update = meetingAreaObj;
     var options = {new: true};
 
@@ -106,13 +110,13 @@ var updateMeetingAreaByUuid = function (req, res, next) {
     });
 };
 
-var deleteMeetingAreaByUuid = function (req, res, next) {
-    if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 36) {
+var deleteMeetingAreaById = function (req, res, next) {
+    if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
         res.status(400).json(new Error("Error: meetingAreaId is not valid or is missing!"));
         return next();
     }
 
-    MeetingArea.findOneAndRemove({uuid: req.params.meetingAreaId}, function (err) {
+    MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function (err) {
         if (err) {
             return next(err);
         }
@@ -121,9 +125,9 @@ var deleteMeetingAreaByUuid = function (req, res, next) {
 };
 
 module.exports = {
-    getMeetingAreaByUuid: getMeetingAreaByUuid,
+    getMeetingAreaById: getMeetingAreaById,
     createNewMeetingArea: createNewMeetingArea,
-    updateMeetingAreaByUuid: updateMeetingAreaByUuid,
-    deleteMeetingAreaByUuid: deleteMeetingAreaByUuid,
+    updateMeetingAreaById: updateMeetingAreaById,
+    deleteMeetingAreaById: deleteMeetingAreaById,
     getMeetingAreasWithParentId: getMeetingAreasWithParentId
 };

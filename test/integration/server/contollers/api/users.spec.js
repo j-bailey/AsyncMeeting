@@ -6,7 +6,7 @@ var Acl = require('../../../../../server/security/acl'),
     bcrypt = require('bcrypt-nodejs'),
     db = require('../../../../../server/db');
 
-var userUuid1 = "",
+var userId1 = "",
     accessToken1;
 var email1 = 'tom@tom.com';
 var pass1 = 'password123';
@@ -14,7 +14,7 @@ var username1 = 'tom';
 var user1 = request('http://localhost:3001');
 var acl = null;
 
-var userUuid2 = "",
+var userId2 = "",
     accessToken2;
 var email2 = 'kelly@kelly.com';
 var pass2 = 'password1234';
@@ -40,20 +40,20 @@ describe('controller/api/users', function () {
                 if (err) {
                     return next(err)
                 }
-                userUuid1 = userObj.uuid;
+                userId1 = userObj._id;
                 acl.allow('users-creator', '/api/users', 'post');
                 acl.addUserRoles(userObj1.username, 'users-creator');
-                acl.allow('users-editor-' + userObj.uuid, '/api/users/' + userObj.uuid, 'put');
-                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.uuid);
-                acl.allow('users-editor-' + userObj.uuid, '/api/users/' + userObj.uuid, 'delete');
-                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.uuid);
-                acl.allow('users-viewer-' + userObj.uuid, '/api/users/' + userObj.uuid, 'get');
-                acl.addUserRoles(userObj1.username, 'users-viewer-' + userObj.uuid);
+                acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'put');
+                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
+                acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'delete');
+                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
+                acl.allow('users-viewer-' + userObj.id, '/api/users/' + userObj.id, 'get');
+                acl.addUserRoles(userObj1.username, 'users-viewer-' + userObj.id);
                 userObj2.save(function (err, userObj) {
                     if (err) {
                         return next(err)
                     }
-                    userUuid2 = userObj.uuid;
+                    userId2 = userObj._id;
 
 
                     user1
@@ -91,20 +91,20 @@ describe('controller/api/users', function () {
     describe('GET \'/\'', function () {
         it('should return a user', function (done) {
             user1
-                .get('/api/users/' + userUuid1)
+                .get('/api/users/' + userId1)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.uuid).to.equal(userUuid1);
+                    expect(result._id).to.equal(userId1.toString());
                 })
                 .end(done);
         });
         it('should return a 403 error and associated JSON', function (done) {
             user2
-                .get('/api/users/' + userUuid2)
+                .get('/api/users/' + userId2)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect('Content-Type', /json/)
@@ -118,14 +118,14 @@ describe('controller/api/users', function () {
         });
         it('should return a user after a query injection attack', function (done) {
             user1
-                .get('/api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .get('/api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect('Content-Type', /json/)
                 .expect(403)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(res.error.message).to.equal('cannot GET /api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(res.error.message).to.equal('cannot GET /api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                 })
                 .end(done);
@@ -149,8 +149,8 @@ describe('controller/api/users', function () {
                 .expect(201)
                 .end(function (err, res) {
                     var result = JSON.parse(res.text);
-                    expect(result.uuid).to.not.be.null;
-                    User.find({uuid: userUuid1}, function (err, user) {
+                    expect(result._id).to.not.be.null;
+                    User.find({_id: userId1}, function (err, user) {
                         expect(user).to.have.length(1);
                         done();
                     });
@@ -182,12 +182,12 @@ describe('controller/api/users', function () {
     describe('DELETE \'/\'', function () {
         it('should remove a user', function (done) {
             user1
-                .delete('/api/users/' + userUuid1)
+                .delete('/api/users/' + userId1)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect(200)
                 .end(function (err, res) {
-                    User.find({uuid: userUuid1}, function (err, user) {
+                    User.find({id: userId1}, function (err, user) {
                         expect(user).to.be.empty;
                         done();
                     });
@@ -195,7 +195,7 @@ describe('controller/api/users', function () {
         });
         it('should return a 403 error and associated JSON', function (done) {
             user2
-                .delete('/api/users/' + userUuid2)
+                .delete('/api/users/' + userId2)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect(200)
@@ -208,13 +208,13 @@ describe('controller/api/users', function () {
         });
         it('should fail during query injection attack', function (done) {
             user1
-                .delete('/api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .delete('/api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect(403)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(res.error.message).to.equal('cannot DELETE /api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(res.error.message).to.equal('cannot DELETE /api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                 })
                 .end(done);
@@ -223,7 +223,7 @@ describe('controller/api/users', function () {
     describe('PUT \'/\'', function () {
         it('should update a user', function (done) {
             user1
-                .put('/api/users/' + userUuid1)
+                .put('/api/users/' + userId1)
                 .send({
                     firstName: 'Kelly2',
                     lastName: 'Thomas2'
@@ -232,10 +232,13 @@ describe('controller/api/users', function () {
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect(200)
                 .end(function (err, res) {
+                    expect(err).to.be.null;
                     var result = JSON.parse(res.text);
                     expect(result.firstName).to.equal('Kelly2');
                     expect(result.lastName).to.equal('Thomas2');
-                    User.find({uuid: userUuid1}, function (err, user) {
+                    // FIXME need to get it working
+                    //expect(result.password).to.be.empty;
+                    User.find({_id: userId1}, function (err, user) {
                         expect(user).to.not.be.empty;
                         expect(user[0].firstName).to.equal('Kelly2');
                         expect(user[0].lastName).to.equal('Thomas2');
@@ -245,7 +248,7 @@ describe('controller/api/users', function () {
         });
         it('should return a 403 error and associated JSON', function (done) {
             user2
-                .put('/api/users/' + userUuid2)
+                .put('/api/users/' + userId2)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect(200)
@@ -258,13 +261,13 @@ describe('controller/api/users', function () {
         });
         it('should fail during query injection attack', function (done) {
             user1
-                .put('/api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .put('/api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect(403)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(res.error.message).to.equal('cannot PUT /api/users/' + userUuid1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(res.error.message).to.equal('cannot PUT /api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                 })
                 .end(done);

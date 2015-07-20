@@ -56,7 +56,7 @@ describe('meeting areas route', function () {
                     meetingArea.save(function (err, savedItem) {
                         if (err) console.log("save error: " + err.message);
 
-                        parentMeetingAreaId = savedItem.uuid;
+                        parentMeetingAreaId = savedItem.id;
                         acl.allow('meetingarea-creator', '/api/meetingareas', 'get');
                         acl.addUserRoles(user1Obj.username, 'meetingarea-creator');
 
@@ -128,7 +128,7 @@ describe('meeting areas route', function () {
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
                     expect(result).to.have.length(1);
-                    expect(result[0].uuid).to.equal(parentMeetingAreaId);
+                    expect(result[0]._id).to.equal(parentMeetingAreaId);
                 })
                 .end(done);
         });

@@ -26,21 +26,21 @@ module.exports = {
             return next(err);
         });
     },
-    findByUuid: function(req, res, next){
-        User.findOne({uuid: req.params.uuid}, function (err, user) {
+    findById: function(req, res, next){
+        User.findOne({_id: req.params.id}, function (err, user) {
             if (err) {
                 return next(err);
             }
             res.status(200).json(user);
         });
     },
-    updateByUuid: function(req, res, next){
-        var uuid = req.params.uuid;
+    updateById: function(req, res, next){
+        var id = req.params.id;
         var userObj = req.body;
         delete userObj._id;
-        delete userObj.uuid;
+        delete userObj.id;
 
-        var search = {uuid: uuid};
+        var search = {_id: id};
         var update = userObj;
         var options = {new: true};
 
@@ -51,9 +51,9 @@ module.exports = {
             res.status(200).json(updatedUser);
         });
     },
-    deleteByUuid: function(req, res, next){
-        var uuid = req.params.uuid;
-        User.findOneAndRemove({ uuid: uuid }, function(err) {
+    deleteById: function(req, res, next){
+        var id = req.params.id;
+        User.findOneAndRemove({ _id: id }, function(err) {
             if (err) { return next(err); }
             res.sendStatus(200);
         });

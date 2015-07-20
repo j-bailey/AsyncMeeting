@@ -32,20 +32,24 @@ describe('meeting area route', function () {
                 description: "Meeting Area Description"
             });
 
-            var req = {query:{parentId: '332b624f-ccd0-4bf8-ba1b-64aa326314ec'}},
-                resSpy = {status: sinon.stub(), json: sinon.spy()},
+            var req = {query:{parentId: '123456789012345678901234'}},
+                resSpy = {status: sandbox.stub(), json: sandbox.spy()},
+                findReturn = {select:sandbox.stub()},
+                execStub = {exec:sandbox.stub()},
                 nextStub = sandbox.stub(),
                 findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),
                 findStub = sandbox.stub(MeetingArea.base.Model, 'find');
 
             findOneStub.yields(null, parentMeetingArea);
-            findStub.yields(null, meetingArea);
+            execStub.exec.yields(null, meetingArea);
+            findReturn.select.returns(execStub);
+            findStub.returns(findReturn);
             resSpy.status.returns(resSpy);
             meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
 
             // TODO fix objectId issue
             //findStub.args[0][0].parentMeetingArea.should.equal({ parentMeetingArea: new ObjectId(1) });
-            findOneStub.args[0][0].should.deep.equal({uuid: '332b624f-ccd0-4bf8-ba1b-64aa326314ec'});
+            findOneStub.args[0][0].should.deep.equal({_id: '123456789012345678901234'});
             findStub.args[0][0].should.not.be.null;
             resSpy.status.args[0][0].should.equal(200);
             resSpy.json.args[0][0].should.deep.equal(meetingArea);
@@ -57,21 +61,24 @@ describe('meeting area route', function () {
                 title: "Meeting Area Title",
                 description: "Meeting Area Description"
             });
+
             var req = {query:{parentId: 'null'}},
-                resSpy = {status: sinon.stub(), json: sinon.spy()},
+                resSpy = {status: sandbox.stub(), json: sandbox.spy()},
+                findReturn = {select:sandbox.stub()},
+                execStub = {exec:sandbox.stub()},
                 nextStub = sandbox.stub(),
+                findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),
                 findStub = sandbox.stub(MeetingArea.base.Model, 'find');
 
-            findStub.yields(null, meetingArea);
+            execStub.exec.yields(null, meetingArea);
+            findReturn.select.returns(execStub);
+            findStub.returns(findReturn);
             resSpy.status.returns(resSpy);
             meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
 
-            // TODO fix objectId issue
-            //findStub.args[0][0].parentMeetingArea.should.equal({ parentMeetingArea: new ObjectId(1) });
             findStub.args[0][0].should.be.deep.equal({ parentMeetingArea: null });
             resSpy.status.args[0][0].should.equal(200);
             resSpy.json.args[0][0].should.deep.equal(meetingArea);
-
             done();
         });
     });
@@ -83,7 +90,10 @@ describe('meeting area route', function () {
                 description: "Meeting Area Description"
             });
 
-            sandbox.stub(MeetingArea.base.Model, 'findOne').yields(null, meetingArea);
+            var execStub = {exec:sandbox.stub().yields(null, meetingArea)},
+                selectStub = {select:sandbox.stub().returns(execStub)};
+            sandbox.stub(MeetingArea.base.Model, 'findOne').returns(selectStub);
+
 
             var req = {params: {meetingAreaId: "1"}};
             var res = {
@@ -100,7 +110,7 @@ describe('meeting area route', function () {
             var statusSpy = sandbox.spy(res, 'status');
             var jsonSpy = sandbox.spy(res, 'json');
 
-            meetingAreaHandler.getMeetingAreaByUuid(req, res);
+            meetingAreaHandler.getMeetingAreaById(req, res);
 
 
         });
@@ -113,9 +123,12 @@ describe('meeting area route', function () {
                 resSpy = {status: sinon.stub(), json: sinon.spy()},
                 nextStub = sandbox.stub();
 
-            sandbox.stub(MeetingArea.base.Model, 'findOne').yields('Big error during search', meetingArea);
+            var execStub = {exec:sandbox.stub().yields('Big error during search', meetingArea)},
+                selectStub = {select:sandbox.stub().returns(execStub)};
+            sandbox.stub(MeetingArea.base.Model, 'findOne').returns(selectStub);
 
-            meetingAreaHandler.getMeetingAreaByUuid(req, resSpy, nextStub);
+
+            meetingAreaHandler.getMeetingAreaById(req, resSpy, nextStub);
 
             nextStub.args[0][0].should.equal('Big error during search');
 
@@ -214,7 +227,7 @@ describe('meeting area route', function () {
             findOneAndUpdateStub.yields(undefined, meetingArea);
             resSpy.status.returns(resSpy);
 
-            meetingAreaHandler.updateMeetingAreaByUuid(req, resSpy, nextStub);
+            meetingAreaHandler.updateMeetingAreaById(req, resSpy, nextStub);
 
             resSpy.status.args[0][0].should.equal(200);
 
@@ -238,7 +251,7 @@ describe('meeting area route', function () {
 
             findOneAndUpdateStub.yields({message:"error finding item"}, meetingArea);
 
-            meetingAreaHandler.updateMeetingAreaByUuid(req, resSpy, nextStub);
+            meetingAreaHandler.updateMeetingAreaById(req, resSpy, nextStub);
 
             nextStub.args[0][0].should.deep.equal({message:"error finding item"});
             expect(resSpy.status.args[0]).to.be.undefined;
@@ -256,7 +269,7 @@ describe('meeting area route', function () {
 
             findOneAndRemoveStub.yields(undefined);
 
-            meetingAreaHandler.deleteMeetingAreaByUuid(req, resSpy, nextStub);
+            meetingAreaHandler.deleteMeetingAreaById(req, resSpy, nextStub);
 
             resSpy.sendStatus.args[0][0].should.equal(200);
 
@@ -270,7 +283,7 @@ describe('meeting area route', function () {
 
             findOneAndRemoveStub.yields({message:"error trying to remove item"});
 
-            meetingAreaHandler.deleteMeetingAreaByUuid(req, resSpy, nextStub);
+            meetingAreaHandler.deleteMeetingAreaById(req, resSpy, nextStub);
 
             nextStub.args[0][0].should.deep.equal({message:"error trying to remove item"});
             expect(resSpy.sendStatus.args[0]).to.be.undefined;

@@ -6,12 +6,12 @@ var acl = require('../../security/acl').getAcl();
 // TODO add authorization
 router.get("/", acl.middleware(), handlers.getMeetingAreasWithParentId);  // takes query parameter of parentId, either id or null string.
 
-router.get('/:meetingAreaId', acl.middleware(), handlers.getMeetingAreaByUuid);
+router.get('/:meetingAreaId', acl.middleware(), handlers.getMeetingAreaById);
 
 router.post('/', acl.middleware(), handlers.createNewMeetingArea);
 
-router.delete('/:meetingAreaId', acl.middleware(), handlers.deleteMeetingAreaByUuid);
+router.delete('/:meetingAreaId', acl.middleware(), handlers.deleteMeetingAreaById);
 
-router.put('/:meetingAreaId', acl.middleware(), handlers.updateMeetingAreaByUuid);
+router.put('/:meetingAreaId', acl.middleware(), handlers.updateMeetingAreaById);
 
 module.exports = router;

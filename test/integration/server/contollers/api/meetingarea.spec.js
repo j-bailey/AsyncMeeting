@@ -57,7 +57,7 @@ describe('meeting area route', function () {
                         meetingArea.save(function (err, savedItem) {
                             if (err) console.log("save error: " + error.message);
 
-                            meetingAreaId = savedItem.uuid;
+                            meetingAreaId = savedItem.id;
                             acl.allow('meetingarea-creator', '/api/meetingareas', 'post');
                             acl.addUserRoles(user1Obj.username, 'meetingarea-creator');
                             acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'put');
@@ -111,7 +111,7 @@ describe('meeting area route', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.uuid).to.equal(meetingAreaId);
+                    expect(result._id).to.equal(meetingAreaId);
                 })
                 .end(done);
         });
@@ -160,7 +160,7 @@ describe('meeting area route', function () {
                 .expect(201)
                 .end(function (err, res) {
                     var result = JSON.parse(res.text);
-                    expect(result.uuid).to.not.be.null;
+                    expect(result._id).to.not.be.null;
                     MeetingArea.find({}, function (err, meetingAreas) {
                         expect(meetingAreas).to.have.length(2);
                         done();
@@ -249,6 +249,7 @@ describe('meeting area route', function () {
                         description: "New Updated Meeting Area Description"
                     }, function (err, meetingAreas) {
                         expect(meetingAreas).to.not.be.empty;
+                        expect(meetingAreas[0]._id.toString()).to.equal(meetingAreaId);
                         expect(meetingAreas[0].title).to.equal("New Updated Meeting Area");
                         expect(meetingAreas[0].description).to.equal("New Updated Meeting Area Description");
                         done();

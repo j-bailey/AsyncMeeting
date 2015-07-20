@@ -9,13 +9,13 @@ router.post('/', acl.middleware(), handlers.createUser);
 
 //router.get('/', acl.middleware, handlers.quickSearchForUser);
 
-router.get('/:uuid', acl.middleware(), handlers.findByUuid);
+router.get('/:id', acl.middleware(), handlers.findById);
 
 //router.post('/', acl.middleware(), handlers.createNewMeetingArea);
 
-router.delete('/:uuid', acl.middleware(), handlers.deleteByUuid);
+router.delete('/:id', acl.middleware(), handlers.deleteById);
 
-router.put('/:uuid', acl.middleware(), handlers.updateByUuid);
+router.put('/:id', acl.middleware(), handlers.updateById);
 
 
 module.exports = router;

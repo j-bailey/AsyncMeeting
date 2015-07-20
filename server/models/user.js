@@ -4,7 +4,6 @@ var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
-var uuid = require('./plugins/uuid');
 var Q = require('q');
 var bcrypt = require('bcrypt');
 var logger = require('winston');
@@ -18,25 +17,28 @@ var schema = new mongoose.Schema({
     lastName: String,
     permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Permission' }],
     roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }]
-
 });
 
 // Add static methods
-var publicFields = 'username email permissions roles createdOn modifiedOn firstName lastName';
+var publicFields = 'uuid username email permissions roles createdOn modifiedOn firstName lastName currentVersion';
+schema.statics.publicFields = publicFields;
+
 schema.statics.findPublicUserById = function (userId) {
-    return this.findById(userId, publicFields)
+    return this.findById(userId)
+        .select(publicFields)
         .populate('permissions')
         .populate('roles')
         .exec();
 };
 schema.statics.findPublicUserByUserName = function (userName) {
     var defer = Q.defer();
-    this.findOne({ 'username': userName }, publicFields)
+    this.findOne({ 'username': userName })
+        .select(publicFields)
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
             if (err){
-                logger.error('error in findPublicUserByUserName with with ' + err);
+                logger.error('error in findPublicUserByUserName with ' + err);
                 defer.reject(err);
             }
             defer.resolve(user);
@@ -46,7 +48,8 @@ schema.statics.findPublicUserByUserName = function (userName) {
 
 schema.statics.findPublicUserByEmail = function (email) {
     var defer = Q.defer();
-    this.findOne({ 'email': email }, publicFields)
+    this.findOne({ 'email': email })
+        .select(publicFields)
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
@@ -83,7 +86,6 @@ schema.static.quickFind = function(searchCriteria) {
 
 schema.plugin(modifiedOn);
 schema.plugin(createInfo);
-schema.plugin(uuid);
 schema.plugin(versionInfo);
 
 var User  = mongoose.model('User', schema);
