@@ -22,9 +22,13 @@ function setUpRoles() {
 
 var init = function () {
     var defer = Q.defer();
-    var dbUrl = nconf.get("database:url");
+    var dbUrl = nconf.get("database:acl:url");
     var self = this;
-    mongodb.connect(dbUrl, function (error, db) {
+    mongodb.connect(
+        dbUrl,
+        nconf.get("database:acl:user"),
+        nconf.get("database:acl:pass"),
+        function (error, db) {
         if (error) {
             logger.error('Error connecting to database for ACL set up.  ' + error);
             defer.reject(error);

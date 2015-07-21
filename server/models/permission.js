@@ -16,4 +16,5 @@ permissionSchema.plugin(versionInfo);
 var Permission = mongoose.model('Permission', permissionSchema);
 
 module.exports = Permission;
+//module.exports = schema;
 

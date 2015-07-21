@@ -29,5 +29,30 @@
       "keyFile": "",
       "certFile": ""
     }
+  },
+  "database": {
+    "read-only": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "asyncmeeting_dev",
+      "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
+    },
+    "read-write": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "asyncmeeting_dev",
+      "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
+    },
+    "admin": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "asyncmeeting_dev",
+      "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
+    },
+    "acl": {
+      "url": "mongodb://localhost:27017/asyncmeeting_dev",
+      "user": "",
+      "pass": ""
+    }
   }
 }

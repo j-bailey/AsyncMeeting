@@ -1,11 +1,13 @@
 var Acl = require('../../../../../server/security/acl'),
     expect = require('chai').expect,
-    MeetingArea = require(__dirname + '/../../../../../server/models/meetingArea'),
+    MeetingAreaModel,
     request = require('supertest'),
-    User = require('../../../../../server/models/user'),
-    secUtil = require('../../../../../server/security/securityUtils'),
-    bcrypt = require('bcrypt-nodejs'),
-    db = require('../../../../../server/db');
+    UserSchema = require('../../../../../server/models/user'),
+    UserModel,
+    db = require('../../../../../server/db'),
+    bcrypt = require('bcrypt-nodejs');
+
+require('../../../../../server/models/meetingArea')
 
 var meetingAreaId = "";
 
@@ -31,11 +33,15 @@ describe('meeting area route', function () {
 
     beforeEach(function (done) {
         meetingAreaId = "";
+        MeetingAreaModel = db.readWriteConnection.model('MeetingArea');
+        //MeetingAreaModel = MeetingAreaSchema.statics.getModel(db.adminConnection);
+        //UserModel = UserSchema.statics.getModel(db.adminConnection);
+        UserModel = UserSchema;
         db.connection.db.dropCollection('users', function (err, result) {
             //if (err) next(err);
-            var user1Obj = new User({username: username1, email: email1, password: pass1});
+            var user1Obj = new UserModel({username: username1, email: email1, password: pass1});
             user1Obj.password = bcrypt.hashSync(pass1, bcrypt.genSaltSync(10), null);
-            var user2Obj = new User({username: username2, email: email2, password: pass2});
+            var user2Obj = new UserModel({username: username2, email: email2, password: pass2});
             user2Obj.password = bcrypt.hashSync(pass2, bcrypt.genSaltSync(10), null);
             user1Obj.save(function (err) {
                 if (err) {
@@ -46,55 +52,54 @@ describe('meeting area route', function () {
                         return done(err)
                     }
 
-                    MeetingArea.remove({}, function (err, removedItem) {
-                        if (err) console.log("remove error: " + error.message);
+                    MeetingAreaModel.remove().exec();
+                    if (err) console.log("remove error: " + error.message);
 
-                        var meetingArea = new MeetingArea({
-                            title: "Meeting Area Title",
-                            description: "Meeting Area Description"
-                        });
+                    var meetingArea = new MeetingAreaModel({
+                        title: "Meeting Area Title",
+                        description: "Meeting Area Description"
+                    });
 
-                        meetingArea.save(function (err, savedItem) {
-                            if (err) console.log("save error: " + error.message);
+                    meetingArea.save(function (err, savedItem) {
+                        if (err) console.log("save error: " + error.message);
 
-                            meetingAreaId = savedItem.id;
-                            acl.allow('meetingarea-creator', '/api/meetingareas', 'post');
-                            acl.addUserRoles(user1Obj.username, 'meetingarea-creator');
-                            acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'put');
-                            acl.addUserRoles(user1Obj.username, 'meetingarea-editor-' + meetingAreaId);
-                            acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'delete');
-                            acl.addUserRoles(user1Obj.username, 'meetingarea-editor-' + meetingAreaId);
-                            acl.allow('meetingarea-viewer-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'get');
-                            acl.addUserRoles(user1Obj.username, 'meetingarea-viewer-' + meetingAreaId);
+                        meetingAreaId = savedItem.id;
+                        acl.allow('meetingarea-creator', '/api/meetingareas', 'post');
+                        acl.addUserRoles(user1Obj.username, 'meetingarea-creator');
+                        acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'put');
+                        acl.addUserRoles(user1Obj.username, 'meetingarea-editor-' + meetingAreaId);
+                        acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'delete');
+                        acl.addUserRoles(user1Obj.username, 'meetingarea-editor-' + meetingAreaId);
+                        acl.allow('meetingarea-viewer-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'get');
+                        acl.addUserRoles(user1Obj.username, 'meetingarea-viewer-' + meetingAreaId);
 
-                            user1
-                                .post('/email-login')
-                                .set('Accept', 'application/json, text/plain, */*')
-                                .set('Accept-encoding', 'gzip, deflate')
-                                .set('Content-type', 'application/json;charset=UTF-8')
-                                .send({email: email1, password: pass1})
-                                .end(function (err, res) {
-                                    // user1 will manage its own cookies
-                                    // res.redirects contains an Array of redirects
-                                    if (err) console.error('err = ' + err);
+                        user1
+                            .post('/email-login')
+                            .set('Accept', 'application/json, text/plain, */*')
+                            .set('Accept-encoding', 'gzip, deflate')
+                            .set('Content-type', 'application/json;charset=UTF-8')
+                            .send({email: email1, password: pass1})
+                            .end(function (err, res) {
+                                // user1 will manage its own cookies
+                                // res.redirects contains an Array of redirects
+                                if (err) console.error('err = ' + err);
 
-                                    accessToken1 = res.body.access_token;
-                                    user2
-                                        .post('/email-login')
-                                        .set('Accept', 'application/json, text/plain, */*')
-                                        .set('Accept-encoding', 'gzip, deflate')
-                                        .set('Content-type', 'application/json;charset=UTF-8')
-                                        .send({email: email2, password: pass2})
-                                        .end(function (err, res) {
-                                            // user1 will manage its own cookies
-                                            // res.redirects contains an Array of redirects
-                                            if (err) console.error('err = ' + err);
+                                accessToken1 = res.body.access_token;
+                                user2
+                                    .post('/email-login')
+                                    .set('Accept', 'application/json, text/plain, */*')
+                                    .set('Accept-encoding', 'gzip, deflate')
+                                    .set('Content-type', 'application/json;charset=UTF-8')
+                                    .send({email: email2, password: pass2})
+                                    .end(function (err, res) {
+                                        // user1 will manage its own cookies
+                                        // res.redirects contains an Array of redirects
+                                        if (err) console.error('err = ' + err);
 
-                                            accessToken2 = res.body.access_token;
-                                            done();
-                                        });
-                                });
-                        });
+                                        accessToken2 = res.body.access_token;
+                                        done();
+                                    });
+                            });
                     });
                 });
             })
@@ -102,7 +107,7 @@ describe('meeting area route', function () {
     });
 
     describe('GET \'/\'', function () {
-        it('should return a meeting area', function (done) {
+        it.only('should return a meeting area', function (done) {
             user1
                 .get('/api/meetingareas/' + meetingAreaId)
                 .set('Accept', 'application/json')
@@ -161,7 +166,7 @@ describe('meeting area route', function () {
                 .end(function (err, res) {
                     var result = JSON.parse(res.text);
                     expect(result._id).to.not.be.null;
-                    MeetingArea.find({}, function (err, meetingAreas) {
+                    MeetingAreaModel.find({}, function (err, meetingAreas) {
                         expect(meetingAreas).to.have.length(2);
                         done();
                     });
@@ -196,7 +201,7 @@ describe('meeting area route', function () {
                 .set('Accept', 'application/json')
                 .expect(200)
                 .end(function (err, res) {
-                    MeetingArea.find({}, function (err, meetingAreas) {
+                    MeetingAreaModel.find({}, function (err, meetingAreas) {
                         expect(meetingAreas).to.be.empty;
                         done();
                     });
@@ -244,7 +249,7 @@ describe('meeting area route', function () {
                     var result = JSON.parse(res.text);
                     expect(result.title).to.equal("New Updated Meeting Area");
                     expect(result.description).to.equal("New Updated Meeting Area Description");
-                    MeetingArea.find({
+                    MeetingAreaModel.find({
                         title: "New Updated Meeting Area",
                         description: "New Updated Meeting Area Description"
                     }, function (err, meetingAreas) {

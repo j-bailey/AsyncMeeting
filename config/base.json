@@ -5,8 +5,5 @@
     "port": 6379,
     "password": "",
     "options":{}
-  },
-  "database": {
-    "url": "mongodb://localhost/asyncmeeting_dev"
   }
 }

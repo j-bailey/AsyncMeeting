@@ -3,7 +3,9 @@
 var logger = require('winston'),
     nconf = require('nconf'),
     jwt = require('jsonwebtoken'),
-    Q = require('q');
+    db = require('../db'),
+    Q = require('q'),
+    acl = require('./acl').getAcl();
 
 var releaseTokenCache = {};
 
@@ -91,5 +93,21 @@ module.exports = {
             defer.reject(new Error('Could not find the identity'));
         }
         return defer.promise;
+    },
+    readOnlyDbConnection: function(req, res, next) {
+        req.db = db.readOnlyConnection;
+        req.db.accessLevel = 'Read-Only';
+        next();
+    },
+    determineDbConnection: function(req, res, next) {
+        req.db = db.readWriteConnection;
+        req.db.accessLevel = 'Read-Write';
+        //if (req.session && req.session.isAdmin) {
+        //    req.db = db.readWriteConnection;
+        //    req.db.accessLevel = 'Read-Write';
+        //} else if (req.session) {
+        //
+        //}
+        next();
     }
 };

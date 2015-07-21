@@ -34,7 +34,7 @@ describe('meeting areas route', function () {
         childMeetingAreaId = "";
         child2MeetingAreaId = "";
 
-        db.connection.db.dropCollection('users', function (err, result) {
+        db.adminConnection.db.dropCollection('users', function (err, result) {
             //if (err) next(err);
             var user1Obj = new User({username: username, email: email, password: pass});
             user1Obj.password = bcrypt.hashSync(pass, bcrypt.genSaltSync(10), null);

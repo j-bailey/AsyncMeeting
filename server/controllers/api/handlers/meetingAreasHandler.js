@@ -1,5 +1,5 @@
 "use strict";
-var MeetingArea = require('../../../../server/models/meetingArea');
+//var MeetingArea = require('../../../../server/models/meetingArea');
 var ObjectId = require('mongoose').Types.ObjectId;
 var logger = require('winston');
 
@@ -45,6 +45,7 @@ var getMeetingAreaById = function (req, res, next) {
         res.status(400).json(new Error("Error: meetingAreaId is not valid or is missing!"));
         return next();
     }
+    var MeetingArea = req.db.model('MeetingArea');
 
     // TODO: add retrieving only meeting areas the user has access to.
     MeetingArea.findOne({_id: req.params.meetingAreaId})

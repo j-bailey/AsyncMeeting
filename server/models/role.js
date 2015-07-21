@@ -17,3 +17,4 @@ var Role = mongoose.model('Role', schema);
 
 module.exports = Role;
 
+//module.exports = schema;

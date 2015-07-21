@@ -7,6 +7,7 @@ var versionInfo = require('./plugins/versionInfo');
 var Q = require('q');
 var bcrypt = require('bcrypt');
 var logger = require('winston');
+var db = require('../db');
 
 
 var schema = new mongoose.Schema({
@@ -82,13 +83,17 @@ schema.static.quickFind = function(searchCriteria) {
     return defer.promise;
 };
 
+schema.statics.getModel = function(conn) {
+    return conn.model('User', schema);
+};
+
 // Add plugins
 
 schema.plugin(modifiedOn);
 schema.plugin(createInfo);
 schema.plugin(versionInfo);
 
-var User  = mongoose.model('User', schema);
-
-module.exports = User;
+db.readOnlyConnection.model('User', schema);
+db.readWriteConnection.model('User', schema);
+db.adminConnection.model('User', schema);
 

@@ -1,7 +1,9 @@
 "use strict";
-
+var db = require('../db');
 var LocalStrategy = require('passport-local').Strategy;
-var User = require('../models/user');
+var UserSchema = require('../models/user'),
+    UserModel = UserSchema;
+    //UserModel = UserSchema.statics.getModel(db.readOnlyConnection);
 var bCrypt = require('bcrypt-nodejs');
 var logger = require('winston');
 
@@ -16,7 +18,7 @@ module.exports = function(passport) {
             },
             function(req, email, password, done) {
 // check in mongo if a user with email exists or not
-                User.findOne({ 'email': email },
+                UserModel.findOne({ 'email': email },
                     function(err, user) {
 // In case of any error, return using the done method
                         if (err) {

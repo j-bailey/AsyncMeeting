@@ -1,9 +1,12 @@
 "use strict";
 
-var router = require('express').Router(),
+var db = require('../db'),
+    router = require('express').Router(),
     passport = require('passport'),
     securityUtils = require('../security/securityUtils'),
-    User = require('../../server/models/user'),
+    UserSchema = require('../../server/models/user'),
+    UserModel = UserSchema,
+    //UserModel = UserSchema.statics.getModel(db.readOnlyConnection),
     requestIp = require('request-ip'),
     logger = require('winston');
 
@@ -15,7 +18,7 @@ router.post('/login',
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        User.findPublicUserById(req.user._id).then(function (user) {
+        UserModel.findPublicUserById(req.user._id).then(function (user) {
             var clientIp = requestIp.getClientIp(req);
             securityUtils.generateAccessToken(user.username, [], clientIp).then(function (accessToken) {
                 res.json({
@@ -45,7 +48,7 @@ router.post('/email-login',
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        User.findPublicUserById(req.user._id).then(function (user) {
+        UserModel.findPublicUserById(req.user._id).then(function (user) {
             logger.debug("Sending response");
             logger.debug("Getting accessToken");
             logger.debug('User = ' + JSON.stringify(user));

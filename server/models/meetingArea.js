@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
-
+var db = require('../db');
 
 var schema = new mongoose.Schema({
     title: { type: String, required: true },
@@ -22,7 +22,8 @@ schema.plugin(createInfo);
 schema.plugin(versionInfo);
 
 
-var MeetingArea  = mongoose.model('MeetingArea', schema);
+db.readOnlyConnection.model('MeetingArea', schema);
+db.readWriteConnection.model('MeetingArea', schema);
+db.adminConnection.model('MeetingArea', schema);
 
-module.exports = MeetingArea;
 

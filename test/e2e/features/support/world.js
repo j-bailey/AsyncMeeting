@@ -5,7 +5,6 @@ module.exports = function() {
     require('../../../../config/configSetup');
     var mongodb = require('mongodb'),
         nconf = require('nconf'),
-        dbUrl = nconf.get("database:url"),
         fs = require('fs'),
         nodeFs = require('node-fs'),
         path = require('path'),
@@ -41,7 +40,11 @@ module.exports = function() {
         this.takeScreenshot = takeScreenshot;
         this.imageUtils = imageUtils;
         var self = this;
-        mongodb.connect(dbUrl, function (error, db) {
+        mongodb.connect(
+            nconf.get("database:acl:url"),
+            nconf.get("database:acl:user"),
+            nconf.get("database:acl:pass"),
+            function (error, db) {
             if (error) {
                 throw error;
             }

@@ -30,7 +30,7 @@ describe('controller/api/users', function () {
     });
 
     beforeEach(function (done) {
-        db.connection.db.dropCollection('users', function (err, result) {
+        db.adminConnection.db.dropCollection('users', function (err, result) {
             //if (err) next(err);
             var userObj1 = new User({username: username1, email: email1, password: pass1});
             userObj1.password = bcrypt.hashSync(pass1, bcrypt.genSaltSync(10), null);

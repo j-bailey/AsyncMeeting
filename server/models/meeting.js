@@ -21,4 +21,5 @@ schema.plugin(versionInfo);
 var Meeting  = mongoose.model('Meeting', schema);
 
 module.exports = Meeting;
+//module.exports = schema;
 
