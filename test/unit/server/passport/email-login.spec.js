@@ -42,7 +42,13 @@ describe('email-login', function() {
                 }
             };
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            sandbox.stub(User.base.Model, 'findOne').yields(null, user);
+            var findOneReturn = {select:sandbox.stub()};
+            var leanReturn = {lean: sandbox.stub()};
+            var execReturn = {exec:sandbox.stub()};
+            sandbox.stub(User.base.Model, 'findOne').returns(findOneReturn);
+            findOneReturn.select.returns(leanReturn);
+            leanReturn.lean.returns(execReturn);
+            execReturn.exec.yields(null, user);
             require('../../../../server/passport/email-login')(passport);
         });
         it('should return an error while looking for a user', function(done) {
@@ -82,7 +88,14 @@ describe('email-login', function() {
             };
             sandbox.stub(require('winston'), 'error', winstomSpy);
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            sandbox.stub(User.base.Model, 'findOne').yields(error, null);
+            //sandbox.stub(User.base.Model, 'findOne').yields(error, null);
+            var findOneReturn = {select:sandbox.stub()};
+            var leanReturn = {lean: sandbox.stub()};
+            var execReturn = {exec:sandbox.stub()};
+            sandbox.stub(User.base.Model, 'findOne').returns(findOneReturn);
+            findOneReturn.select.returns(leanReturn);
+            leanReturn.lean.returns(execReturn);
+            execReturn.exec.yields(error, null);
             require('../../../../server/passport/email-login')(passport);
         });
         it('should log and return an error when it cannot find a user', function(done) {
@@ -117,7 +130,14 @@ describe('email-login', function() {
             };
             sandbox.stub(require('winston'), 'debug', winstomSpy);
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            sandbox.stub(User.base.Model, 'findOne').yields(null, user);
+            //sandbox.stub(User.base.Model, 'findOne').yields(null, user);
+            var findOneReturn = {select:sandbox.stub()};
+            var leanReturn = {lean: sandbox.stub()};
+            var execReturn = {exec:sandbox.stub()};
+            sandbox.stub(User.base.Model, 'findOne').returns(findOneReturn);
+            findOneReturn.select.returns(leanReturn);
+            leanReturn.lean.returns(execReturn);
+            execReturn.exec.yields(null, user);
             require('../../../../server/passport/email-login')(passport);
         });
         it('should log and return an error when user passwords do not match', function(done) {
@@ -155,7 +175,14 @@ describe('email-login', function() {
             };
             sandbox.stub(require('winston'), 'debug', winstomSpy);
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return false;});
-            sandbox.stub(User.base.Model, 'findOne').yields(null, user);
+            //sandbox.stub(User.base.Model, 'findOne').yields(null, user);
+            var findOneReturn = {select:sandbox.stub()};
+            var leanReturn = {lean: sandbox.stub()};
+            var execReturn = {exec:sandbox.stub()};
+            sandbox.stub(User.base.Model, 'findOne').returns(findOneReturn);
+            findOneReturn.select.returns(leanReturn);
+            leanReturn.lean.returns(execReturn);
+            execReturn.exec.yields(null, user);
             require('../../../../server/passport/email-login')(passport);
         });
     });

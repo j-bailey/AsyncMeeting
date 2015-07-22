@@ -105,7 +105,7 @@ describe('meeting area route', function () {
     });
 
     describe('GET \'/\'', function () {
-        it.only('should return a meeting area', function (done) {
+        it('should return a meeting area', function (done) {
             user1
                 .get('/api/meetingareas/' + meetingAreaId)
                 .set('Accept', 'application/json')

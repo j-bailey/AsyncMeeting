@@ -1,5 +1,6 @@
 var db = require('../../../../server/db');
-var User = require('../../../../server/models/user');
+require('../../../../server/models/user');
+var User = db.adminConnection.model('User');
 var bcrypt = require('bcrypt-nodejs');
 var chai = require('chai');
 chai.use(require('chai-as-promised'));

@@ -5,18 +5,6 @@ var logger = require('winston');
 var nconf = require('nconf');
 
 
-var dbUrl = nconf.get("database:acl:url");
-
-mongoose.connect(dbUrl, function (err) {
-    if (err) {
-        logger.error('Error connecting to DB from mongoose', err);
-        throw err;
-    }
-    logger.info('Mongoose is connected to ' + dbUrl);
-});
-
-module.exports = mongoose;
-
 var hostReadOnly = nconf.get("database:read-only:host");
 var databaseReadOnly = nconf.get("database:read-only:database");
 var portReadOnly = nconf.get("database:read-only:port");
@@ -80,7 +68,31 @@ adminConnection.on('connected', function(err){
         databaseAdmin );
 });
 
+
+var hostSession = nconf.get("database:session:host");
+var databaseSession = nconf.get("database:session:database");
+var portSession = nconf.get("database:session:port");
+var optionsSession = nconf.get("database:session:options");
+var sessionConnection = mongoose.createConnection(hostSession, databaseSession, portSession, optionsSession);
+sessionConnection.on('error', function (err) {
+    if (err) {
+        logger.error('Error with Session DB from mongoose', err);
+        throw err;
+    }
+});
+sessionConnection.on('connected', function(err){
+    if (err) {
+        logger.error('Error connecting with Session DB from mongoose', err);
+        throw err;
+    }
+    logger.info('Mongoose is connected to Session DB via ' + hostSession + ':' + portSession + '/' +
+        databaseSession );
+});
+
+
+
 module.exports.readOnlyConnection = readOnlyConnection;
 module.exports.readWriteConnection = readWriteConnection;
+module.exports.sessionConnection = sessionConnection;
 module.exports.adminConnection = adminConnection;
 

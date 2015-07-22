@@ -3,7 +3,7 @@
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var mongoose = require('mongoose');
+var db = require('./server/db');
 var fs = require('fs');
 var nconf = require('nconf');
 
@@ -35,7 +35,7 @@ var passport = require('passport');
 var expressSession = require('express-session');
 var MongoStore = require('connect-mongo')(expressSession);
 app.use(expressSession({
-    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    store: new MongoStore({ mongooseConnection: db.sessionConnection }),
     secret: nconf.get('session:secret'),
     resave: false,
     //rolling: true, // TODO: See if this can work somehow even though angular is single page.

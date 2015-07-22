@@ -49,6 +49,12 @@
       "database": "asyncmeeting_dev",
       "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
     },
+    "session": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "asyncmeeting_dev",
+      "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
+    },
     "acl": {
       "url": "mongodb://localhost:27017/asyncmeeting_dev",
       "user": "",
