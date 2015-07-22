@@ -16,7 +16,7 @@ var childMeetingAreaId = "";
 var child2MeetingAreaId = "";
 var accessToken;
 var email = 'tom@tom.com';
-var pass = 'password123';
+var pass = 'pword123';
 var username = 'tom';
 var user1 = request('http://localhost:3001');
 var acl = null;
@@ -40,7 +40,7 @@ describe('meeting areas route', function () {
         User.remove().exec();
         //if (err) next(err);
         var user1Obj = new User({username: username, email: email, password: pass});
-        user1Obj.password = bcrypt.hashSync(pass, bcrypt.genSaltSync(10), null);
+        user1Obj.password = pass;
         user1Obj.save(function (err) {
             if (err) {
                 return next(err)

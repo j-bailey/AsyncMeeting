@@ -7,15 +7,14 @@ chai.use(require('chai-as-promised'));
 var expect = chai.expect;
 
 var email = 'user@user.com';
-var pass = 'password#123';
+var pass = 'pword#123';
 
 var steps = function () {
 
     this.Given(/^I have a valid and active account with username (.*), email (.*), and password (.*)$/, function (username, email, password, next) {
         db.adminConnection.db.dropCollection('users', function (err, result) {
             //if (err) next(err);
-            var user = new User({ email: email, username: username });
-            user.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
+            var user = new User({ email: email, username: username, password: password});
             user.save(function (err) {
                 if (err) {
                     return next(err)
@@ -66,8 +65,7 @@ var steps = function () {
     this.Given(/^I have an invalid account$/, function (next) {
         db.adminConnection.db.dropCollection('users', function (err, result) {
             //if (err) next(err);
-            var user = new User({ email: email + 1, username: 'user1' });
-            user.password = bcrypt.hashSync(pass, bcrypt.genSaltSync(10), null);
+            var user = new User({ email: email + 1, username: 'user1', password: pass });
             user.save(function (err) {
                 if (err) {
                     return next(err)

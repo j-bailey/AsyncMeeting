@@ -8,10 +8,10 @@ var LocalStrategy = require('passport-local').Strategy,
     freeTier = require('../security/resources/free-tier-role');
 
 module.exports = function(passport) {
-    // Generates hash using bCrypt
-    var createHash = function(password) {
-        return User.hashPassword(password);
-    };
+    //// Generates hash using bCrypt
+    //var createHash = function(password) {
+    //    return User.hashPassword(password);
+    //};
 
     passport.use('signup', new LocalStrategy({
                 passReqToCallback: true // allows us to pass back the entire request to the callback
@@ -47,7 +47,8 @@ module.exports = function(passport) {
                                 var newUser = new User();
 // set the user's local credentials
                                 newUser.username = username;
-                                newUser.password = createHash(password);
+                                //newUser.password = createHash(password);
+                                newUser.password = password;
                                 newUser.email = req.body.email;
                                 newUser.firstName = req.body.firstName;
                                 newUser.lastName = req.body.lastName;

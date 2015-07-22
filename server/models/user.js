@@ -8,6 +8,7 @@ var Q = require('q');
 var bcrypt = require('bcrypt');
 var logger = require('winston');
 var db = require('../db');
+var dictValidator = require('../security/dictionary-validator');
 
 
 var schema = new mongoose.Schema({
@@ -18,6 +19,26 @@ var schema = new mongoose.Schema({
     lastName: String,
     permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Permission' }],
     roles: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Role' }]
+});
+
+
+schema.pre('validate', function(next){
+    var user = this;
+// only hash the password if it has been modified (or is new)
+    if (!user.isModified('password')) {
+        return next();
+    }
+    if (dictValidator.isImproper(this.username, this.password)){
+        next(new Error('Either the password cannot contain your username or be on the list of commonly used passwords.'));
+    }
+    bcrypt.hash(user.password, 12, function (err, hash) {
+        if(err) {
+            next(err);
+            return;
+        }
+        user.password = hash;
+        next();
+    });
 });
 
 // Add static methods
@@ -63,9 +84,6 @@ schema.statics.findPublicUserByEmail = function (email) {
     return defer.promise;
 };
 
-schema.statics.hashPassword = function(password){
-    return bcrypt.hashSync(password, 10);
-};
 
 schema.static.quickFind = function(searchCriteria) {
     var defer = Q.defer();

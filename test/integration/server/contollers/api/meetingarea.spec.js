@@ -14,12 +14,12 @@ var meetingAreaId = "";
 
 var accessToken1,
     email1 = 'tom@tom.com',
-    pass1 = 'password123',
+    pass1 = 'pword123',
     username1 = 'tom',
     user1 = request('http://localhost:3001');
 var accessToken2,
     email2 = 'kelly@kelly.com',
-    pass2 = 'password1234',
+    pass2 = 'pword1234',
     username2 = 'kelly',
     user2 = request('http://localhost:3001');
 var acl = null;
@@ -39,9 +39,9 @@ describe('meeting area route', function () {
         UserModel.remove().exec();
         //if (err) next(err);
         var user1Obj = new UserModel({username: username1, email: email1, password: pass1});
-        user1Obj.password = bcrypt.hashSync(pass1, bcrypt.genSaltSync(10), null);
+        user1Obj.password = pass1;
         var user2Obj = new UserModel({username: username2, email: email2, password: pass2});
-        user2Obj.password = bcrypt.hashSync(pass2, bcrypt.genSaltSync(10), null);
+        user2Obj.password = pass2;
         user1Obj.save(function (err) {
             if (err) {
                 return done(err)

@@ -11,7 +11,7 @@ require('../../../../../server/models/user')
 var userId1 = "",
     accessToken1;
 var email1 = 'tom@tom.com';
-var pass1 = 'password123';
+var pass1 = 'pword123';
 var username1 = 'tom';
 var user1 = request('http://localhost:3001');
 var acl = null;
@@ -19,7 +19,7 @@ var acl = null;
 var userId2 = "",
     accessToken2;
 var email2 = 'kelly@kelly.com';
-var pass2 = 'password1234';
+var pass2 = 'pword1234';
 var username2 = 'kelly';
 var user2 = request('http://localhost:3001');
 
@@ -36,9 +36,9 @@ describe('controller/api/users', function () {
         User.remove().exec();
         //if (err) next(err);
         var userObj1 = new User({username: username1, email: email1, password: pass1});
-        userObj1.password = bcrypt.hashSync(pass1, bcrypt.genSaltSync(10), null);
+        userObj1.password = pass1;
         var userObj2 = new User({username: username2, email: email2, password: pass2});
-        userObj2.password = bcrypt.hashSync(pass2, bcrypt.genSaltSync(10), null);
+        userObj2.password = pass2;
         userObj1.save(function (err, userObj) {
             if (err) {
                 return next(err)

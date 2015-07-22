@@ -5,10 +5,7 @@ var logger = require('winston');
 module.exports = {
     createUser: function (req, res, next) {
         var User = req.db.model('User');
-        var user = new User(req.body),
-            hashedPassword = User.hashPassword(req.body.password);
-        /* jshint ignore:line */
-        user.password = hashedPassword;
+        var user = new User(req.body);
         user.save(function (err, savedUser) {
             if (err) {
                 return next(err);

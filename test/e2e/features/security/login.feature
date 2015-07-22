@@ -13,11 +13,11 @@ Feature: Login to my account
 
     Examples:
       | saved username                     | username                           | email                                       | password                                   | description                |
-      | USER                               | user                               | user@user.com                               | Password#123                               | simple account             |
-      | user123456789012345678901234567890 | user123456789012345678901234567890 | user1@user.com                              | Password#123                               | Longest alloed username    |
-      | U                                  | u                                  | user2@user.com                              | Password#123                               | Shortetst allowed username |
-      | User3                              | user3                              | user123456789012345678901234567890@user.com | Password#123                               | Longest alloed email       |
-      | USer4                              | user4                              | u@u.c                                       | Password#123                               | Shortetst allowed email    |
+      | USER                               | user                               | user@user.com                               | Pword#123                               | simple account             |
+      | user123456789012345678901234567890 | user123456789012345678901234567890 | user1@user.com                              | Pword#123                               | Longest alloed username    |
+      | U                                  | u                                  | user2@user.com                              | Pword#123                               | Shortetst allowed username |
+      | User3                              | user3                              | user123456789012345678901234567890@user.com | Pword#123                               | Longest alloed email       |
+      | USer4                              | user4                              | u@u.c                                       | Pword#123                               | Shortetst allowed email    |
       | User5                              | user5                              | user5@user.com                              | Password#123123456789012345678901234567890 | Longest alloed password    |
       | user6                              | user6                              | user6@user.com                              | Pass#123                                   | Shortetst allowed password |
 

@@ -87,17 +87,6 @@ describe('model/user', function () {
             done();
         });
     });
-    describe('hashPassword', function () {
-        it('should return a hashed password', function (done) {
-            var hashSyncStub  = sandbox.stub(require('bcrypt'), 'hashSync');
-            user.hashPassword('Password123');
-
-            hashSyncStub.args[0][0].should.equal('Password123');
-            hashSyncStub.args[0][1].should.equal(10);
-
-            done();
-        });
-    });
     describe('quickFind', function () {
         it('should limited user data based on search criteria', function (done) {
             var userObj = {_id:1, username: "myName"},
