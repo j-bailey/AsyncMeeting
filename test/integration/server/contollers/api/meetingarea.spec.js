@@ -2,12 +2,13 @@ var Acl = require('../../../../../server/security/acl'),
     expect = require('chai').expect,
     MeetingAreaModel,
     request = require('supertest'),
-    UserSchema = require('../../../../../server/models/user'),
     UserModel,
     db = require('../../../../../server/db'),
     bcrypt = require('bcrypt-nodejs');
 
-require('../../../../../server/models/meetingArea')
+// Load the models, so they get tied to the DB connections
+require('../../../../../server/models/meetingArea');
+require('../../../../../server/models/user');
 
 var meetingAreaId = "";
 
@@ -34,75 +35,72 @@ describe('meeting area route', function () {
     beforeEach(function (done) {
         meetingAreaId = "";
         MeetingAreaModel = db.readWriteConnection.model('MeetingArea');
-        //MeetingAreaModel = MeetingAreaSchema.statics.getModel(db.adminConnection);
-        //UserModel = UserSchema.statics.getModel(db.adminConnection);
-        UserModel = UserSchema;
-        db.connection.db.dropCollection('users', function (err, result) {
-            //if (err) next(err);
-            var user1Obj = new UserModel({username: username1, email: email1, password: pass1});
-            user1Obj.password = bcrypt.hashSync(pass1, bcrypt.genSaltSync(10), null);
-            var user2Obj = new UserModel({username: username2, email: email2, password: pass2});
-            user2Obj.password = bcrypt.hashSync(pass2, bcrypt.genSaltSync(10), null);
-            user1Obj.save(function (err) {
+        UserModel = db.readWriteConnection.model('User');
+        UserModel.remove().exec();
+        //if (err) next(err);
+        var user1Obj = new UserModel({username: username1, email: email1, password: pass1});
+        user1Obj.password = bcrypt.hashSync(pass1, bcrypt.genSaltSync(10), null);
+        var user2Obj = new UserModel({username: username2, email: email2, password: pass2});
+        user2Obj.password = bcrypt.hashSync(pass2, bcrypt.genSaltSync(10), null);
+        user1Obj.save(function (err) {
+            if (err) {
+                return done(err)
+            }
+            user2Obj.save(function (err) {
                 if (err) {
                     return done(err)
                 }
-                user2Obj.save(function (err) {
-                    if (err) {
-                        return done(err)
-                    }
 
-                    MeetingAreaModel.remove().exec();
-                    if (err) console.log("remove error: " + error.message);
+                MeetingAreaModel.remove().exec();
+                if (err) console.log("remove error: " + error.message);
 
-                    var meetingArea = new MeetingAreaModel({
-                        title: "Meeting Area Title",
-                        description: "Meeting Area Description"
-                    });
-
-                    meetingArea.save(function (err, savedItem) {
-                        if (err) console.log("save error: " + error.message);
-
-                        meetingAreaId = savedItem.id;
-                        acl.allow('meetingarea-creator', '/api/meetingareas', 'post');
-                        acl.addUserRoles(user1Obj.username, 'meetingarea-creator');
-                        acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'put');
-                        acl.addUserRoles(user1Obj.username, 'meetingarea-editor-' + meetingAreaId);
-                        acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'delete');
-                        acl.addUserRoles(user1Obj.username, 'meetingarea-editor-' + meetingAreaId);
-                        acl.allow('meetingarea-viewer-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'get');
-                        acl.addUserRoles(user1Obj.username, 'meetingarea-viewer-' + meetingAreaId);
-
-                        user1
-                            .post('/email-login')
-                            .set('Accept', 'application/json, text/plain, */*')
-                            .set('Accept-encoding', 'gzip, deflate')
-                            .set('Content-type', 'application/json;charset=UTF-8')
-                            .send({email: email1, password: pass1})
-                            .end(function (err, res) {
-                                // user1 will manage its own cookies
-                                // res.redirects contains an Array of redirects
-                                if (err) console.error('err = ' + err);
-
-                                accessToken1 = res.body.access_token;
-                                user2
-                                    .post('/email-login')
-                                    .set('Accept', 'application/json, text/plain, */*')
-                                    .set('Accept-encoding', 'gzip, deflate')
-                                    .set('Content-type', 'application/json;charset=UTF-8')
-                                    .send({email: email2, password: pass2})
-                                    .end(function (err, res) {
-                                        // user1 will manage its own cookies
-                                        // res.redirects contains an Array of redirects
-                                        if (err) console.error('err = ' + err);
-
-                                        accessToken2 = res.body.access_token;
-                                        done();
-                                    });
-                            });
-                    });
+                var meetingArea = new MeetingAreaModel({
+                    title: "Meeting Area Title",
+                    description: "Meeting Area Description"
                 });
-            })
+
+                meetingArea.save(function (err, savedItem) {
+                    if (err) console.log("save error: " + error.message);
+
+                    meetingAreaId = savedItem.id;
+                    acl.allow('meetingarea-creator', '/api/meetingareas', 'post');
+                    acl.addUserRoles(user1Obj.username, 'meetingarea-creator');
+                    acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'put');
+                    acl.addUserRoles(user1Obj.username, 'meetingarea-editor-' + meetingAreaId);
+                    acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'delete');
+                    acl.addUserRoles(user1Obj.username, 'meetingarea-editor-' + meetingAreaId);
+                    acl.allow('meetingarea-viewer-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'get');
+                    acl.addUserRoles(user1Obj.username, 'meetingarea-viewer-' + meetingAreaId);
+
+                    user1
+                        .post('/email-login')
+                        .set('Accept', 'application/json, text/plain, */*')
+                        .set('Accept-encoding', 'gzip, deflate')
+                        .set('Content-type', 'application/json;charset=UTF-8')
+                        .send({email: email1, password: pass1})
+                        .end(function (err, res) {
+                            // user1 will manage its own cookies
+                            // res.redirects contains an Array of redirects
+                            if (err) console.error('err = ' + err);
+
+                            accessToken1 = res.body.access_token;
+                            user2
+                                .post('/email-login')
+                                .set('Accept', 'application/json, text/plain, */*')
+                                .set('Accept-encoding', 'gzip, deflate')
+                                .set('Content-type', 'application/json;charset=UTF-8')
+                                .send({email: email2, password: pass2})
+                                .end(function (err, res) {
+                                    // user1 will manage its own cookies
+                                    // res.redirects contains an Array of redirects
+                                    if (err) console.error('err = ' + err);
+
+                                    accessToken2 = res.body.access_token;
+                                    done();
+                                });
+                        });
+                });
+            });
         });
     });
 

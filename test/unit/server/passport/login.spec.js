@@ -1,4 +1,6 @@
-var User = require('../../../../server/models/user');
+var mongoose = require('mongoose'),
+    User = mongoose.model('User')? mongoose.model('User'): mongoose.model('User', require('../../../../server/models/user').schema),
+    db = require('../../../../server/db');
 
 describe('login', function() {
     var sandbox;
@@ -43,7 +45,8 @@ describe('login', function() {
             };
             sandbox.stub(require('winston'), 'log', winstomSpy);
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            sandbox.stub(User.base.Model, 'findOne').yields(null, user);
+            var u = db.readOnlyConnection.model('User');
+            sandbox.stub(db.readOnlyConnection.model('User'), 'findOne').yields(null, user);
             require('../../../../server/passport/login')(passport);
         });
         it('should return an error while looking for a user', function(done) {
@@ -78,7 +81,7 @@ describe('login', function() {
             };
             sandbox.stub(require('winston'), 'log', winstomSpy);
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            sandbox.stub(User.base.Model, 'findOne').yields(error, null);
+            sandbox.stub(db.readOnlyConnection.model('User'), 'findOne').yields(error, null);
             require('../../../../server/passport/login')(passport);
         });
         it('should log and return an error when it cannot find a user', function(done) {
@@ -113,7 +116,7 @@ describe('login', function() {
             sandbox.stub(require('winston'), 'log', winstomSpy);
             sandbox.stub(require('winston'), 'debug', winstomSpy);
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
-            sandbox.stub(User.base.Model, 'findOne').yields(null, user);
+            sandbox.stub(db.readOnlyConnection.model('User'), 'findOne').yields(null, user);
             require('../../../../server/passport/login')(passport);
         });
         it('should log and return an error when user passwords do not match', function(done) {
@@ -151,7 +154,7 @@ describe('login', function() {
             sandbox.stub(require('winston'), 'debug', winstomSpy);
             sandbox.stub(require('winston'), 'log', winstomSpy);
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return false;});
-            sandbox.stub(User.base.Model, 'findOne').yields(null, user);
+            sandbox.stub(db.readOnlyConnection.model('User'), 'findOne').yields(null, user);
             require('../../../../server/passport/login')(passport);
         });
     });

@@ -46,12 +46,15 @@ describe('security/acl', function () {
     });
 
     describe('init and setup roles', function () {
+        // FIXME need to fix my test
         it('should create a connection to the DB and create the default ACL instance', function (done) {
             var dbObj = {bdid:'test'};
             acl.init();
 
             mongoStub.args[0][0].should.equal(mongoDbUrl);
-            mongoStub.args[0][1](undefined, dbObj);
+            //mongoStub.args[0][1].should.equal('');
+            //mongoStub.args[0][2].should.equal('');
+            mongoStub.args[0][3](undefined, dbObj);
             AclAllowStub.args[0][0].should.equal('FreeTierUserRole');
             AclAllowStub.args[0][1].should.have.members(['MeetingAreaResource', 'MeetingResource']);
             AclAllowStub.args[0][2].should.deep.have.members([{delete:"delete", get:"get", post:"post", put:"put"}]);

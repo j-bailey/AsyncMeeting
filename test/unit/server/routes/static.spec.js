@@ -1,6 +1,5 @@
-var User = require('../../../../server/models/user'),
-    acl = require('acl'),
-    aclSetup = require('../../../../server/security/acl'),
+var mongoose = require('mongoose'),
+    User = mongoose.model('User')? mongoose.model('User'): mongoose.model('User', require('../../../../server/models/user').schema),
     logger = require('winston');
 
 describe('routes/static', function () {
@@ -45,7 +44,7 @@ describe('routes/static', function () {
         securityUtilsGetTokenStub = sandbox.stub(ss, 'generateAccessToken');
         securityUtilsGetTokenStub.returns('bigToken');
         securityUtilsReleaseTokenStub = sandbox.stub(require('../../../../server/security/securityUtils'), 'releaseAccessToken');
-        UserStub = sandbox.stub(require('../../../../server/models/user'), 'findPublicUserById');
+        UserStub = sandbox.stub(User, 'findPublicUserById');
         UserThenSpy = sandbox.spy();
         UserStub.returns({then:UserThenSpy});
         // TODO fix winston stub
@@ -60,6 +59,7 @@ describe('routes/static', function () {
         logger.debug = prevDebug;
     });
 
+    // FIXME need to fix me
     describe('/login', function () {
         it('should authenticate login request and return user', function (done) {
             var userObj = {_id:2, username:"username2"},
@@ -80,6 +80,7 @@ describe('routes/static', function () {
         });
     });
     describe('/email-login', function () {
+        // FIXME need to fix me
         it('should authenticate login request and return user', function (done) {
             var userObj = {_id:2, username:"username2"},
                 reqObj = {user:{id:1, username:"username1"}},

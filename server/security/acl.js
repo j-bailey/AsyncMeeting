@@ -13,7 +13,7 @@ function setUpRoles() {
     fs.readdirSync(__dirname + '/resources').forEach(function (file) {
         if (file.indexOf('-role') > -1) {
             var role = require('./resources/' + file);
-            role.object.allows.forEach(function(allow) {
+            role.object.allows.forEach(function (allow) {
                 acl.allow(role.object.key, allow.resources, allow.permissions);
             });
         }
@@ -29,16 +29,16 @@ var init = function () {
         nconf.get("database:acl:user"),
         nconf.get("database:acl:pass"),
         function (error, db) {
-        if (error) {
-            logger.error('Error connecting to database for ACL set up.  ' + error);
-            defer.reject(error);
-        }
-        self.aclBackend = new Acl.mongodbBackend(db, "acl");
-        acl = new Acl(self.aclBackend);
-        logger.info('Acl is connected to ' + dbUrl);
-        setUpRoles();
-        defer.resolve(acl);
-    });
+            if (error) {
+                logger.error('Error connecting to database for ACL set up.  ' + error);
+                defer.reject(error);
+            }
+            self.aclBackend = new Acl.mongodbBackend(db, "acl");
+            acl = new Acl(self.aclBackend);
+            logger.info('Acl is connected to ' + dbUrl);
+            setUpRoles();
+            defer.resolve(acl);
+        });
     return defer.promise;
 };
 

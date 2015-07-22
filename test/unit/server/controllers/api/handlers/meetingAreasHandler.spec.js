@@ -1,5 +1,6 @@
 var logger = require('winston'),
-    MeetingArea = require('../../../../../../server/models/meetingArea'),
+    mongoose = require('mongoose'),
+    MeetingArea = mongoose.model('MeetingArea', require('../../../../../../server/models/meetingArea').schema),
     meetingAreaHandler = require('../../../../../../server/controllers/api/handlers/meetingAreasHandler');
 
 
@@ -32,14 +33,16 @@ describe('meeting area route', function () {
                 description: "Meeting Area Description"
             });
 
-            var req = {query:{parentId: '123456789012345678901234'}},
+            var
                 resSpy = {status: sandbox.stub(), json: sandbox.spy()},
                 findReturn = {select:sandbox.stub()},
                 execStub = {exec:sandbox.stub()},
                 nextStub = sandbox.stub(),
-                findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),
-                findStub = sandbox.stub(MeetingArea.base.Model, 'find');
+                findOneStub = sandbox.stub(),
+                findStub = sandbox.stub(),
+                req = {query:{parentId: '123456789012345678901234'}, db:{model: sandbox.stub()}};
 
+            req.db.model.returns({find: findStub, findOne: findOneStub});
             findOneStub.yields(null, parentMeetingArea);
             execStub.exec.yields(null, meetingArea);
             findReturn.select.returns(execStub);
@@ -62,14 +65,15 @@ describe('meeting area route', function () {
                 description: "Meeting Area Description"
             });
 
-            var req = {query:{parentId: 'null'}},
-                resSpy = {status: sandbox.stub(), json: sandbox.spy()},
+            var resSpy = {status: sandbox.stub(), json: sandbox.spy()},
                 findReturn = {select:sandbox.stub()},
                 execStub = {exec:sandbox.stub()},
                 nextStub = sandbox.stub(),
-                findOneStub = sandbox.stub(MeetingArea.base.Model, 'findOne'),
-                findStub = sandbox.stub(MeetingArea.base.Model, 'find');
+                findOneStub = sandbox.stub(),
+                findStub = sandbox.stub(),
+                req = {query:{parentId: 'null'}, db:{model: sandbox.stub()}};
 
+            req.db.model.returns({find: findStub, findOne: findOneStub});
             execStub.exec.yields(null, meetingArea);
             findReturn.select.returns(execStub);
             findStub.returns(findReturn);
@@ -91,11 +95,12 @@ describe('meeting area route', function () {
             });
 
             var execStub = {exec:sandbox.stub().yields(null, meetingArea)},
-                selectStub = {select:sandbox.stub().returns(execStub)};
-            sandbox.stub(MeetingArea.base.Model, 'findOne').returns(selectStub);
+                selectStub = {select:sandbox.stub().returns(execStub)},
+                findOneStub = sandbox.stub().returns(selectStub);
 
 
-            var req = {params: {meetingAreaId: "1"}};
+            var req = {params: {meetingAreaId: "1"}, db:{model: sandbox.stub()}};
+            req.db.model.returns({findOne: findOneStub});
             var res = {
                 status: function (status) {
                     expect(statusSpy.calledWith(200)).to.equal(true);
@@ -119,15 +124,14 @@ describe('meeting area route', function () {
                 title: "Meeting Area Title",
                 description: "Meeting Area Description"
             });
-            var req = {params:{meetingAreaId: 1}},
-                resSpy = {status: sinon.stub(), json: sinon.spy()},
+            var resSpy = {status: sinon.stub(), json: sinon.spy()},
                 nextStub = sandbox.stub();
 
             var execStub = {exec:sandbox.stub().yields('Big error during search', meetingArea)},
-                selectStub = {select:sandbox.stub().returns(execStub)};
-            sandbox.stub(MeetingArea.base.Model, 'findOne').returns(selectStub);
-
-
+                selectStub = {select:sandbox.stub().returns(execStub)},
+                findOneStub = sandbox.stub().returns(selectStub),
+                req = {params:{meetingAreaId: 1}, db:{model: sandbox.stub()}};
+            req.db.model.returns({findOne: findOneStub});
             meetingAreaHandler.getMeetingAreaById(req, resSpy, nextStub);
 
             nextStub.args[0][0].should.equal('Big error during search');
@@ -151,15 +155,18 @@ describe('meeting area route', function () {
             meetingArea.parentMeetingArea = parentMeetingArea._id;
 
             sandbox.stub(MeetingArea.prototype, 'save').yields(null, meetingArea);
-            sandbox.stub(MeetingArea.base.Model, 'findOne').yields(null, {_id:'123456789012'});
+            var findOneStub = sandbox.stub().yields(null, {_id:'123456789012'});
 
             var req = {
                 body: {
                     title: meetingArea.title,
                     description: meetingArea.description,
                     parentMeetingAreaId: parentMeetingArea.id
-                }
+                },
+                db:{model: sandbox.stub()}
             };
+
+            req.db.model.returns(MeetingArea);
 
             var res = {
                 status: function (status) {
@@ -176,6 +183,8 @@ describe('meeting area route', function () {
             var jsonSpy = sandbox.spy(res, "json");
 
             meetingAreaHandler.createNewMeetingArea(req, res);
+
+            done();
         });
         it('should throw an promise error on save', function (done) {
             var meetingArea = new MeetingArea({
@@ -186,11 +195,12 @@ describe('meeting area route', function () {
                 title: "Parent Meeting Area Title",
                 description: "Parent Meeting Area Description"
             });
-            var req = {body:{parentMeetingAreaId: 1}},
+            var req = {body:{parentMeetingAreaId: 1}, db:{model: sandbox.stub()}},
                 resSpy = {status: sinon.stub(), json: sinon.spy()},
                 saveStub = sandbox.stub(MeetingArea.prototype, 'save'),
                 nextStub = sandbox.stub();
 
+            req.db.model.returns(MeetingArea);
             meetingArea.parentMeetingArea = parentMeetingArea._id;
 
             saveStub.yields({message:"Big error!"}, meetingArea);
@@ -217,10 +227,13 @@ describe('meeting area route', function () {
                 title: "Parent Meeting Area Title",
                 description: "Parent Meeting Area Description"
             });
-            var req = {params: {meetingAreaId: '332b624f-ccd0-4bf8-ba1b-64aa326314ec'}, body:{title:"My Title", description:"My desc"}},
+            var req = {params: {meetingAreaId: '332b624f-ccd0-4bf8-ba1b-64aa326314ec'},
+                    body:{title:"My Title", description:"My desc"}, db:{model: sandbox.stub()}},
                 resSpy = {status: sinon.stub(), json: sinon.spy()},
                 findOneAndUpdateStub = sandbox.stub(MeetingArea.base.Model, 'findOneAndUpdate'),
                 nextStub = sandbox.stub();
+
+            req.db.model.returns(MeetingArea);
 
             meetingArea.parentMeetingArea = parentMeetingArea._id;
 
@@ -242,11 +255,12 @@ describe('meeting area route', function () {
                 title: "Parent Meeting Area Title",
                 description: "Parent Meeting Area Description"
             });
-            var req = {params:{meetingAreaId: 1}, body:{title:"My Title", description:"My desc"}},
+            var req = {params:{meetingAreaId: 1}, body:{title:"My Title", description:"My desc"}, db:{model: sandbox.stub()}},
                 resSpy = {status: sinon.stub(), json: sinon.spy()},
                 findOneAndUpdateStub = sandbox.stub(MeetingArea.base.Model, 'findOneAndUpdate'),
                 nextStub = sandbox.stub();
 
+            req.db.model.returns(MeetingArea);
             meetingArea.parentMeetingArea = parentMeetingArea._id;
 
             findOneAndUpdateStub.yields({message:"error finding item"}, meetingArea);
@@ -262,12 +276,13 @@ describe('meeting area route', function () {
 
     describe('deleteMeetingArea', function () {
         it('should delete a meeting area', function (done) {
-            var req = {params:{meetingAreaId: 1, title:"My Title", description:"My desc"}},
+            var req = {params:{meetingAreaId: 1, title:"My Title", description:"My desc"}, db:{model: sandbox.stub()}},
                 resSpy = {sendStatus: sinon.stub(), json: sinon.spy()},
                 findOneAndRemoveStub = sandbox.stub(MeetingArea.base.Model, 'findOneAndRemove'),
                 nextStub = sandbox.stub();
 
             findOneAndRemoveStub.yields(undefined);
+            req.db.model.returns(MeetingArea);
 
             meetingAreaHandler.deleteMeetingAreaById(req, resSpy, nextStub);
 
@@ -275,13 +290,14 @@ describe('meeting area route', function () {
 
             done();
         });
-        it('should delete a meeting area', function (done) {
-            var req = {params:{meetingAreaId: 1, title:"My Title", description:"My desc"}},
+        it('should throw an error', function (done) {
+            var req = {params:{meetingAreaId: 1, title:"My Title", description:"My desc"}, db:{model: sandbox.stub()}},
                 resSpy = {sendStatus: sinon.stub(), json: sinon.spy()},
                 findOneAndRemoveStub = sandbox.stub(MeetingArea.base.Model, 'findOneAndRemove'),
                 nextStub = sandbox.stub();
 
             findOneAndRemoveStub.yields({message:"error trying to remove item"});
+            req.db.model.returns(MeetingArea);
 
             meetingAreaHandler.deleteMeetingAreaById(req, resSpy, nextStub);
 

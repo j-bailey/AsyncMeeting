@@ -19,7 +19,8 @@ module.exports = function(grunt) {
         var childProcess,
             spawnSync = require('child_process').spawnSync,
             cmd = './node_modules/.bin/istanbul',
-            cmdArgs = ['cover', './node_modules/.bin/_mocha', '--', '--recursive', '-R', 'spec', '-r', 'should', testFolder];
+            testPath = path.normalize(testFolder),
+            cmdArgs = ['cover', './node_modules/.bin/_mocha', '--', '--opts', path.join(testPath, 'mocha.opts'), testPath];
 
 
         // TODO Remove external dependencies from Mocha server unit tests

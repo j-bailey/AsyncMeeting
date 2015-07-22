@@ -4,9 +4,7 @@ var db = require('../db'),
     router = require('express').Router(),
     passport = require('passport'),
     securityUtils = require('../security/securityUtils'),
-    UserSchema = require('../../server/models/user'),
-    UserModel = UserSchema,
-    //UserModel = UserSchema.statics.getModel(db.readOnlyConnection),
+    UserModel = db.readOnlyConnection.model('User'),
     requestIp = require('request-ip'),
     logger = require('winston');
 

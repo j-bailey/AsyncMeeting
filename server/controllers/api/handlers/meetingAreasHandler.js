@@ -1,5 +1,4 @@
 "use strict";
-//var MeetingArea = require('../../../../server/models/meetingArea');
 var ObjectId = require('mongoose').Types.ObjectId;
 var logger = require('winston');
 
@@ -17,6 +16,7 @@ var getMeetingAreasWithParentId = function (req, res, next) {
         res.status(400).json(new Error("Error: parentId is not correct!"));
         return next();
     }
+    var MeetingArea = req.db.model('MeetingArea');
     if (parentId === null) {
         MeetingArea.find({parentMeetingArea: null})
             .select(MeetingArea.publicFields)
@@ -68,7 +68,7 @@ var createNewMeetingArea = function (req, res, next) {
         parentId = req.body.parentMeetingAreaId;
     }
 
-
+    var MeetingArea = req.db.model('MeetingArea');
     MeetingArea.findOne({_id: parentId}, function (err, parentMeetingArea) {
         if (err) {
             return next(err);
@@ -103,6 +103,7 @@ var updateMeetingAreaById = function (req, res, next) {
     var update = meetingAreaObj;
     var options = {new: true};
 
+    var MeetingArea = req.db.model('MeetingArea');
     MeetingArea.findOneAndUpdate(search, update, options, function (err, meetingArea) {
         if (err) {
             return next(err);
@@ -117,6 +118,7 @@ var deleteMeetingAreaById = function (req, res, next) {
         return next();
     }
 
+    var MeetingArea = req.db.model('MeetingArea');
     MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function (err) {
         if (err) {
             return next(err);

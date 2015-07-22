@@ -36,7 +36,7 @@ readOnlyConnection.on('connected', function(err){
     }
 
     logger.info('Mongoose is connected to Read-Only DB via ' + hostReadOnly + ':' + portReadOnly +
-        '/' + databaseReadOnly );
+        '/' + databaseReadOnly);
 });
 
 

@@ -1,10 +1,12 @@
 var Acl = require('../../../../../server/security/acl'),
     expect = require('chai').expect,
     request = require('supertest'),
-    User = require('../../../../../server/models/user'),
-    secUtil = require('../../../../../server/security/securityUtils'),
+    User,
     bcrypt = require('bcrypt-nodejs'),
     db = require('../../../../../server/db');
+
+// Load the models, so they get tied to the DB connections
+require('../../../../../server/models/user')
 
 var userId1 = "",
     accessToken1;
@@ -30,62 +32,62 @@ describe('controller/api/users', function () {
     });
 
     beforeEach(function (done) {
-        db.adminConnection.db.dropCollection('users', function (err, result) {
-            //if (err) next(err);
-            var userObj1 = new User({username: username1, email: email1, password: pass1});
-            userObj1.password = bcrypt.hashSync(pass1, bcrypt.genSaltSync(10), null);
-            var userObj2 = new User({username: username2, email: email2, password: pass2});
-            userObj2.password = bcrypt.hashSync(pass2, bcrypt.genSaltSync(10), null);
-            userObj1.save(function (err, userObj) {
+        User = db.adminConnection.model('User');
+        User.remove().exec();
+        //if (err) next(err);
+        var userObj1 = new User({username: username1, email: email1, password: pass1});
+        userObj1.password = bcrypt.hashSync(pass1, bcrypt.genSaltSync(10), null);
+        var userObj2 = new User({username: username2, email: email2, password: pass2});
+        userObj2.password = bcrypt.hashSync(pass2, bcrypt.genSaltSync(10), null);
+        userObj1.save(function (err, userObj) {
+            if (err) {
+                return next(err)
+            }
+            userId1 = userObj._id;
+            acl.allow('users-creator', '/api/users', 'post');
+            acl.addUserRoles(userObj1.username, 'users-creator');
+            acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'put');
+            acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
+            acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'delete');
+            acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
+            acl.allow('users-viewer-' + userObj.id, '/api/users/' + userObj.id, 'get');
+            acl.addUserRoles(userObj1.username, 'users-viewer-' + userObj.id);
+            userObj2.save(function (err, userObj) {
                 if (err) {
                     return next(err)
                 }
-                userId1 = userObj._id;
-                acl.allow('users-creator', '/api/users', 'post');
-                acl.addUserRoles(userObj1.username, 'users-creator');
-                acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'put');
-                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
-                acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'delete');
-                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
-                acl.allow('users-viewer-' + userObj.id, '/api/users/' + userObj.id, 'get');
-                acl.addUserRoles(userObj1.username, 'users-viewer-' + userObj.id);
-                userObj2.save(function (err, userObj) {
-                    if (err) {
-                        return next(err)
-                    }
-                    userId2 = userObj._id;
+                userId2 = userObj._id;
 
 
-                    user1
-                        .post('/email-login')
-                        .set('Accept', 'application/json, text/plain, */*')
-                        .set('Accept-encoding', 'gzip, deflate')
-                        .set('Content-type', 'application/json;charset=UTF-8')
-                        .send({email: email1, password: pass1})
-                        .end(function (err, res) {
-                            // user1 will manage its own cookies
-                            // res.redirects contains an Array of redirects
-                            if (err) console.error('err = ' + err);
+                user1
+                    .post('/email-login')
+                    .set('Accept', 'application/json, text/plain, */*')
+                    .set('Accept-encoding', 'gzip, deflate')
+                    .set('Content-type', 'application/json;charset=UTF-8')
+                    .send({email: email1, password: pass1})
+                    .end(function (err, res) {
+                        // user1 will manage its own cookies
+                        // res.redirects contains an Array of redirects
+                        if (err) console.error('err = ' + err);
 
-                            accessToken1 = res.body.access_token;
-                            user2
-                                .post('/email-login')
-                                .set('Accept', 'application/json, text/plain, */*')
-                                .set('Accept-encoding', 'gzip, deflate')
-                                .set('Content-type', 'application/json;charset=UTF-8')
-                                .send({email: email2, password: pass2})
-                                .end(function (err, res) {
-                                    // user1 will manage its own cookies
-                                    // res.redirects contains an Array of redirects
-                                    if (err) console.error('err = ' + err);
+                        accessToken1 = res.body.access_token;
+                        user2
+                            .post('/email-login')
+                            .set('Accept', 'application/json, text/plain, */*')
+                            .set('Accept-encoding', 'gzip, deflate')
+                            .set('Content-type', 'application/json;charset=UTF-8')
+                            .send({email: email2, password: pass2})
+                            .end(function (err, res) {
+                                // user1 will manage its own cookies
+                                // res.redirects contains an Array of redirects
+                                if (err) console.error('err = ' + err);
 
-                                    accessToken2 = res.body.access_token;
-                                    done();
-                                });
-                        });
-                });
-            })
-        });
+                                accessToken2 = res.body.access_token;
+                                done();
+                            });
+                    });
+            });
+        })
     });
 
     describe('GET \'/\'', function () {

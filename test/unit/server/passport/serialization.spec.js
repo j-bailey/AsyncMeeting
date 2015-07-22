@@ -1,4 +1,5 @@
-var User = require('../../../../server/models/user');
+var mongoose = require('mongoose'),
+    User = mongoose.model('User')? mongoose.model('User'): mongoose.model('User', require('../../../../server/models/user').schema);
 
 describe('serialization', function() {
     var sandbox;

@@ -26,4 +26,5 @@ db.readOnlyConnection.model('MeetingArea', schema);
 db.readWriteConnection.model('MeetingArea', schema);
 db.adminConnection.model('MeetingArea', schema);
 
+module.exports.schema = schema;
 

@@ -1,10 +1,10 @@
 "use strict";
 
-var User = require('../../../../server/models/user');
 var logger = require('winston');
 
 module.exports = {
     createUser: function (req, res, next) {
+        var User = req.db.model('User');
         var user = new User(req.body),
             hashedPassword = User.hashPassword(req.body.password);
         /* jshint ignore:line */
@@ -25,6 +25,8 @@ module.exports = {
     },
     quickSearchForUser: function (req, res, next) {
         var serachCriteria = req.body.searchCriteria;
+        var User = req.db.model('User');
+
         /* jshint ignore:line */
         User.quickFind(serachCriteria).then(function (users) {
             res.json(JSON.stringify(users));
@@ -34,6 +36,7 @@ module.exports = {
         });
     },
     findById: function(req, res, next){
+        var User = req.db.model('User');
         User.findOne({_id: req.params.id})
             .select(User.publicFields)
             .exec(function (err, user) {
@@ -53,6 +56,7 @@ module.exports = {
         var update = userObj;
         var options = {new: true};
 
+        var User = req.db.model('User');
         User.findOneAndUpdate(search, update, options)
             .select(User.publicFields)
             .exec(function(err, updatedUser){
@@ -64,6 +68,8 @@ module.exports = {
     },
     deleteById: function(req, res, next){
         var id = req.params.id;
+        var User = req.db.model('User');
+
         User.findOneAndRemove({ _id: id }, function(err) {
             if (err) { return next(err); }
             res.sendStatus(200);

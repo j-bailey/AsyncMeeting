@@ -1,7 +1,8 @@
 "use strict";
 
 var LocalStrategy = require('passport-local').Strategy;
-var User = require('../models/user');
+var db = require('../db');
+var User = db.readOnlyConnection.model('User');
 var bCrypt = require('bcrypt-nodejs');
 var logger = require('winston');
 

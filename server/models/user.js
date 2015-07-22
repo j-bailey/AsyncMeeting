@@ -83,10 +83,6 @@ schema.static.quickFind = function(searchCriteria) {
     return defer.promise;
 };
 
-schema.statics.getModel = function(conn) {
-    return conn.model('User', schema);
-};
-
 // Add plugins
 
 schema.plugin(modifiedOn);
@@ -97,3 +93,4 @@ db.readOnlyConnection.model('User', schema);
 db.readWriteConnection.model('User', schema);
 db.adminConnection.model('User', schema);
 
+module.exports.schema = schema;

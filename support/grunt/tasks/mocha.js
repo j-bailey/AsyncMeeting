@@ -31,6 +31,7 @@ module.exports = function(grunt) {
             cmdArgs = [];
 
         if (fs.existsSync(path.join(testFolder, 'mocha.opts'))) {
+            console.log('using mocha.opts ' + path.join(testFolder, 'mocha.opts'));
             cmdArgs.push('--opts');
             cmdArgs.push(path.join(testFolder, 'mocha.opts'));
         }

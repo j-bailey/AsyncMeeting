@@ -1,12 +1,13 @@
+var mongoose = require('mongoose'),
+    db = require('../../../../server/db');
+
 describe('model/user', function () {
     var sandbox;
-    var user;
+    var user = db.adminConnection.model('User');
 
     beforeEach(function () {
         sandbox = sinon.sandbox.create();
         sandbox.stub(process, 'nextTick').yields();
-
-        user = require('../../../../server/models/user');
     });
 
     afterEach(function () {
@@ -20,7 +21,7 @@ describe('model/user', function () {
                 selectStub = sandbox.stub(),
                 execStub = sandbox.stub(),
                 findByIdStub  = sandbox.stub(user.base.Model, 'findById');
-            var execStub = sandbox.stub(require('mongoose').__proto__.Query.prototype, 'exec')
+            var execStub = sandbox.stub(require('mongoose').__proto__.Query.prototype, 'exec');
             findByIdStub.returns({select:selectStub});
             selectStub.returns({populate:populateStub1});
             populateStub1.returns({populate:populateStub2});

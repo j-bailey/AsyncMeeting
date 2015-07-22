@@ -1,7 +1,8 @@
 "use strict";
 
 var LocalStrategy = require('passport-local').Strategy,
-    User = require('../models/user'),
+    db = require('../db'),
+    User = db.readOnlyConnection.model('User'),
     logger = require('winston'),
     acl = require('../security/acl'),
     freeTier = require('../security/resources/free-tier-role');

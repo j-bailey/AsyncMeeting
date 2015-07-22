@@ -4,8 +4,7 @@ var logger = require('winston'),
     nconf = require('nconf'),
     jwt = require('jsonwebtoken'),
     db = require('../db'),
-    Q = require('q'),
-    acl = require('./acl').getAcl();
+    Q = require('q');
 
 var releaseTokenCache = {};
 
@@ -100,6 +99,7 @@ module.exports = {
         next();
     },
     determineDbConnection: function(req, res, next) {
+        // FIXME need to add logic for determineDbConnection
         req.db = db.readWriteConnection;
         req.db.accessLevel = 'Read-Write';
         //if (req.session && req.session.isAdmin) {

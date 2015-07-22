@@ -6,7 +6,8 @@ var secUtils = require('../../security/securityUtils');
 
 
 // TODO add authorization
-router.get("/", acl.middleware(), secUtils.readOnlyDbConnection, handlers.getMeetingAreasWithParentId);  // takes query parameter of parentId, either id or null string.
+router.get("/", acl.middleware(), secUtils.readOnlyDbConnection, handlers.getMeetingAreasWithParentId);
+// takes query parameter of parentId, either id or null string.
 
 router.get('/:meetingAreaId', acl.middleware(), secUtils.readOnlyDbConnection, handlers.getMeetingAreaById);
 

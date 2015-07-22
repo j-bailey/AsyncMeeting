@@ -1,6 +1,7 @@
 --recursive
 --require test/unit/server/support/common
 --require test/unit/server/support/node
+--require test/unit/server/support/mongoose
 --timeout 2000
 --ui bdd
 --reporter spec

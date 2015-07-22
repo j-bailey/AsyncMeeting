@@ -1,12 +1,14 @@
 var Acl = require('../../../../../server/security/acl'),
     expect = require('chai').expect,
-    MeetingArea = require('../../../../../server/models/meetingArea'),
-//app = require('../../../../../app'),
+    MeetingArea,
     request = require('supertest'),
-//user1 = request.agent(app),
-    User = require('../../../../../server/models/user'),
+    User,
     bcrypt = require('bcrypt-nodejs'),
     db = require('../../../../../server/db');
+
+// Load the models, so they get tied to the DB connections
+require('../../../../../server/models/meetingArea');
+require('../../../../../server/models/user');
 
 
 var parentMeetingAreaId = "";
@@ -18,7 +20,6 @@ var pass = 'password123';
 var username = 'tom';
 var user1 = request('http://localhost:3001');
 var acl = null;
-
 
 
 describe('meeting areas route', function () {
@@ -34,71 +35,72 @@ describe('meeting areas route', function () {
         childMeetingAreaId = "";
         child2MeetingAreaId = "";
 
-        db.adminConnection.db.dropCollection('users', function (err, result) {
-            //if (err) next(err);
-            var user1Obj = new User({username: username, email: email, password: pass});
-            user1Obj.password = bcrypt.hashSync(pass, bcrypt.genSaltSync(10), null);
-            user1Obj.save(function (err) {
-                if (err) {
-                    return next(err)
-                }
-                //acl.getAcl().addUserRoles(user.username, freeTierRole.key);
+        User = db.readWriteConnection.model('User');
+        MeetingArea = db.readWriteConnection.model('MeetingArea');
+        User.remove().exec();
+        //if (err) next(err);
+        var user1Obj = new User({username: username, email: email, password: pass});
+        user1Obj.password = bcrypt.hashSync(pass, bcrypt.genSaltSync(10), null);
+        user1Obj.save(function (err) {
+            if (err) {
+                return next(err)
+            }
+            //acl.getAcl().addUserRoles(user.username, freeTierRole.key);
 
-                MeetingArea.remove({}, function (err, removedItem) {
-                    if (err) console.log("remove error: " + err.message);
+            MeetingArea.remove({}, function (err, removedItem) {
+                if (err) console.log("remove error: " + err.message);
 
-                    var meetingArea = new MeetingArea({
-                        title: "Meeting Area Title",
-                        description: "Meeting Area Description",
-                        parentMeetingArea: null
+                var meetingArea = new MeetingArea({
+                    title: "Meeting Area Title",
+                    description: "Meeting Area Description",
+                    parentMeetingArea: null
+                });
+
+                meetingArea.save(function (err, savedItem) {
+                    if (err) console.log("save error: " + err.message);
+
+                    parentMeetingAreaId = savedItem.id;
+                    acl.allow('meetingarea-creator', '/api/meetingareas', 'get');
+                    acl.addUserRoles(user1Obj.username, 'meetingarea-creator');
+
+                    var childMeetingArea = new MeetingArea({
+                        title: "Child Meeting Area Title",
+                        description: "Child Meeting Area Description",
+                        parentMeetingArea: savedItem._id
                     });
 
-                    meetingArea.save(function (err, savedItem) {
-                        if (err) console.log("save error: " + err.message);
+                    childMeetingArea.save(function (err, savedChildItem) {
+                        if (err) console.log("save child error: " + err.message);
+                        childMeetingAreaId = savedChildItem.id;
 
-                        parentMeetingAreaId = savedItem.id;
-                        acl.allow('meetingarea-creator', '/api/meetingareas', 'get');
-                        acl.addUserRoles(user1Obj.username, 'meetingarea-creator');
-
-                        var childMeetingArea = new MeetingArea({
-                            title: "Child Meeting Area Title",
-                            description: "Child Meeting Area Description",
+                        var child2MeetingArea = new MeetingArea({
+                            title: "Child 2 Meeting Area Title",
+                            description: "Child 2 Meeting Area Description",
                             parentMeetingArea: savedItem._id
                         });
 
-                        childMeetingArea.save(function (err, savedChildItem) {
+                        child2MeetingArea.save(function (err, savedChildItem2) {
                             if (err) console.log("save child error: " + err.message);
-                            childMeetingAreaId = savedChildItem.id;
+                            child2MeetingAreaId = savedChildItem2.id;
+                            user1
+                                .post('/email-login')
+                                .set('Accept', 'application/json, text/plain, */*')
+                                .set('Accept-encoding', 'gzip, deflate')
+                                .set('Content-type', 'application/json;charset=UTF-8')
+                                .send({email: email, password: pass})
+                                .end(function (err, res) {
+                                    // user1 will manage its own cookies
+                                    // res.redirects contains an Array of redirects
+                                    if (err) console.error('err = ' + err);
 
-                            var child2MeetingArea = new MeetingArea({
-                                title: "Child 2 Meeting Area Title",
-                                description: "Child 2 Meeting Area Description",
-                                parentMeetingArea: savedItem._id
-                            });
-
-                            child2MeetingArea.save(function (err, savedChildItem2) {
-                                if (err) console.log("save child error: " + err.message);
-                                child2MeetingAreaId = savedChildItem2.id;
-                                user1
-                                    .post('/email-login')
-                                    .set('Accept', 'application/json, text/plain, */*')
-                                    .set('Accept-encoding', 'gzip, deflate')
-                                    .set('Content-type', 'application/json;charset=UTF-8')
-                                    .send({email: email, password: pass})
-                                    .end(function (err, res) {
-                                        // user1 will manage its own cookies
-                                        // res.redirects contains an Array of redirects
-                                        if (err) console.error('err = ' + err);
-
-                                        accessToken = res.body.access_token;
-                                        done();
-                                    });
-                            });
+                                    accessToken = res.body.access_token;
+                                    done();
+                                });
                         });
                     });
                 });
-            })
-        });
+            });
+        })
     });
 
 
@@ -152,7 +154,7 @@ describe('meeting areas route', function () {
                 .expect('Content-Type', /json/)
                 .expect(400)
                 .expect(function (res) {
-                    expect(res.error.message).to.equal('cannot GET /api/meetingareas?parentId=null' +'%3Bvar%20date%3Dnew%20Date()%3B%20do%7BcurDate%20%3D%20new%20Date()%3B%7Dwhile(cur-Date-date%3C10000 (400)');
+                    expect(res.error.message).to.equal('cannot GET /api/meetingareas?parentId=null' + '%3Bvar%20date%3Dnew%20Date()%3B%20do%7BcurDate%20%3D%20new%20Date()%3B%7Dwhile(cur-Date-date%3C10000 (400)');
                 })
                 .end(done);
         });

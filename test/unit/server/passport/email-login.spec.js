@@ -1,8 +1,9 @@
-var User = require('../../../../server/models/user');
+var db = require('../../../../server/db');
 
+//FIXME need to get the tests working again
 describe('email-login', function() {
     var sandbox;
-
+    var User = db.adminConnection.model('User');
     beforeEach(function() {
         sandbox = sinon.sandbox.create();
     });

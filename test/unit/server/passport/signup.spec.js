@@ -1,4 +1,6 @@
-var User = require('../../../../server/models/user'),
+var mongoose = require('mongoose'),
+    User = mongoose.model('User')? mongoose.model('User'): mongoose.model('User', require('../../../../server/models/user').schema),
+    db = require('../../../../server/db'),
     acl = require('acl'),
     aclSetup = require('../../../../server/security/acl');
 
@@ -47,10 +49,10 @@ describe('signup', function() {
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
             sandbox.stub(require('winston'), 'debug');
             sandbox.stub(User, 'hashPassword', function(password){return password});
-            var findOneStub = sandbox.stub(User.base.Model, 'findOne');
+            var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);
             findOneStub.onCall(1).yields(null, null);
-            var saveStub = sandbox.stub(User.prototype, 'save');
+            var saveStub = sandbox.stub(db.readOnlyConnection.model('User').prototype, 'save');
             saveStub.yields(null, savedUser);
             sandbox.stub(acl.prototype, 'addUserRoles');
             var getAclStub = sandbox.stub(aclSetup, 'getAcl');
@@ -95,7 +97,7 @@ describe('signup', function() {
             sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
-            var findOneStub = sandbox.stub(User.base.Model, 'findOne');
+            var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(signUpError, null);
 
             require('../../../../server/passport/signup')(passport);
@@ -137,7 +139,7 @@ describe('signup', function() {
             sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
-            var findOneStub = sandbox.stub(User.base.Model, 'findOne');
+            var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, savedUser);
 
             require('../../../../server/passport/signup')(passport);
@@ -175,7 +177,7 @@ describe('signup', function() {
             sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
-            var findOneStub = sandbox.stub(User.base.Model, 'findOne');
+            var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);
             findOneStub.onCall(1).yields(signUpError, null);
 
@@ -218,7 +220,7 @@ describe('signup', function() {
             sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
-            var findOneStub = sandbox.stub(User.base.Model, 'findOne');
+            var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);
             findOneStub.onCall(1).yields(null, savedUser);
 
@@ -260,10 +262,10 @@ describe('signup', function() {
             sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             sandbox.stub(User, 'hashPassword', function(password){return password});
-            var findOneStub = sandbox.stub(User.base.Model, 'findOne');
+            var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);
             findOneStub.onCall(1).yields(null, null);
-            var saveStub = sandbox.stub(User.prototype, 'save');
+            var saveStub = sandbox.stub(db.readOnlyConnection.model('User').prototype, 'save');
             saveStub.yields(saveError, savedUser);
             sandbox.stub(acl.prototype, 'addUserRoles');
             var getAclStub = sandbox.stub(aclSetup, 'getAcl');
