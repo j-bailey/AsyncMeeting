@@ -21,6 +21,7 @@ var numCPUs = require('os').cpus().length,
     singleProcess = nconf.get('server:singleProcess');
 
 if (singleProcess === 'true' || singleProcess === true) {
+    console.log('Forced to single process');
     numCPUs = 1;
 } else if (numCPUs - reservedCPUs < 1) {
     throw new Error('resveredCPUs is too high and does not allow enough CPUs for the application.  ' +
