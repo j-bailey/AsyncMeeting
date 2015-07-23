@@ -20,14 +20,17 @@ var numCPUs = require('os').cpus().length,
     reservedCPUs = nconf.get('server:reservedCPUs'),
     singleProcess = nconf.get('server:singleProcess');
 
-if (singleProcess) {
+if (singleProcess === 'true' || singleProcess === true) {
     numCPUs = 1;
 } else if (numCPUs - reservedCPUs < 1) {
     throw new Error('resveredCPUs is too high and does not allow enough CPUs for the application.  ' +
-        'Number of available CPUs is at: ' + numCPUs - reservedCPUs);
+        'Number of available CPUs is at: ' + (numCPUs - reservedCPUs));
 } else {
     numCPUs = numCPUs - reservedCPUs;
 }
+
+console.log('Number of reserved CPUs are: ' + reservedCPUs);
+console.log('Number of CPUs used by the app are: ' + numCPUs);
 
 cluster.setupMaster({
     exec : './server/index.js' // Points to the index file you want to fork
