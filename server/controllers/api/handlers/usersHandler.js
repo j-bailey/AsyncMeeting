@@ -11,7 +11,6 @@ module.exports = {
                 return next(err);
             }
             User.findOne({_id: savedUser._id})
-                .select(User.publicFields)
                 .exec(function(err, newUser) {
                     if (err) {
                         return next(err);
@@ -35,7 +34,6 @@ module.exports = {
     findById: function(req, res, next){
         var User = req.db.model('User');
         User.findOne({_id: req.params.id})
-            .select(User.publicFields)
             .exec(function (err, user) {
             if (err) {
                 return next(err);
@@ -55,7 +53,6 @@ module.exports = {
 
         var User = req.db.model('User');
         User.findOneAndUpdate(search, update, options)
-            .select(User.publicFields)
             .exec(function(err, updatedUser){
             if (err){
                 next(err);

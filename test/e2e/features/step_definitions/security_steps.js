@@ -25,7 +25,7 @@ var steps = function () {
         });
     });
 
-    this.Given(/^I am logged into the sysyetm$/, function (next) {
+    this.Given(/^I am logged into the system$/, function (next) {
         // Write code here that turns the phrase above into concrete actions
         next.pending();
     });

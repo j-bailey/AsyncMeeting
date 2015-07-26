@@ -2,7 +2,7 @@
 
 module.exports = exports = function creationInfo(schema) {
     schema.add({
-        createdOn: {type: Date, default: Date.now}
+        createdOn: {type: Date, default: Date.now, select:true}
         //createdBy: { type: String, required: true },
         //createdById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
         //createdByUuid: { type: String, required: true }

@@ -12,8 +12,8 @@ var dictValidator = require('../security/dictionary-validator');
 
 
 var schema = new mongoose.Schema({
-    username: { type: String, required: false },
-    password: { type: String, required: true },
+    username: { type: String, required: false, select: true },
+    password: { type: String, required: true, select: false },
     email: { type: String, required: true },
     firstName: String,
     lastName: String,
@@ -42,12 +42,9 @@ schema.pre('validate', function(next){
 });
 
 // Add static methods
-var publicFields = 'uuid username email permissions roles createdOn modifiedOn firstName lastName currentVersion';
-schema.statics.publicFields = publicFields;
 
 schema.statics.findPublicUserById = function (userId) {
     return this.findById(userId)
-        .select(publicFields)
         .populate('permissions')
         .populate('roles')
         .exec();
@@ -55,7 +52,6 @@ schema.statics.findPublicUserById = function (userId) {
 schema.statics.findPublicUserByUserName = function (userName) {
     var defer = Q.defer();
     this.findOne({ 'username': userName })
-        .select(publicFields)
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {
@@ -71,7 +67,6 @@ schema.statics.findPublicUserByUserName = function (userName) {
 schema.statics.findPublicUserByEmail = function (email) {
     var defer = Q.defer();
     this.findOne({ 'email': email })
-        .select(publicFields)
         .populate('permissions')
         .populate('roles')
         .exec(function (err, user) {

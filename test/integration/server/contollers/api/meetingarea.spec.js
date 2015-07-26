@@ -170,6 +170,67 @@ describe('meeting area route', function () {
                     });
                 });
         });
+        it('should create multiple meeting areas with the correct hierarchy', function (done) {
+            var expectedAncestors = [];
+            user1
+                .post('/api/meetingareas')
+                .send({
+                    title: "New Meeting Area",
+                    description: "New Meeting Area Description"
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    var result = JSON.parse(res.text);
+                    expectedAncestors.push(result._id);
+                    expect(result._id).to.not.be.null;
+                    expect(result.parentMeetingArea).to.be.null;
+                    expect(result.ancestors.length).to.equal(0);
+                    user1
+                        .post('/api/meetingareas')
+                        .send({
+                            parentMeetingAreaId: result._id,
+                            title: "New Meeting Area - 2nd Depth",
+                            description: "New Meeting Area Description - 2nd Depth"
+                        })
+                        .set('Accept', 'application/json')
+                        .set('Authorization', 'Bearer ' + accessToken1)
+                        .expect('Content-Type', /json/)
+                        .expect(201)
+                        .end(function (err, res) {
+                            var result = JSON.parse(res.text);
+                            expectedAncestors.push(result._id);
+                            expect(result._id).to.not.be.null;
+                            expect(result.parentMeetingArea).to.not.be.null;
+                            expect(result.ancestors.length).to.equal(1);
+                            user1
+                                .post('/api/meetingareas')
+                                .send({
+                                    parentMeetingAreaId: result._id,
+                                    title: "New Meeting Area - 3rd Depth",
+                                    description: "New Meeting Area Description - 3rd Depth"
+                                })
+                                .set('Accept', 'application/json')
+                                .set('Authorization', 'Bearer ' + accessToken1)
+                                .expect('Content-Type', /json/)
+                                .expect(201)
+                                .end(function (err, res) {
+                                    var result = JSON.parse(res.text);
+                                    expect(result._id).to.not.be.null;
+                                    expect(result.parentMeetingArea).to.not.be.null;
+                                    expect(result.ancestors.length).to.equal(2);
+                                    expect(result.ancestors).to.deep.equal(expectedAncestors);
+                                    MeetingAreaModel.find({}, function (err, meetingAreas) {
+                                        expect(meetingAreas).to.have.length(4);
+                                        done();
+                                    });
+                                });
+                        });
+
+                });
+        });
         it('should return a forbidden error', function (done) {
             user2
                 .post('/api/meetingareas')

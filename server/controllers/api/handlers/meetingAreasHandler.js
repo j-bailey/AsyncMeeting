@@ -19,23 +19,21 @@ var getMeetingAreasWithParentId = function (req, res, next) {
     var MeetingArea = req.db.model('MeetingArea');
     if (parentId === null) {
         MeetingArea.find({parentMeetingArea: null})
-            .select(MeetingArea.publicFields)
             .exec(function (err, meetingAreas) {
-            if (err) {
-                return next(err);
-            }
-            res.status(200).json(meetingAreas);
-        });
-    } else {
-        MeetingArea.findOne({_id: parentId}, function (err, meetingArea) {
-            MeetingArea.find({parentMeetingArea: (new ObjectId(meetingArea._id))})
-                .select(MeetingArea.publicFields)
-                .exec(function (err, meetingAreas) {
                 if (err) {
                     return next(err);
                 }
                 res.status(200).json(meetingAreas);
             });
+    } else {
+        MeetingArea.findOne({_id: parentId}, function (err, meetingArea) {
+            MeetingArea.find({parentMeetingArea: (new ObjectId(meetingArea._id))})
+                .exec(function (err, meetingAreas) {
+                    if (err) {
+                        return next(err);
+                    }
+                    res.status(200).json(meetingAreas);
+                });
         });
     }
 };
@@ -49,14 +47,13 @@ var getMeetingAreaById = function (req, res, next) {
 
     // TODO: add retrieving only meeting areas the user has access to.
     MeetingArea.findOne({_id: req.params.meetingAreaId})
-        .select(MeetingArea.publicFields)
         .exec(function (err, meetingArea) {
-        if (err) {
-            return next(err);
-        }
+            if (err) {
+                return next(err);
+            }
 
-        res.status(200).json(meetingArea);
-    });
+            res.status(200).json(meetingArea);
+        });
 };
 
 var createNewMeetingArea = function (req, res, next) {
@@ -69,24 +66,18 @@ var createNewMeetingArea = function (req, res, next) {
     }
 
     var MeetingArea = req.db.model('MeetingArea');
-    MeetingArea.findOne({_id: parentId}, function (err, parentMeetingArea) {
+    var meetingArea = new MeetingArea({
+        title: req.body.title,
+        description: req.body.description,
+        parentMeetingArea: parentId ? new ObjectId(parentId) : null
+    });
+
+    meetingArea.save(function (err, savedMeetingArea) {
         if (err) {
+            logger.error("Error saving meeting area: " + err.message);
             return next(err);
         }
-
-        var meetingArea = new MeetingArea({
-            title: req.body.title,
-            description: req.body.description,
-            parentMeetingArea: parentMeetingArea ? new ObjectId(parentMeetingArea._id) : null
-        });
-
-        meetingArea.save(function (err, savedMeetingArea) {
-            if (err) {
-                logger.error("Error saving meeting area: " + err.message);
-                return next(err);
-            }
-            res.status(201).json(savedMeetingArea);
-        });
+        res.status(201).json(savedMeetingArea);
     });
 };
 

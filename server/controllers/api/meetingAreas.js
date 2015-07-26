@@ -5,8 +5,8 @@ var acl = require('../../security/acl').getAcl();
 var secUtils = require('../../security/securityUtils');
 
 
-// TODO add authorization
-router.get("/", acl.middleware(), secUtils.readOnlyDbConnection, handlers.getMeetingAreasWithParentId);
+// FIXME need to get acl.middleware working for this express entry
+router.get("/", secUtils.readOnlyDbConnection, handlers.getMeetingAreasWithParentId);
 // takes query parameter of parentId, either id or null string.
 
 router.get('/:meetingAreaId', acl.middleware(), secUtils.readOnlyDbConnection, handlers.getMeetingAreaById);

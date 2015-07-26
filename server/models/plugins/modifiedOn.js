@@ -2,7 +2,7 @@
 
 module.exports = exports = function modifyInfo(schema) {
     schema.add({
-        modifiedOn: {type: Date, default: Date.now}
+        modifiedOn: {type: Date, default: Date.now, select: true}
         //modifiedBy: {type: String, default: 'UNKNOWN', required: true},
         //modifiedById: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
         //modifiedByUuid: {type: String, required: true}
