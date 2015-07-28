@@ -8,7 +8,7 @@ function handleJsonErrorResponse(err, req, res, next){
     if(err.msg && err.errorCode){
         res.status(err.errorCode || 500).json({status:err.errorCode, msg:err.msg});
     } else {
-        res.status(err.status || 500).json({status:500, msg:'Unknown error, please try agian later'});
+        res.status(err.status || 500).json({status:500, msg:'Unknown error, please try again later'});
     }
     next();
 }

@@ -43,7 +43,7 @@ describe('security/securityUtils', function () {
             new Date(); //=> return the fake Date 'Sat Oct 01 2011 00:00:00'
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.generateAccessToken(identity, [], '127.0.0.1').then(function (accessToken, err) {
+            securityUtils.generateAccessToken(identity, [], '127.0.0.1', 'firefox').then(function (accessToken, err) {
                 expect(err).to.be.undefined;
                 new Date(); //=> will return the real time again (now)
 
@@ -51,7 +51,7 @@ describe('security/securityUtils', function () {
                 //redisClientSpies.setex.args[0][1].should.equal(1800);
                 //redisClientSpies.setex.args[0][2].should.equal(identity);
 
-                expect(accessToken).to.equal('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6InRvbUJsYW5rIiwicGVybWlzc2lvbnMiOltdLCJjbGllbnRJcCI6IjEyNy4wLjAuMSIsImlhdCI6MTMxNzQ1MjQwMCwiZXhwIjoxMzE3NTYwNDAwLCJhdWQiOiIxMjcuMC4wLjEiLCJpc3MiOiJodHRwczovL3Byb2R1Y3RpdmVnYWlucy5jb20iLCJzdWIiOiJwcm9kdWN0aXZlZ2FpbnM6dG9tQmxhbmsifQ.4dtJ9khy9vAlvapV-zuHPfc2guESCQyL-AcGhMUjPXrJlSlVsnw6hXho5L0ua5ijPpBCI7ed1hNQpSXCQxPPzQ');
+                expect(accessToken).to.equal('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6InRvbUJsYW5rIiwicGVybWlzc2lvbnMiOltdLCJjbGllbnRJcCI6IjEyNy4wLjAuMSIsInVzZXJBZ2VudCI6ImZpcmVmb3giLCJpYXQiOjEzMTc0NTI0MDAsImV4cCI6MTMxNzU2MDQwMCwiYXVkIjoiMTI3LjAuMC4xIiwiaXNzIjoiaHR0cHM6Ly9wcm9kdWN0aXZlZ2FpbnMuY29tIiwic3ViIjoicHJvZHVjdGl2ZWdhaW5zOnRvbUJsYW5rIn0.2gPaK3qKgxmdKcN9InniyjCjIqxQkzRoa6Ux97erkt64SIHU3xGQX2ry-OOrSt5AosGjC6B0wLtWoFrnrmCuOg');
 
                 done();
             });
@@ -75,7 +75,7 @@ describe('security/securityUtils', function () {
             new Date(); //=> return the fake Date 'Sat Oct 01 2011 00:00:00'
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.generateAccessToken(identity, [], '127.0.0.1').catch(function (err) {
+            securityUtils.generateAccessToken(identity, [], '127.0.0.1', 'firefox').catch(function (err) {
                 expect(err.message).to.equal('Unable to create token');
                 errorLogSpy.args[0][0].should.equal('Failed to create JWT token');
 
@@ -103,14 +103,54 @@ describe('security/securityUtils', function () {
         });
     });
     describe('isValidToken', function () {
-        it('should confirm the token is valid', function (done) {
+        it('should confirm the token is valid with bind client IP and user agent on', function (done) {
             var token = 'asfd',
+                nconfGetStub = sandbox.stub(nconf, 'get'),
                 jwtStub = sandbox.stub(jwt, 'verify');
 
-            jwtStub.returns({clientIp:'1.1.1.1'});
+            nconfGetStub.withArgs('accessToken:bindToClientIp').returns(true);
+            nconfGetStub.withArgs('accessToken:bindToClientUserAgent').returns(true);
+
+            jwtStub.returns({clientIp:'1.1.1.1', userAgent: 'firefox'});
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.isValidToken(token, '1.1.1.1').then(function (result, err) {
+            securityUtils.isValidToken(token, '1.1.1.1', 'firefox').then(function (result, err) {
+                expect(err).to.be.undefined;
+
+                result.should.equal(true);
+                done();
+            });
+        });
+        it('should confirm the token is valid with bind user agent on', function (done) {
+            var token = 'asfd',
+                nconfGetStub = sandbox.stub(nconf, 'get'),
+                jwtStub = sandbox.stub(jwt, 'verify');
+
+            nconfGetStub.withArgs('accessToken:bindToClientIp').returns(false);
+            nconfGetStub.withArgs('accessToken:bindToClientUserAgent').returns(true);
+
+            jwtStub.returns({clientIp:'1.1.1.1', userAgent: 'firefox'});
+
+            var securityUtils = require('../../../../server/security/securityUtils');
+            securityUtils.isValidToken(token, '1.1.1.1', 'firefox').then(function (result, err) {
+                expect(err).to.be.undefined;
+
+                result.should.equal(true);
+                done();
+            });
+        });
+        it('should confirm the token is valid with bind client IP and user agent on OFF', function (done) {
+            var token = 'asfd',
+                nconfGetStub = sandbox.stub(nconf, 'get'),
+                jwtStub = sandbox.stub(jwt, 'verify');
+
+            nconfGetStub.withArgs('accessToken:bindToClientIp').returns(false);
+            nconfGetStub.withArgs('accessToken:bindToClientUserAgent').returns(false);
+
+            jwtStub.returns({clientIp:'1.1.1.1', userAgent: 'firefox'});
+
+            var securityUtils = require('../../../../server/security/securityUtils');
+            securityUtils.isValidToken(token, '1.1.1.1', 'firefox').then(function (result, err) {
                 expect(err).to.be.undefined;
 
                 result.should.equal(true);
@@ -121,7 +161,7 @@ describe('security/securityUtils', function () {
             var token = undefined;
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.isValidToken(token, '1.1.1.1').catch(function (err) {
+            securityUtils.isValidToken(token, '1.1.1.1', 'firefox').catch(function (err) {
                 expect(err).to.equal('Need a token for isValidToken');
                 errorLogSpy.args[0][0].should.equal('Need a token for isValidToken');
                 done();
@@ -136,7 +176,7 @@ describe('security/securityUtils', function () {
                 jwtStub.throws(new Error('Dummy error'));
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.isValidToken(token, '1.1.1.1').catch(function (err) {
+            securityUtils.isValidToken(token, '1.1.1.1', 'firefox').catch(function (err) {
                 expect(err.message).to.equal('Failed to verify token');
                 errorLogSpy.args[0][0].should.equal('Failed to verify token for clientIp ' + clientIp);
                 done();

@@ -18,7 +18,7 @@ router.post('/login',
         // `req.user` contains the authenticated user.
         UserModel.findPublicUserById(req.user._id).then(function (user) {
             var clientIp = requestIp.getClientIp(req);
-            securityUtils.generateAccessToken(user.username, [], clientIp).then(function (accessToken) {
+            securityUtils.generateAccessToken(user.username, [], clientIp, req.headers['user-agent']).then(function (accessToken) {
                 res.json({
                     user: user, access_token: accessToken,
                     permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
@@ -51,7 +51,7 @@ router.post('/email-login',
             logger.debug("Getting accessToken");
             logger.debug('User = ' + JSON.stringify(user));
             var clientIp = requestIp.getClientIp(req);
-            securityUtils.generateAccessToken(user.username, [], clientIp).then(function (accessToken) {
+            securityUtils.generateAccessToken(user.username, [], clientIp, req.headers['user-agent']).then(function (accessToken) {
                 res.json({
                     user: user, access_token: accessToken,
                     permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']

@@ -35,7 +35,6 @@ describe('meeting area route', function () {
 
             var
                 resSpy = {status: sandbox.stub(), json: sandbox.spy()},
-                findReturn = {select:sandbox.stub()},
                 execStub = {exec:sandbox.stub()},
                 nextStub = sandbox.stub(),
                 findOneStub = sandbox.stub(),
@@ -45,8 +44,7 @@ describe('meeting area route', function () {
             req.db.model.returns({find: findStub, findOne: findOneStub});
             findOneStub.yields(null, parentMeetingArea);
             execStub.exec.yields(null, meetingArea);
-            findReturn.select.returns(execStub);
-            findStub.returns(findReturn);
+            findStub.returns(execStub);
             resSpy.status.returns(resSpy);
             meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
 
@@ -66,7 +64,6 @@ describe('meeting area route', function () {
             });
 
             var resSpy = {status: sandbox.stub(), json: sandbox.spy()},
-                findReturn = {select:sandbox.stub()},
                 execStub = {exec:sandbox.stub()},
                 nextStub = sandbox.stub(),
                 findOneStub = sandbox.stub(),
@@ -75,8 +72,7 @@ describe('meeting area route', function () {
 
             req.db.model.returns({find: findStub, findOne: findOneStub});
             execStub.exec.yields(null, meetingArea);
-            findReturn.select.returns(execStub);
-            findStub.returns(findReturn);
+            findStub.returns(execStub);
             resSpy.status.returns(resSpy);
             meetingAreaHandler.getMeetingAreasWithParentId(req, resSpy, nextStub);
 
@@ -95,8 +91,7 @@ describe('meeting area route', function () {
             });
 
             var execStub = {exec:sandbox.stub().yields(null, meetingArea)},
-                selectStub = {select:sandbox.stub().returns(execStub)},
-                findOneStub = sandbox.stub().returns(selectStub);
+                findOneStub = sandbox.stub().returns(execStub);
 
 
             var req = {params: {meetingAreaId: "1"}, db:{model: sandbox.stub()}};
@@ -128,8 +123,7 @@ describe('meeting area route', function () {
                 nextStub = sandbox.stub();
 
             var execStub = {exec:sandbox.stub().yields('Big error during search', meetingArea)},
-                selectStub = {select:sandbox.stub().returns(execStub)},
-                findOneStub = sandbox.stub().returns(selectStub),
+                findOneStub = sandbox.stub().returns(execStub),
                 req = {params:{meetingAreaId: 1}, db:{model: sandbox.stub()}};
             req.db.model.returns({findOne: findOneStub});
             meetingAreaHandler.getMeetingAreaById(req, resSpy, nextStub);

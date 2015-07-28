@@ -18,7 +18,7 @@ module.exports = function (passport) {
             // would want to validate the token for authenticity.
             logger.debug('Bearer token check: ' + token);
             var clientIp = requestIp.getClientIp(req);
-            securityUtils.isValidToken(token, clientIp).then(function(exists) {
+            securityUtils.isValidToken(token, clientIp, req.headers['user-agent']).then(function(exists) {
                 if (exists) {
                     logger.debug('found a token');
                     done(null, true);

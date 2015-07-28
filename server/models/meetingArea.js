@@ -1,3 +1,5 @@
+"use strict";
+
 var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
@@ -14,7 +16,6 @@ var schema = new mongoose.Schema({
 
 schema.pre('validate', function (next) {
     var meetingArea = this;
-    var result;
     if (meetingArea.isNew){
         if (!meetingArea.parentMeetingArea || (meetingArea.parentMeetingArea && meetingArea.parentMeetingArea === null)) {
             meetingArea.ancestors = [];

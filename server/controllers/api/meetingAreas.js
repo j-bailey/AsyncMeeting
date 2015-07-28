@@ -5,9 +5,7 @@ var acl = require('../../security/acl').getAcl();
 var secUtils = require('../../security/securityUtils');
 
 
-// FIXME need to get acl.middleware working for this express entry
-router.get("/", secUtils.readOnlyDbConnection, handlers.getMeetingAreasWithParentId);
-// takes query parameter of parentId, either id or null string.
+router.get("/", secUtils.isAllowedToResourceBasedOnUrlQueryValue('parentId', true), secUtils.readOnlyDbConnection, handlers.getMeetingAreasWithParentId);
 
 router.get('/:meetingAreaId', acl.middleware(), secUtils.readOnlyDbConnection, handlers.getMeetingAreaById);
 

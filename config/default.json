@@ -1,12 +1,23 @@
 {
   "session": {
     "secret": "b1bce56042e44bb7c491e03d4142b652",
-    "timeout": "1800000",
-    "sessionIdName": "asm.sid"
+    "timeout": "120",
+    "sessionIdName": "asm.sid",
+    "proxy": null,
+    "rolling": false,
+    "cookie": {
+      "secure": false,
+      "domain": "",
+      "path": "/",
+      "httpOnly": true,
+      "maxAge": null
+    }
   },
   "accessToken":{
     "secret": "supersecretkey",
-    "timeout": 240
+    "timeout": 240,
+    "bindToClientIp": true,
+    "bindToClientUserAgent": true
   },
   "log": {
     "directory": "logs",

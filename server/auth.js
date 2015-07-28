@@ -1,17 +1,27 @@
 "use strict";
 
 var logger = require('winston'),
+    requestIp = require('request-ip'),
     secUtils = require('./security/securityUtils');
 
 module.exports = function (req, res, next) {
     if (req.headers.authorization) {
-        secUtils.getIdentity(req.headers.authorization.trim().split(' ')[1]).then(function(identity){
-            req.session.userId = identity;
+        var clientIp = requestIp.getClientIp(req),
+            userAgent = req.headers['user-agent'],
+            token = req.headers.authorization.trim().split(' ')[1];
+        secUtils.getIdentity(token, clientIp, userAgent).then(function(identity){
+            if (!req.session){
+                req.session = {};
+            }
+            req.session.userId = identity; // required for ACL
+            req.session.token = token;
             next();
         }).catch(function(err){
             logger.error(err);
+            next(err);
         });
     } else {
+        req.session = {};
         next();
     }
 };

@@ -9,9 +9,13 @@ var router = require('express').Router(),
 router.use(bodyParser.json());
 router.use(require('../auth'));
 router.use(require('./static'));
+router.use(function (req, res, next) {
+    res.header('Cache-Control', 'no-cache="Set-Cookie, Set-Cookie2"');
+    next();
+});
 //router.use('/api/sessions', require('./../controllers/api/sessions'));
-router.use('/api/users', passport.authenticate('bearer', { session: false }), require('./../controllers/api/users'));
-router.use('/api/meetingareas', passport.authenticate('bearer', { session: false }),  require('./../controllers/api/meetingAreas'));
+router.use('/api/users', passport.authenticate('bearer', { session: true }), require('./../controllers/api/users'));
+router.use('/api/meetingareas', passport.authenticate('bearer', { session: true }),  require('./../controllers/api/meetingAreas'));
 
 // catch 404 and forward to error handler
 router.use(function(req, res, next) {

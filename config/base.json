@@ -4,6 +4,7 @@
     "host": "localhost",
     "port": 6379,
     "password": "",
-    "options":{}
+    "options":{},
+    "db": 0
   }
 }
