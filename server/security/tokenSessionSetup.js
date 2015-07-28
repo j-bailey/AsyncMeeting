@@ -2,7 +2,7 @@
 
 var logger = require('winston'),
     requestIp = require('request-ip'),
-    secUtils = require('./security/securityUtils');
+    secUtils = require('./securityUtils');
 
 module.exports = function (req, res, next) {
     if (req.headers.authorization) {

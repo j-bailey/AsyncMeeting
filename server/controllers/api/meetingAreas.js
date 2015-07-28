@@ -5,7 +5,8 @@ var acl = require('../../security/acl').getAcl();
 var secUtils = require('../../security/securityUtils');
 
 
-router.get("/", secUtils.isAllowedToResourceBasedOnUrlQueryValue('parentId', true), secUtils.readOnlyDbConnection, handlers.getMeetingAreasWithParentId);
+router.get("/", secUtils.isAllowedToResourceBasedOnUrlQueryValue('parentId', true), secUtils.readOnlyDbConnection,
+    handlers.getMeetingAreasWithParentId);
 
 router.get('/:meetingAreaId', acl.middleware(), secUtils.readOnlyDbConnection, handlers.getMeetingAreaById);
 

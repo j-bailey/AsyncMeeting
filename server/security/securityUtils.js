@@ -5,6 +5,7 @@ var acl = require('../security/acl').getAcl(),
     nconf = require('nconf'),
     jwt = require('jsonwebtoken'),
     db = require('../db'),
+    RouteError = require('../routes/routeError'),
     Q = require('q');
 
 var releaseTokenCache = {};
@@ -135,7 +136,7 @@ module.exports = {
                     next();
                 } else {
                     logger.warn('This combo is not allowed: ' + req.session.userId + ' - ' + req.baseUrl + ' - ' + req.method);
-                    next({errorCode: 401, msg:'Not allowed'});
+                    next(new RouteError(401, 'Not allowed', false));
                 }
             });
         };

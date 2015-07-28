@@ -7,8 +7,8 @@ var router = require('express').Router(),
 
 
 router.use(bodyParser.json());
-router.use(require('../auth'));
-router.use(require('./static'));
+router.use(require('../security/tokenSessionSetup'));
+router.use(require('./signupAndLoginHandlers'));
 router.use(function (req, res, next) {
     res.header('Cache-Control', 'no-cache="Set-Cookie, Set-Cookie2"');
     next();

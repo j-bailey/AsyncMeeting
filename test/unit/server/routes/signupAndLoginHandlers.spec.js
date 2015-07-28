@@ -31,7 +31,7 @@ describe('routes/static', function () {
         debugLogSpy = sandbox.stub();
         logger.debug = debugLogSpy;
 
-        delete require.cache[require.resolve('../../../../server/routes/static')];
+        delete require.cache[require.resolve('../../../../server/routes/signupAndLoginHandlers')];
 
         routerPostStub = sandbox.stub(require('express').Router().__proto__, 'post');
         routerDeleteStub = sandbox.stub(require('express').Router().__proto__, 'delete');
@@ -50,7 +50,7 @@ describe('routes/static', function () {
         // TODO fix winston stub
         //loggerStub = sandbox.stub(require('winston').__proto__, 'debug');
 
-        require('../../../../server/routes/static');
+        require('../../../../server/routes/signupAndLoginHandlers');
     });
 
     after(function () {
