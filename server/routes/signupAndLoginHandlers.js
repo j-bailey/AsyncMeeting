@@ -16,22 +16,27 @@ router.post('/login',
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        UserModel.findPublicUserById(req.user._id).then(function (user) {
+        UserModel.findById(req.user._id)
+            .select('+tenantId')
+            .populate('permissions')
+            .populate('roles')
+            .exec(function (err, user) {
+                if (err){
+                    logger.error('Error getting token. ' + err);
+                    res.status(500);
+                    res.json({
+                        status: "error",
+                        message: "Cannot login into the system right now. Please come back shierly.",
+                        code: "00001"
+                    });
+                }
             var clientIp = requestIp.getClientIp(req);
-            securityUtils.generateAccessToken(user.username, [], clientIp, req.headers['user-agent']).then(function (accessToken) {
+            securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp, req.headers['user-agent']).then(function (accessToken) {
                 res.json({
                     user: user, access_token: accessToken,
                     permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
                 });
                 // TODO test permissions need to be removed after permissions are fixed
-            }).catch(function (err) {
-                logger.error('Error getting token. ' + err);
-                res.status(500);
-                res.json({
-                    status: "error",
-                    message: "Cannot login into the system right now. Please come back shierly.",
-                    code: "00001"
-                });
             });
 
         });
@@ -46,25 +51,30 @@ router.post('/email-login',
         res.setHeader('Content-Type', 'application/json');
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
-        UserModel.findPublicUserById(req.user._id).then(function (user) {
+        UserModel.findById(req.user._id)
+            .select('+tenantId')
+            .populate('permissions')
+            .populate('roles')
+            .exec(function (err, user) {
+                if (err){
+                    logger.error('Error getting token. ' + err);
+                    res.status(500);
+                    res.json({
+                        status: "error",
+                        message: "Cannot login into the system right now. Please come back shierly.",
+                        code: "00001"
+                    });
+                }
             logger.debug("Sending response");
             logger.debug("Getting accessToken");
             logger.debug('User = ' + JSON.stringify(user));
             var clientIp = requestIp.getClientIp(req);
-            securityUtils.generateAccessToken(user.username, [], clientIp, req.headers['user-agent']).then(function (accessToken) {
+            securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp, req.headers['user-agent']).then(function (accessToken) {
                 res.json({
                     user: user, access_token: accessToken,
                     permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
                 });
                 // TODO test permissions need to be removed after permissions are fixed
-            }).catch(function (err) {
-                logger.error('Error getting token. ' + err);
-                res.status(500);
-                res.json({
-                    status: "error",
-                    message: "Cannot login into the system right now. Please come back shierly.",
-                    code: "00001"
-                });
             });
         });
     }

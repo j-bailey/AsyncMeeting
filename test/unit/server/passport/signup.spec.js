@@ -2,6 +2,7 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User')? mongoose.model('User'): mongoose.model('User', require('../../../../server/models/user').schema),
     db = require('../../../../server/db'),
     acl = require('acl'),
+    Q = require('q'),
     aclSetup = require('../../../../server/security/acl');
 
 describe('signup', function() {
@@ -51,14 +52,8 @@ describe('signup', function() {
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);
             findOneStub.onCall(1).yields(null, null);
-            var saveStub = sandbox.stub(db.readOnlyConnection.model('User').prototype, 'save');
-            saveStub.yields(null, savedUser);
-            sandbox.stub(acl.prototype, 'addUserRoles');
-            var getAclStub = sandbox.stub(aclSetup, 'getAcl');
-            getAclStub.returns({addUserRoles:function(a,b) {
-                expect(a).to.equal(savedUser.username);
-                expect(b).to.equal(require('../../../../server/security/resources/free-tier-role').object.key);
-            }});
+            var saveStub = sandbox.stub(db.readOnlyConnection.model('User'), 'createNewSignedUpUser');
+            saveStub.returns(Q.resolve(savedUser));
 
             require('../../../../server/passport/signup')(passport);
 
@@ -238,7 +233,6 @@ describe('signup', function() {
                 expect(two).to.deep.equal(false);
                 expect(three).to.deep.equal({ message: "We're sorry, we could not create your account at this time!" });
                 expect(four).to.equal(undefined);
-                winstonErrorStub.args[0][0].should.equal('Error in Saving user: ' + saveError);
                 done();
             };
 
@@ -259,14 +253,8 @@ describe('signup', function() {
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);
             findOneStub.onCall(1).yields(null, null);
-            var saveStub = sandbox.stub(db.readOnlyConnection.model('User').prototype, 'save');
-            saveStub.yields(saveError, savedUser);
-            sandbox.stub(acl.prototype, 'addUserRoles');
-            var getAclStub = sandbox.stub(aclSetup, 'getAcl');
-            getAclStub.returns({addUserRoles:function(a,b) {
-                expect(a).to.equal(savedUser.username);
-                expect(b).to.equal(require('../../../../server/security/resources/free-tier-role').object.key);
-            }});
+            var createNewUserStub = sandbox.stub(db.readWriteConnection.model('User'), 'createNewSignedUpUser');
+            createNewUserStub.returns(Q.reject({ message: "We're sorry, we could not create your account at this time!" }));
 
             require('../../../../server/passport/signup')(passport);
 

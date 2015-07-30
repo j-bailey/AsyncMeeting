@@ -2,7 +2,7 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User')? mongoose.model('User'): mongoose.model('User', require('../../../../server/models/user').schema),
     logger = require('winston');
 
-describe('routes/static', function () {
+describe.skip('routes/static', function () {
     var sandbox;
 
     var routerPostStub,

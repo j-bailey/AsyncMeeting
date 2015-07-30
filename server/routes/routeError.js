@@ -3,7 +3,7 @@
 var RouteError = function(errorCode, msg, runSilent){
     this.errorCode = errorCode || 500;
     this.msg = msg || 'Unknown error';
-    this.runSilent = (runSilent === undefined)? true: runSilent;
+    this.runSilent = (runSilent === undefined)? false: runSilent;
 };
 
 module.exports = RouteError;

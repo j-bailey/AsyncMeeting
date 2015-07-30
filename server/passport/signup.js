@@ -2,10 +2,8 @@
 
 var LocalStrategy = require('passport-local').Strategy,
     db = require('../db'),
-    User = db.readOnlyConnection.model('User'),
-    logger = require('winston'),
-    acl = require('../security/acl'),
-    freeTier = require('../security/resources/free-tier-role');
+    User = db.readWriteConnection.model('User'),
+    logger = require('winston');
 
 module.exports = function(passport) {
     //// Generates hash using bCrypt
@@ -53,15 +51,14 @@ module.exports = function(passport) {
                                 newUser.firstName = req.body.firstName;
                                 newUser.lastName = req.body.lastName;
 // save the user
-                                newUser.save(function(err, savedUser) {
-                                    if (err){
-                                        logger.error('Error in Saving user: ' + err);
-                                        return done(null, false, { message: "We're sorry, we could not create your account at this time!" });
-                                    }
-                                    logger.debug('User Registration successful');
-                                    acl.getAcl().addUserRoles(savedUser.username, freeTier.object.key);
+                                User.createNewSignedUpUser(newUser).then(function(savedUser) {
                                     return done(null, savedUser);
+                                }).fail(function(err){
+                                    if (err){
+                                        return done(null, false, err);
+                                    }
                                 });
+
                             });
                         }
                     });

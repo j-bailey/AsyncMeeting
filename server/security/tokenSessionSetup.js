@@ -9,14 +9,19 @@ module.exports = function (req, res, next) {
         var clientIp = requestIp.getClientIp(req),
             userAgent = req.headers['user-agent'],
             token = req.headers.authorization.trim().split(' ')[1];
-        secUtils.getIdentity(token, clientIp, userAgent).then(function(identity){
-            if (!req.session){
+        secUtils.getContents(token, clientIp, userAgent).then(function (contents, err) {
+            if (err) {
+                logger.error(err);
+                next(err);
+            }
+            if (!req.session) {
                 req.session = {};
             }
-            req.session.userId = identity; // required for ACL
+            req.session.userId = contents.username; // required for ACL
             req.session.token = token;
+            req.session.tenantId = contents.tId;
             next();
-        }).catch(function(err){
+        }).catch(function (err) {
             logger.error(err);
             next(err);
         });

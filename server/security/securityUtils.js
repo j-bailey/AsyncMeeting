@@ -11,7 +11,7 @@ var acl = require('../security/acl').getAcl(),
 var releaseTokenCache = {};
 
 module.exports = {
-    generateAccessToken: function (identity, basePermissions, clientIp, userAgent) {
+    generateAccessToken: function (identity, tenantId, basePermissions, clientIp, userAgent) {
         var defer = Q.defer();
         // TODO figure out how to get supertest to pass client IPs
         //if (!clientIp || clientIp === null || clientIp === '') {
@@ -30,7 +30,8 @@ module.exports = {
             username: identity,
             permissions: basePermissions,
             clientIp: clientIp,
-            userAgent: userAgent
+            userAgent: userAgent,
+            tId: tenantId
         };
         try {
             var token = jwt.sign(jwtPayload, nconf.get('accessToken:secret'), jwtOptions);
@@ -98,6 +99,21 @@ module.exports = {
             defer.resolve(decoded.username);
         } else {
             defer.reject(new Error('Could not find the identity'));
+        }
+        return defer.promise;
+    },
+    getContents: function (token, clientIp, userAgent) {
+        var defer = Q.defer();
+        if (!token) {
+            logger.error('Need a token for getContents');
+            defer.reject('Need a token for getContents');
+            return defer.promise;
+        }
+        if (this.isValidToken(token, clientIp, userAgent)) {
+            var decoded = jwt.verify(token, nconf.get('accessToken:secret'));
+            defer.resolve(decoded);
+        } else {
+            defer.reject(new Error('Could not get the contants'));
         }
         return defer.promise;
     },

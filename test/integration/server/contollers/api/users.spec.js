@@ -23,71 +23,90 @@ var pass2 = 'pword1234';
 var username2 = 'kelly';
 var user2 = request('http://localhost:3001');
 
+var userId3 = ""; // to be deleted
+var email3 = 'berry@berry.com';
+var pass3 = 'pword1234';
+var username3 = 'berry';
+
+var userId4 = ""; // to be deleted
+var email4 = 'doug@doug.com';
+var pass4 = 'pword1234';
+var username4 = 'doug';
+
 describe('controller/api/users', function () {
     before(function (done) {
         Acl.init().then(function (aclIns) {
             acl = aclIns;
-            done();
-        });
-    });
+            User = db.adminConnection.model('User');
+            User.remove().exec();
+            //if (err) next(err);
+            var userObj1 = new User({username: username1, email: email1, password: pass1});
+            userObj1.password = pass1;
+            var userObj2 = new User({username: username2, email: email2, password: pass2});
+            userObj2.password = pass2;
+            var userObj3 = new User({username: username3, email: email3, password: pass3});
+            userObj3.password = pass3;
+            var userObj4 = new User({username: username4, email: email4, password: pass4});
+            userObj4.password = pass4;
+            User.createNewSignedUpUser(userObj1).then(function (userObj) {
+                userId1 = userObj._id;
+                acl.allow('users-creator', '/api/users', 'post');
+                acl.addUserRoles(userObj1.username, 'users-creator');
+                acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'put');
+                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
+                acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'delete');
+                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
+                acl.allow('users-viewer-' + userObj.id, '/api/users/' + userObj.id, 'get');
+                acl.addUserRoles(userObj1.username, 'users-viewer-' + userObj.id);
+                User.createNewSignedUpUser(userObj2).then(function (userObj) {
+                    userId2 = userObj._id;
+                    User.createNewSignedUpUser(userObj3).then(function (userObj) {
+                        userId3 = userObj._id;
+                        acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'put');
+                        acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
+                        User.createNewSignedUpUser(userObj4).then(function (userObj) {
+                            userId4 = userObj._id;
+                            acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'delete');
+                            acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
 
-    beforeEach(function (done) {
-        User = db.adminConnection.model('User');
-        User.remove().exec();
-        //if (err) next(err);
-        var userObj1 = new User({username: username1, email: email1, password: pass1});
-        userObj1.password = pass1;
-        var userObj2 = new User({username: username2, email: email2, password: pass2});
-        userObj2.password = pass2;
-        userObj1.save(function (err, userObj) {
-            if (err) {
-                return next(err)
-            }
-            userId1 = userObj._id;
-            acl.allow('users-creator', '/api/users', 'post');
-            acl.addUserRoles(userObj1.username, 'users-creator');
-            acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'put');
-            acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
-            acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'delete');
-            acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
-            acl.allow('users-viewer-' + userObj.id, '/api/users/' + userObj.id, 'get');
-            acl.addUserRoles(userObj1.username, 'users-viewer-' + userObj.id);
-            userObj2.save(function (err, userObj) {
-                if (err) {
-                    return next(err)
-                }
-                userId2 = userObj._id;
+                            user1
+                                .post('/email-login')
+                                .set('Accept', 'application/json, text/plain, */*')
+                                .set('Accept-encoding', 'gzip, deflate')
+                                .set('Content-type', 'application/json;charset=UTF-8')
+                                .send({email: email1, password: pass1})
+                                .end(function (err, res) {
+                                    // user1 will manage its own cookies
+                                    // res.redirects contains an Array of redirects
+                                    if (err) console.error('err = ' + err);
 
+                                    accessToken1 = res.body.access_token;
+                                    user2
+                                        .post('/email-login')
+                                        .set('Accept', 'application/json, text/plain, */*')
+                                        .set('Accept-encoding', 'gzip, deflate')
+                                        .set('Content-type', 'application/json;charset=UTF-8')
+                                        .send({email: email2, password: pass2})
+                                        .end(function (err, res) {
+                                            // user1 will manage its own cookies
+                                            // res.redirects contains an Array of redirects
+                                            if (err) console.error('err = ' + err);
 
-                user1
-                    .post('/email-login')
-                    .set('Accept', 'application/json, text/plain, */*')
-                    .set('Accept-encoding', 'gzip, deflate')
-                    .set('Content-type', 'application/json;charset=UTF-8')
-                    .send({email: email1, password: pass1})
-                    .end(function (err, res) {
-                        // user1 will manage its own cookies
-                        // res.redirects contains an Array of redirects
-                        if (err) console.error('err = ' + err);
+                                            accessToken2 = res.body.access_token;
 
-                        accessToken1 = res.body.access_token;
-                        user2
-                            .post('/email-login')
-                            .set('Accept', 'application/json, text/plain, */*')
-                            .set('Accept-encoding', 'gzip, deflate')
-                            .set('Content-type', 'application/json;charset=UTF-8')
-                            .send({email: email2, password: pass2})
-                            .end(function (err, res) {
-                                // user1 will manage its own cookies
-                                // res.redirects contains an Array of redirects
-                                if (err) console.error('err = ' + err);
+                                            done();
+                                        });
 
-                                accessToken2 = res.body.access_token;
-                                done();
-                            });
+                                });
+                        });
                     });
-            });
-        })
+                }).catch(function(err){
+                    done(err);
+                });
+            }).catch(function(err){
+                done(err);
+            })
+        });
     });
 
     describe('GET \'/\'', function () {
@@ -189,7 +208,7 @@ describe('controller/api/users', function () {
     describe('DELETE \'/\'', function () {
         it('should remove a user', function (done) {
             user1
-                .delete('/api/users/' + userId1)
+                .delete('/api/users/' + userId4)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect(200)
@@ -204,7 +223,7 @@ describe('controller/api/users', function () {
         });
         it('should return a 403 error and associated JSON', function (done) {
             user2
-                .delete('/api/users/' + userId2)
+                .delete('/api/users/' + userId4)
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect(200)
@@ -218,13 +237,13 @@ describe('controller/api/users', function () {
         });
         it('should fail during query injection attack', function (done) {
             user1
-                .delete('/api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .delete('/api/users/' + userId4 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect(403)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(res.error.message).to.equal('cannot DELETE /api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
+                    expect(res.error.message).to.equal('cannot DELETE /api/users/' + userId4 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                     expect(result.password).to.be.empty;
                 })
@@ -255,6 +274,30 @@ describe('controller/api/users', function () {
                         done();
                     });
                 });
+        });
+        it('should return a 409 on due to user missing', function (done) {
+            User.remove({_id:userId3}).exec(function(err, item) {
+                user1
+                    .put('/api/users/' + userId3)
+                    .send({
+                        firstName: 'Berry2',
+                        lastName: 'Apple2'
+                    })
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + accessToken1)
+                    .expect(409)
+                    .end(function (err, res) {
+                        expect(err).to.be.null;
+                        var result = JSON.parse(res.text);
+                        expect(result.firstName).to.be.empty;
+                        expect(result.lastName).to.be.empty;
+                        expect(result.password).to.be.empty;
+                        User.find({_id: userId3}, function (err, user) {
+                            expect(user).to.be.empty;
+                            done();
+                        });
+                    });
+            });
         });
         it('should return a 403 error and associated JSON', function (done) {
             user2

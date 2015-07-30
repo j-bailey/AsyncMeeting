@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
+var tenantInfo = require('./plugins/tenantInfo');
 var db = require('../db');
 
 var schema = new mongoose.Schema({
@@ -30,7 +31,6 @@ schema.pre('validate', function (next) {
             delete meetingArea.ancestors; // changing the parent of a meeting area is not allowed
             delete meetingArea.parentMeetingArea;
             //result = arePropertiesInSync(meetingArea);
-            next();
         }
         next();
     }
@@ -79,6 +79,7 @@ var setAncestors = function(meetingArea, parentMeetingArea, ancestors, next) {
 schema.plugin(modifiedOn);
 schema.plugin(createInfo);
 schema.plugin(versionInfo);
+schema.plugin(tenantInfo);
 
 
 db.readOnlyConnection.model('MeetingArea', schema);

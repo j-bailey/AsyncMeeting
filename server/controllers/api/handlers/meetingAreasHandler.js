@@ -1,6 +1,8 @@
 "use strict";
+
 var ObjectId = require('mongoose').Types.ObjectId;
 var logger = require('winston');
+var RouteError = require('./../../../routes/routeError');
 
 module.exports = {
     getMeetingAreasWithParentId: function (req, res, next) {
@@ -57,25 +59,41 @@ module.exports = {
     createNewMeetingArea: function (req, res, next) {
         var parentId;
         if (req.body && req.body.parentMeetingAreaId && req.body.parentMeetingAreaId === 24) {
-            res.status(400).json(new Error("Error: parentMeetingAreaId is not valid or is missing!"));
-            return next();
+            return next(new RouteError(400, 'parent meeting area ID is not valid or is missing.  Please provide a valid parent meeting ID.'));
         } else {
             parentId = req.body.parentMeetingAreaId;
         }
 
         var MeetingArea = req.db.model('MeetingArea');
-        var meetingArea = new MeetingArea({
-            title: req.body.title,
-            description: req.body.description,
-            parentMeetingArea: parentId ? new ObjectId(parentId) : null
-        });
-
-        meetingArea.save(function (err, savedMeetingArea) {
-            if (err) {
-                logger.error("Error saving meeting area: " + err.message);
-                return next(err);
+        MeetingArea.findOne({_id:parentId}).select('+tenantId').lean().exec(function(err, parentMeetingArea) {
+            if (err){
+                logger.error(err);
+                return next(new RouteError(500, 'Internal server issue'));
             }
-            res.status(201).json(savedMeetingArea);
+            var newTenantId;
+            if (parentMeetingArea === null) {
+                if (!req.session || !req.session.tenantId) {
+                    logger.error('Need user Tenant Id to create a new meeting area');
+                    return next(new RouteError());
+                }
+                newTenantId = req.session.tenantId;
+            } else {
+                newTenantId = parentMeetingArea.tenantId;
+            }
+            var meetingArea = new MeetingArea({
+                title: req.body.title,
+                description: req.body.description,
+                parentMeetingArea: parentId ? new ObjectId(parentId) : null,
+                tenantId:  newTenantId
+            });
+
+            meetingArea.save(function (err, savedMeetingArea) {
+                if (err) {
+                    logger.error("Error saving meeting area: " + err.message);
+                    return next(err);
+                }
+                res.status(201).json(savedMeetingArea);
+            });
         });
     },
     updateMeetingAreaById: function (req, res, next) {
@@ -96,7 +114,11 @@ module.exports = {
             if (err) {
                 return next(err);
             }
-            res.status(200).json(meetingArea);
+            if (meetingArea === null){
+                res.status(409).json({});
+            } else {
+                res.status(200).json(meetingArea);
+            }
         });
     },
     deleteMeetingAreaById: function (req, res, next) {

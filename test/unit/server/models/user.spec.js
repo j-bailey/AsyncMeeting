@@ -14,25 +14,6 @@ describe('model/user', function () {
         sandbox.restore();
     });
 
-    describe('findPublicUserById', function () {
-        it('should return public user information for a given ID', function (done) {
-            var populateStub1 = sandbox.stub(),
-                populateStub2 = sandbox.stub(),
-                execStub = sandbox.stub(),
-                findByIdStub  = sandbox.stub(user.base.Model, 'findById');
-            var execStub = sandbox.stub(require('mongoose').__proto__.Query.prototype, 'exec');
-            findByIdStub.returns({populate:populateStub1});
-            populateStub1.returns({populate:populateStub2});
-            populateStub2.returns({exec:execStub});
-            user.findPublicUserById(1);
-
-            findByIdStub.args[0][0].should.equal(1);
-            populateStub1.args[0][0].should.equal('permissions');
-            populateStub2.args[0][0].should.equal('roles');
-
-            done();
-        });
-    });
     describe('findPublicUserByUserName', function () {
         it('should return public user information for a given ID', function (done) {
             var userObj = {_id:1, username: "myName"},

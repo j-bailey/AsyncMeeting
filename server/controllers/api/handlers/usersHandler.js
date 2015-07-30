@@ -11,7 +11,7 @@ module.exports = {
                 return next(err);
             }
             User.findOne({_id: savedUser._id})
-                .exec(function(err, newUser) {
+                .exec(function (err, newUser) {
                     if (err) {
                         return next(err);
                     }
@@ -31,17 +31,17 @@ module.exports = {
             return next(err);
         });
     },
-    findById: function(req, res, next){
+    findById: function (req, res, next) {
         var User = req.db.model('User');
         User.findOne({_id: req.params.id})
             .exec(function (err, user) {
-            if (err) {
-                return next(err);
-            }
-            res.status(200).json(user);
-        });
+                if (err) {
+                    return next(err);
+                }
+                res.status(200).json(user);
+            });
     },
-    updateById: function(req, res, next){
+    updateById: function (req, res, next) {
         var id = req.params.id;
         var userObj = req.body;
         delete userObj._id;
@@ -53,19 +53,25 @@ module.exports = {
 
         var User = req.db.model('User');
         User.findOneAndUpdate(search, update, options)
-            .exec(function(err, updatedUser){
-            if (err){
-                next(err);
-            }
-            res.status(200).json(updatedUser);
-        });
+            .exec(function (err, updatedUser) {
+                if (err) {
+                    next(err);
+                }
+                if (updatedUser === null){
+                    res.status(409).json({});
+                } else {
+                    res.status(200).json(updatedUser);
+                }
+            });
     },
-    deleteById: function(req, res, next){
+    deleteById: function (req, res, next) {
         var id = req.params.id;
         var User = req.db.model('User');
 
-        User.findOneAndRemove({ _id: id }, function(err) {
-            if (err) { return next(err); }
+        User.findOneAndRemove({_id: id}, function (err) {
+            if (err) {
+                return next(err);
+            }
             res.sendStatus(200);
         });
     }

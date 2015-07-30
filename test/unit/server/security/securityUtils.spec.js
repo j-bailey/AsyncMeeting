@@ -43,7 +43,7 @@ describe('security/securityUtils', function () {
             new Date(); //=> return the fake Date 'Sat Oct 01 2011 00:00:00'
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.generateAccessToken(identity, [], '127.0.0.1', 'firefox').then(function (accessToken, err) {
+            securityUtils.generateAccessToken(identity, '1234232344', [], '127.0.0.1', 'firefox').then(function (accessToken, err) {
                 expect(err).to.be.undefined;
                 new Date(); //=> will return the real time again (now)
 
@@ -51,7 +51,7 @@ describe('security/securityUtils', function () {
                 //redisClientSpies.setex.args[0][1].should.equal(1800);
                 //redisClientSpies.setex.args[0][2].should.equal(identity);
 
-                expect(accessToken).to.equal('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6InRvbUJsYW5rIiwicGVybWlzc2lvbnMiOltdLCJjbGllbnRJcCI6IjEyNy4wLjAuMSIsInVzZXJBZ2VudCI6ImZpcmVmb3giLCJpYXQiOjEzMTc0NTI0MDAsImV4cCI6MTMxNzU2MDQwMCwiYXVkIjoiMTI3LjAuMC4xIiwiaXNzIjoiaHR0cHM6Ly9wcm9kdWN0aXZlZ2FpbnMuY29tIiwic3ViIjoicHJvZHVjdGl2ZWdhaW5zOnRvbUJsYW5rIn0.2gPaK3qKgxmdKcN9InniyjCjIqxQkzRoa6Ux97erkt64SIHU3xGQX2ry-OOrSt5AosGjC6B0wLtWoFrnrmCuOg');
+                expect(accessToken).to.equal('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6InRvbUJsYW5rIiwicGVybWlzc2lvbnMiOltdLCJjbGllbnRJcCI6IjEyNy4wLjAuMSIsInVzZXJBZ2VudCI6ImZpcmVmb3giLCJ0SWQiOiIxMjM0MjMyMzQ0IiwiaWF0IjoxMzE3NDUyNDAwLCJleHAiOjEzMTc1NjA0MDAsImF1ZCI6IjEyNy4wLjAuMSIsImlzcyI6Imh0dHBzOi8vcHJvZHVjdGl2ZWdhaW5zLmNvbSIsInN1YiI6InByb2R1Y3RpdmVnYWluczp0b21CbGFuayJ9.ffUb-fg2DMT8HJKnPQyz9bXrixgauU0grRqXO_9lBlog0g-4lk-UBYSQ81xZn1XSSW6xBooTzEdi9U3TjvVsGQ');
 
                 done();
             });
