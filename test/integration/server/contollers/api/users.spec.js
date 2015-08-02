@@ -52,22 +52,22 @@ describe('controller/api/users', function () {
                 userId1 = userObj._id;
                 acl.allow('users-creator', '/api/users', 'post');
                 acl.addUserRoles(userObj1.username, 'users-creator');
-                acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'put');
-                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
-                acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'delete');
-                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
-                acl.allow('users-viewer-' + userObj.id, '/api/users/' + userObj.id, 'get');
-                acl.addUserRoles(userObj1.username, 'users-viewer-' + userObj.id);
+                acl.allow('users-editor-' + userObj._id, '/api/users/' + userObj._id, 'put');
+                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj._id);
+                acl.allow('users-editor-' + userObj._id, '/api/users/' + userObj._id, 'delete');
+                acl.addUserRoles(userObj1.username, 'users-editor-' + userObj._id);
+                acl.allow('users-viewer-' + userObj._id, '/api/users/' + userObj._id, 'get');
+                acl.addUserRoles(userObj1.username, 'users-viewer-' + userObj._id);
                 User.createNewSignedUpUser(userObj2).then(function (userObj) {
                     userId2 = userObj._id;
                     User.createNewSignedUpUser(userObj3).then(function (userObj) {
                         userId3 = userObj._id;
-                        acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'put');
-                        acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
+                        acl.allow('users-editor-' + userObj._id, '/api/users/' + userObj._id, 'put');
+                        acl.addUserRoles(userObj1.username, 'users-editor-' + userObj._id);
                         User.createNewSignedUpUser(userObj4).then(function (userObj) {
                             userId4 = userObj._id;
-                            acl.allow('users-editor-' + userObj.id, '/api/users/' + userObj.id, 'delete');
-                            acl.addUserRoles(userObj1.username, 'users-editor-' + userObj.id);
+                            acl.allow('users-editor-' + userObj._id, '/api/users/' + userObj._id, 'delete');
+                            acl.addUserRoles(userObj1.username, 'users-editor-' + userObj._id);
 
                             user1
                                 .post('/email-login')

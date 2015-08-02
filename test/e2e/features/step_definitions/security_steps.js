@@ -1,4 +1,5 @@
 var db = require('../../../../server/db');
+require('../../../../server/models/meetingArea');
 require('../../../../server/models/user');
 var User = db.adminConnection.model('User');
 var bcrypt = require('bcrypt-nodejs');
@@ -15,11 +16,10 @@ var steps = function () {
         db.adminConnection.db.dropCollection('users', function (err, result) {
             //if (err) next(err);
             var user = new User({ email: email, username: username, password: password});
-            user.save(function (err) {
+            User.createNewSignedUpUser(user).then(function (savedUser, err) {
                 if (err) {
-                    return next(err)
+                    return next(err);
                 }
-                //acl.getAcl().addUserRoles(user.username, freeTierRole.key);
                 next();
             })
         });

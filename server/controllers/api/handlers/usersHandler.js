@@ -6,17 +6,14 @@ module.exports = {
     createUser: function (req, res, next) {
         var User = req.db.model('User');
         var user = new User(req.body);
-        user.save(function (err, savedUser) {
-            if (err) {
-                return next(err);
+        User.createNewSignedUpUser(user).then(function (newUser) {
+            User.findById(newUser._id);
+            res.status(201).json(newUser);
+        }).catch(function (err) {
+            if(err.errors) {
+                logger.error(err.errors);
             }
-            User.findOne({_id: savedUser._id})
-                .exec(function (err, newUser) {
-                    if (err) {
-                        return next(err);
-                    }
-                    res.status(201).json(newUser);
-                });
+            next(err);
         });
     },
     quickSearchForUser: function (req, res, next) {
@@ -57,7 +54,7 @@ module.exports = {
                 if (err) {
                     next(err);
                 }
-                if (updatedUser === null){
+                if (updatedUser === null) {
                     res.status(409).json({});
                 } else {
                     res.status(200).json(updatedUser);

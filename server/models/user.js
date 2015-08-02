@@ -1,6 +1,5 @@
 "use strict";
 
-
 var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
@@ -12,6 +11,7 @@ var logger = require('winston');
 var db = require('../db');
 require('./tenant');
 var Tenant = db.readOnlyConnection.model('Tenant');
+var MeetingArea = db.readOnlyConnection.model('MeetingArea');
 var dictValidator = require('../security/dictionary-validator');
 var acl = require('../security/acl'),
     freeTier = require('../security/resources/free-tier-role');
@@ -25,12 +25,20 @@ var schema = new mongoose.Schema({
     lastName: String,
     permissions: [{type: mongoose.Schema.Types.ObjectId, ref: 'Permission'}],
     roles: [{type: mongoose.Schema.Types.ObjectId, ref: 'Role'}],
-    allowedTenantResources: [{type: mongoose.Schema.Types.Mixed, validate: tenantResourcesValidator, select: false}]
+    allowedTenantResources: [
+        {
+            tenantId: {type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true},
+            resourceId:  {type: mongoose.Schema.Types.ObjectId, required: true},
+            resourceType: {type: String, required: true}
+        }
+    ]
 });
 
-function tenantResourcesValidator(val) {
+schema.path('allowedTenantResources').validate(function tenantResourcesValidator(val) {
     return (val.tenantId && val.resourceId && val.resourceType);
-}
+}, 'User tenant resource is incorrect');
+
+schema.path('allowedTenantResources').select(false);
 
 schema.pre('validate', function (next) {
     var user = this;
@@ -111,33 +119,65 @@ schema.statics.createNewSignedUpUser = function (newUser) {
     newTenant.save(function (err, savedTenant) {
         if (err) {
             logger.error('Error in saving new tenant: ' + err);
-            defer.reject({message: "We're sorry, we could not create your account at this time!"});
-            return;
+            return defer.reject({message: "We're sorry, we could not create your account at this time!"});
         }
         logger.debug('new tenant ' + savedTenant + ' has been saved');
-
-        var allowedResources = {
-            tenantId: savedTenant._id,
-            resourceId: 'ALL',
-            resourceType: ' ALL'
-        };
-        acl.getAcl().addUserRoles(newUser.username, freeTier.object.key);
-        newUser.allowedTenantResources = allowedResources;
-        newUser.tenantId = savedTenant._id;
-
-        newUser.save(function (err, savedUser) {
+        var firstMeetingArea = new MeetingArea({
+            title: 'My First Meeting Area',
+            description: 'This is your meeting area, which can contain multiple meetings and other areas.  ' +
+            'Please feel to change me or add to me.',
+            parentMeetingArea: null,
+            ancestors: [],
+            tenantId: savedTenant._id
+        });
+        firstMeetingArea.save(function(err, savedArea) {
             if (err) {
-                logger.error('Error in Saving user: ' + err);
-                savedTenant.remove(function (err) {
-                    if (err) {
-                        logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
-                    }
-                    defer.reject({message: "We're sorry, we could not create your account at this time!"});
-                });
-                return;
+                logger.error('Error in saving meeing area for new tenant: ' + err);
+                return defer.reject({message: "We're sorry, we could not create your account at this time!"});
             }
-            logger.debug('User Registration successful');
-            defer.resolve(savedUser);
+            var allowedResources = {
+                tenantId: savedTenant._id,
+                resourceId: savedArea._id,
+                resourceType: 'MeetingArea'
+            };
+            acl.getAcl().addUserRoles(newUser.username, freeTier.object.key);
+            newUser.allowedTenantResources = allowedResources;
+            newUser.tenantId = savedTenant._id;
+
+            newUser.save(function (err, savedUser) {
+                if (err) {
+                    logger.error('Error in Saving user: ' + err);
+                    savedTenant.remove(function (err) {
+                        if (err) {
+                            logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
+                        }
+                        savedArea.remove(function(err){
+                            if (err) {
+                                logger.error('Unable to delete Meeting Area for new user with ID: ' + savedTenant._id);
+                            }
+                            return defer.reject({message: "We're sorry, we could not create your account at this time!"});
+                        });
+                    });
+                }
+                logger.debug('User Registration successful');
+                db.readOnlyConnection.model('User').findById(savedUser._id).lean().exec(function(err, safeUser) {
+                    if (err) {
+                        logger.error('Error in Saving user: ' + err);
+                        savedTenant.remove(function (err) {
+                            if (err) {
+                                logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
+                            }
+                            savedArea.remove(function(err){
+                                if (err) {
+                                    logger.error('Unable to delete Meeting Area for new user with ID: ' + savedTenant._id);
+                                }
+                                return defer.reject({message: "We're sorry, we could not create your account at this time!"});
+                            });
+                        });
+                    }
+                    defer.resolve(safeUser);
+                });
+            });
         });
     });
     return defer.promise;

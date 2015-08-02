@@ -5,6 +5,7 @@ var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 var tenantInfo = require('./plugins/tenantInfo');
+var logger = require('winston');
 var db = require('../db');
 
 var schema = new mongoose.Schema({
@@ -22,7 +23,7 @@ schema.pre('validate', function (next) {
             meetingArea.ancestors = [];
             next();
         } else if (meetingArea.parentMeetingArea) {
-            setAncestors(meetingArea, meetingArea.parentMeetingArea, undefined,next);
+            setAncestors(meetingArea, meetingArea.parentMeetingArea,next);
         } else {
             next();
         }
@@ -36,23 +37,27 @@ schema.pre('validate', function (next) {
     }
 });
 
-var setAncestors = function(meetingArea, parentMeetingArea, ancestors, next) {
-    if (ancestors === undefined || ancestors === null) {
-        ancestors = [];
+var setAncestors = function(meetingArea, parentMeetingArea, next) {
+    if (!parentMeetingArea  || parentMeetingArea === null) {
+        meetingArea.ancestors = [];
+        return next();
+    } else {
+        db.readOnlyConnection.model('MeetingArea').findById(parentMeetingArea).lean().exec(function (err, parent) {
+            if (err) {
+                next(err);
+                return;
+            }
+            if (parent === null) {
+                logger.warn('Could not find meeting area for id: ' + parentMeetingArea.toString());
+                return next('Could not find meeting area for id: ' + parentMeetingArea.toString());
+            } else {
+                var ancestors = parent.ancestors;
+                ancestors.push(parent._id);
+                meetingArea.ancestors = ancestors;
+                return next();
+            }
+        });
     }
-    db.readOnlyConnection.model('MeetingArea').findById(parentMeetingArea).lean().exec(function(err, parent){
-        if (err) {
-            next(err);
-            return;
-        }
-        ancestors.unshift(parent._id);
-        if (parent.parentMeetingArea && parent.parentMeetingArea !== null) {
-            setAncestors(meetingArea, parent.parentMeetingArea, ancestors, next);
-        } else {
-            meetingArea.ancestors = ancestors;
-            next();
-        }
-    });
 };
 
 //var arePropertiesInSync = function(meetingArea){
