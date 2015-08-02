@@ -17,6 +17,7 @@ var accessToken1,
     pass1 = 'pword123',
     username1 = 'tom',
     userModel1,
+    user1AllowedResource,
     user1 = request('http://localhost:3001');
 
 var accessToken2,
@@ -50,60 +51,64 @@ describe('meeting area route', function () {
                 if (err) {
                     return done(err)
                 }
-                User.findById(savedUser1._id).select('+tenantId +allowedTenantResources').lean().exec(function (err, savedUser1) {
+                User.findById(savedUser1._id).select('+tenantId').lean().exec(function (err, savedUser1) {
                     userModel1 = savedUser1;
-                    User.createNewSignedUpUser(user2Obj).then(function (savedUser2, err) {
-                        if (err) {
-                            return done(err)
-                        }
-                        User.findById(savedUser2._id).select('+tenantId').lean().exec(function (err, savedUser2) {
-                            userModel2 = savedUser2;
-                            User.createNewSignedUpUser(user3Obj).then(function (savedUser3, err) {
-                                if (err) {
-                                    return done(err)
-                                }
-                                User.findById(savedUser3._id).select('+tenantId').lean().exec(function (err, savedUser3) {
-                                    userModel3 = savedUser3;
-                                    user1
-                                        .post('/email-login')
-                                        .set('Accept', 'application/json, text/plain, */*')
-                                        .set('Accept-encoding', 'gzip, deflate')
-                                        .set('Content-type', 'application/json;charset=UTF-8')
-                                        .send({email: email1, password: pass1})
-                                        .end(function (err, res) {
-                                            // user1 will manage its own cookies
-                                            // res.redirects contains an Array of redirects
-                                            if (err) console.error('err = ' + err);
+                    var UserAllowedResources = db.readWriteConnection.model('UserAllowedResources');
+                    UserAllowedResources.findOne({userId: savedUser1._id}).exec(function (err, resource) {
+                        user1AllowedResource = resource;
+                        User.createNewSignedUpUser(user2Obj).then(function (savedUser2, err) {
+                            if (err) {
+                                return done(err)
+                            }
+                            User.findById(savedUser2._id).select('+tenantId').lean().exec(function (err, savedUser2) {
+                                userModel2 = savedUser2;
+                                User.createNewSignedUpUser(user3Obj).then(function (savedUser3, err) {
+                                    if (err) {
+                                        return done(err)
+                                    }
+                                    User.findById(savedUser3._id).select('+tenantId').lean().exec(function (err, savedUser3) {
+                                        userModel3 = savedUser3;
+                                        user1
+                                            .post('/email-login')
+                                            .set('Accept', 'application/json, text/plain, */*')
+                                            .set('Accept-encoding', 'gzip, deflate')
+                                            .set('Content-type', 'application/json;charset=UTF-8')
+                                            .send({email: email1, password: pass1})
+                                            .end(function (err, res) {
+                                                // user1 will manage its own cookies
+                                                // res.redirects contains an Array of redirects
+                                                if (err) console.error('err = ' + err);
 
-                                            accessToken1 = res.body.access_token;
-                                            user2
-                                                .post('/email-login')
-                                                .set('Accept', 'application/json, text/plain, */*')
-                                                .set('Accept-encoding', 'gzip, deflate')
-                                                .set('Content-type', 'application/json;charset=UTF-8')
-                                                .send({email: email2, password: pass2})
-                                                .end(function (err, res) {
-                                                    // user1 will manage its own cookies
-                                                    // res.redirects contains an Array of redirects
-                                                    if (err) console.error('err = ' + err);
+                                                accessToken1 = res.body.access_token;
+                                                user2
+                                                    .post('/email-login')
+                                                    .set('Accept', 'application/json, text/plain, */*')
+                                                    .set('Accept-encoding', 'gzip, deflate')
+                                                    .set('Content-type', 'application/json;charset=UTF-8')
+                                                    .send({email: email2, password: pass2})
+                                                    .end(function (err, res) {
+                                                        // user1 will manage its own cookies
+                                                        // res.redirects contains an Array of redirects
+                                                        if (err) console.error('err = ' + err);
 
-                                                    accessToken2 = res.body.access_token;
-                                                    user3
-                                                        .post('/email-login')
-                                                        .set('Accept', 'application/json, text/plain, */*')
-                                                        .set('Accept-encoding', 'gzip, deflate')
-                                                        .set('Content-type', 'application/json;charset=UTF-8')
-                                                        .send({email: email3, password: pass3})
-                                                        .end(function (err, res) {
-                                                            // user1 will manage its own cookies
-                                                            // res.redirects contains an Array of redirects
-                                                            if (err) console.error('err = ' + err);
+                                                        accessToken2 = res.body.access_token;
+                                                        user3
+                                                            .post('/email-login')
+                                                            .set('Accept', 'application/json, text/plain, */*')
+                                                            .set('Accept-encoding', 'gzip, deflate')
+                                                            .set('Content-type', 'application/json;charset=UTF-8')
+                                                            .send({email: email3, password: pass3})
+                                                            .end(function (err, res) {
+                                                                // user1 will manage its own cookies
+                                                                // res.redirects contains an Array of redirects
+                                                                if (err) console.error('err = ' + err);
 
-                                                            accessToken3 = res.body.access_token;
-                                                            done();
-                                                        });
-                                                });
-                                        });
+                                                                accessToken3 = res.body.access_token;
+                                                                done();
+                                                            });
+                                                    });
+                                            });
+                                    });
                                 });
                             });
                         });
@@ -139,7 +144,7 @@ describe('meeting area route', function () {
             acl.addUserRoles(userModel1.username, 'meetingarea-viewer-' + meetingAreaId);
 
 
-            var parentMeetingAreaId = userModel1.allowedTenantResources[0].resourceId;
+            var parentMeetingAreaId = user1AllowedResource.resourceId;
             var rootMeetingArea = new MeetingArea({
                 title: "Root Meeting Area Title",
                 description: "Root Meeting Area Description",
@@ -329,7 +334,7 @@ describe('meeting area route', function () {
                                     expect(result.ancestors.length).to.equal(2);
                                     expect(result.ancestors).to.deep.equal(expectedAncestors);
                                     expectedAncestors.push(result._id);
-                                    MeetingArea.find({_id: { $in: expectedAncestors}}).lean().exec(function (err, meetingAreas) {
+                                    MeetingArea.find({_id: {$in: expectedAncestors}}).lean().exec(function (err, meetingAreas) {
                                         expect(meetingAreas).to.have.length(3);
                                         done();
                                     });

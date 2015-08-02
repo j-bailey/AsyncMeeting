@@ -19,6 +19,7 @@ module.exports = {
             return next();
         }
         var MeetingArea = req.db.model('MeetingArea');
+        var User = req.db.model('User');
         if (parentId === null) {
             MeetingArea.find({parentMeetingArea: null})
                 .exec(function (err, meetingAreas) {
@@ -29,6 +30,7 @@ module.exports = {
                 });
         } else {
             MeetingArea.findOne({_id: parentId}, function (err, meetingArea) {
+                User.find({_id: req.session.userId}).and()
                 MeetingArea.find({parentMeetingArea: (new ObjectId(meetingArea._id))})
                     .exec(function (err, meetingAreas) {
                         if (err) {
