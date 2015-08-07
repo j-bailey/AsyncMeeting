@@ -5,15 +5,32 @@ var acl = require('../../security/acl').getAcl();
 var secUtils = require('../../security/securityUtils');
 
 
-router.get("/", secUtils.isAllowedToResourceBasedOnUrlQueryValue('parentId', true), secUtils.readOnlyDbConnection,
-    handlers.getMeetingAreasWithParentId);
+router.get("/",
+    secUtils.isAllowedResourceAccess('parentId', true),
+    secUtils.readOnlyDbConnection, handlers.getMeetingAreasWithParentId);
 
-router.get('/:meetingAreaId', acl.middleware(), secUtils.readOnlyDbConnection, handlers.getMeetingAreaById);
+router.get('/:meetingAreaId',
+    secUtils.isAllowedResourceAccess('meetingAreaId', false),
+    secUtils.readOnlyDbConnection, handlers.getMeetingAreaById);
 
-router.post('/', acl.middleware(), secUtils.determineDbConnection, handlers.createNewMeetingArea);
+router.post('/',
+    secUtils.isAllowedResourceAccess('parentMeetingArea', true),
+    secUtils.determineDbConnection, handlers.createNewMeetingArea);
 
-router.delete('/:meetingAreaId', acl.middleware(), secUtils.determineDbConnection, handlers.deleteMeetingAreaById);
+router.post('/:meetingAreaId/member/:userId',
+    secUtils.isAllowedResourceAccess('meetingAreaId', true),
+    secUtils.determineDbConnection, handlers.grantUserAccess);
 
-router.put('/:meetingAreaId', acl.middleware(), secUtils.determineDbConnection, handlers.updateMeetingAreaById);
+router.delete('/:meetingAreaId',
+    secUtils.isAllowedResourceAccess('meetingAreaId', false),
+    secUtils.determineDbConnection, handlers.deleteMeetingAreaById);
+
+router.delete('/:meetingAreaId/member/:userId',
+    secUtils.isAllowedResourceAccess('meetingAreaId', true),
+    secUtils.determineDbConnection, handlers.removeUserAccess);
+
+router.put('/:meetingAreaId',
+    secUtils.isAllowedResourceAccess('meetingAreaId', false),
+    secUtils.determineDbConnection, handlers.updateMeetingAreaById);
 
 module.exports = router;

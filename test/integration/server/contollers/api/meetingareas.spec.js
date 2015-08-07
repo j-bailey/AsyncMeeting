@@ -1,6 +1,8 @@
 var Acl = require('../../../../../server/security/acl'),
     expect = require('chai').expect,
     MeetingArea,
+    UserAllowedResources,
+    meetingAreaHandler = require('../../../../../server/controllers/api/handlers/meetingAreasHandler'),
     request = require('supertest'),
     User,
     bcrypt = require('bcrypt-nodejs'),
@@ -35,20 +37,23 @@ describe('meeting areas route', function () {
             acl = aclIns;
             User = db.readWriteConnection.model('User');
             User.remove().exec();
-            //if (err) next(err);
+            //if (err) done(err);
             var user1Obj = new User({username: username1, email: email1, password: pass1});
             var user2Obj = new User({username: username2, email: email2, password: pass2});
             User.createNewSignedUpUser(user1Obj).then(function (savedUser1, err) {
                 if (err) {
-                    return next(err)
+                    return done(err)
                 }
                 User.findById(savedUser1._id).select('+tenantId').lean().exec(function (err, savedUser1) {
                     userModel1 = savedUser1;
                     User.createNewSignedUpUser(user2Obj).then(function (savedUser2, err) {
                         if (err) {
-                            return next(err)
+                            return done(err)
                         }
                         User.findById(savedUser2._id).select('+tenantId').lean().exec(function (err, savedUser2) {
+                            if (err) {
+                                return done(err)
+                            }
                             userModel2 = savedUser2;
                             user1
                                 .post('/email-login')
@@ -59,7 +64,9 @@ describe('meeting areas route', function () {
                                 .end(function (err, res) {
                                     // user1 will manage its own cookies
                                     // res.redirects contains an Array of redirects
-                                    if (err) console.error('err = ' + err);
+                                    if (err) {
+                                        return done(err)
+                                    }
 
                                     accessToken1 = res.body.access_token;
                                     user2
@@ -71,7 +78,9 @@ describe('meeting areas route', function () {
                                         .end(function (err, res) {
                                             // user1 will manage its own cookies
                                             // res.redirects contains an Array of redirects
-                                            if (err) console.error('err = ' + err);
+                                            if (err) {
+                                                return done(err)
+                                            }
 
                                             accessToken2 = res.body.access_token;
                                             done();
@@ -88,7 +97,8 @@ describe('meeting areas route', function () {
         parentMeetingAreaId = "";
         childMeetingAreaId = "";
         child2MeetingAreaId = "";
-        MeetingArea = db.readWriteConnection.model('MeetingArea');
+        UserAllowedResources = db.readWriteConnection.model('UserAllowedResources'),
+            MeetingArea = db.readWriteConnection.model('MeetingArea');
 
         var meetingArea = new MeetingArea({
             title: "Meeting Area Title",
@@ -97,14 +107,11 @@ describe('meeting areas route', function () {
             tenantId: userModel1.tenantId
         });
 
-        meetingArea.save(function (err, savedItem) {
-            if (err) console.log("save error: " + err.message);
+        meetingAreaHandler._createMeetingArea(meetingArea, userModel1.username, db.readWriteConnection).then(function (savedItem, err) {
 
             parentMeetingAreaId = savedItem._id;
-            acl.allow('meetingarea-creator', '/api/meetingareas/' + parentMeetingAreaId, 'get');
-            acl.addUserRoles(userModel1.username, 'meetingarea-creator');
-            acl.allow('meetingarea-creator-parent', '/api/meetingareas', 'get');
-            acl.addUserRoles(userModel1.username, 'meetingarea-creator-parent');
+            //acl.allow('meetingarea-creator-parent', '/api/meetingareas', 'get');
+            //acl.addUserRoles(userModel1.username, 'meetingarea-creator-parent');
 
             var childMeetingArea = new MeetingArea({
                 title: "Child Meeting Area Title",
@@ -113,9 +120,9 @@ describe('meeting areas route', function () {
                 tenantId: userModel1.tenantId
             });
 
-            childMeetingArea.save(function (err, savedChildItem) {
-                if (err) console.log("save child error: " + err.message);
-                childMeetingAreaId = savedChildItem.id;
+            meetingAreaHandler._createMeetingArea(childMeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem, err) {
+                childMeetingAreaId = savedChildItem._id;
+
 
                 var child2MeetingArea = new MeetingArea({
                     title: "Child 2 Meeting Area Title",
@@ -124,13 +131,14 @@ describe('meeting areas route', function () {
                     tenantId: userModel1.tenantId
                 });
 
-                child2MeetingArea.save(function (err, savedChildItem2) {
-                    if (err) console.log("save child error: " + err.message);
-                    child2MeetingAreaId = savedChildItem2.id;
+                meetingAreaHandler._createMeetingArea(child2MeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem2) {
+                    child2MeetingAreaId = savedChildItem2._id;
                     done();
                 });
             });
 
+        }).catch(function (err) {
+            return done(err);
         });
     });
 
@@ -146,8 +154,8 @@ describe('meeting areas route', function () {
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
                     expect(result).to.have.length(2);
-                    expect(result[0]._id).to.equal(childMeetingAreaId);
-                    expect(result[1]._id).to.equal(child2MeetingAreaId);
+                    expect(result[0]._id.toString()).to.equal(childMeetingAreaId.toString());
+                    expect(result[1]._id.toString()).to.equal(child2MeetingAreaId.toString());
                 })
                 .end(done);
         });
@@ -201,6 +209,7 @@ describe('meeting areas route', function () {
                 .get('/api/meetingareas?parentId=null' + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
+                // FIXME need to get the 401 to show up in the http code
                 //.expect('Content-Type', /json/)
                 //.expect(401)
                 .expect(function (res) {
@@ -211,4 +220,61 @@ describe('meeting areas route', function () {
                 .end(done);
         });
     });
+    describe('Post \'/:meetingAreaId/member/:userId\'', function () {
+        it('should grant viewer access to meeting area', function (done) {
+            user1
+                .post('/api/meetingareas/' + parentMeetingAreaId + '/member/' + userModel2._id)
+                .send({
+                    permission: 'viewer'
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.empty;
+                    UserAllowedResources.find({resourceId: parentMeetingAreaId})
+                        .and({userId: userModel2._id})
+                        .lean()
+                        .exec(function (err, allowedResources) {
+                            expect(allowedResources).to.have.length(1);
+                            expect(allowedResources[0].userId.toString()).to.equal(userModel2._id.toString());
+                            expect(allowedResources[0].resourceType).to.equal('MeetingArea');
+                            acl.isAllowed(userModel2.username, '/api/meetingareas/' + parentMeetingAreaId, 'get', function(err, result) {
+                                expect(err).to.be.null;
+                                expect(result).to.equal(true);
+                                done();
+                            });
+                        });
+                });
+        });
+    });
+    describe('Delete \'/:meetingAreaId/member/:userId\'', function () {
+        it.only('should remove grant viewer access to meeting area', function (done) {
+            user1
+                .delete('/api/meetingareas/' + parentMeetingAreaId + '/member/' + userModel2._id)
+                .send({
+                    permission: 'viewer'
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.empty;
+                    UserAllowedResources.find({resourceId: parentMeetingAreaId})
+                        .and({userId: userModel2._id})
+                        .lean()
+                        .exec(function (err, allowedResources) {
+                            expect(allowedResources).to.have.length(0);
+                            acl.isAllowed(userModel2.username, '/api/meetingareas/' + parentMeetingAreaId, 'get', function(err, result) {
+                                expect(err).to.be.null;
+                                expect(result).to.equal(false);
+                                done();
+                            });
+                        });
+                });
+        });
+    });
+
 });

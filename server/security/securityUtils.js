@@ -134,25 +134,84 @@ module.exports = {
         //}
         next();
     },
-    isAllowedToResourceBasedOnUrlQueryValue: function (queryKey, allowNulls) {
+    isAllowedResourceAccess: function (resourceKey, allowNulls) {
         return function (req, res, next) {
-            var queryValue = req.query[queryKey],
+            var resourceId,
                 controlledResource;
-            if (allowNulls && (queryValue === null || queryValue === 'null')) {
+
+            if (!resourceKey) {
+                logger.debug('Require resourceKey for isAllowedToResourceBasedOnUrlQueryValue');
+                return next(new RouteError(401, 'Not allowed', false));
+            }
+            if (req.query && req.query[resourceKey]){
+               resourceId  = req.query[resourceKey]
+            } else if (req.body && req.body[resourceKey]){
+                resourceId = req.body[resourceKey]
+            } else if (req.params && req.params[resourceKey]) {
+                resourceId = req.params[resourceKey];
+            } else {
+                logger.debug('No acceptable ways to retrieve resource value for key "' + resourceKey + '" in isAllowedToResourceBasedOnUrlQueryValue');
+                return next(new RouteError(401, 'Not allowed', false));
+            }
+
+            if (allowNulls && (resourceId === null || resourceId === 'null')) {
                 controlledResource = req.baseUrl;
             } else {
-                controlledResource = req.baseUrl + '/' + queryValue;
+                controlledResource = req.baseUrl + '/' + resourceId;
             }
             acl.isAllowed(req.session.userId, controlledResource, req.method.toLowerCase(), function (err, allow) {
                 if (err) {
                     logger.error(err);
-                    next(err);
+                    return next(err);
                 }
                 if (allow) {
-                    next();
+                    return next();
                 } else {
                     logger.warn('This combo is not allowed: ' + req.session.userId + ' - ' + req.baseUrl + ' - ' + req.method);
-                    next(new RouteError(401, 'Not allowed', false));
+                    if (req.baseUrl.indexOf('meetingarea') >= 0 && (resourceId !== null || resourceId !== 'null') ) {
+                        var MeetingArea = db.readOnlyConnection.model('MeetingArea');
+                        MeetingArea.findById(resourceId).exec(function (err, meetingArea) {
+                            if (err){
+                                logger.error('Could not find meeting area for ID: ' + resourceId);
+                                logger.debug(err);
+                                return next(new RouteError(401, 'Not allowed', false));
+                            }
+                            if (!meetingArea){
+                                logger.error('Could not find meeting area for ID: ' + resourceId);
+                                return next(new RouteError(401, 'Not allowed', false));
+                            }
+                            var UserAllowedResources = db.readOnlyConnection.model('UserAllowedResources');
+                            UserAllowedResources.find({username: req.session.userId})
+                                .and({tenantId: meetingArea.tenantId})
+                                .exec(function (err, allowedResources) {
+                                    if (err) {
+                                        return next(err);
+                                    }
+                                    if (allowedResources && allowedResources.length > 0) {
+                                        allowedResources.forEach(function (allowedResource) {
+                                            meetingArea.ancestors.forEach(function (ancestor) {
+                                                if (allowedResource === ancestor) {
+                                                    acl.isAllowed(req.session.userId, controlledResource, req.method.toLowerCase(), function (err, allow) {
+                                                        if (err) {
+                                                            logger.error(err);
+                                                            return next(err);
+                                                        }
+                                                        if (allow) {
+                                                            return next();
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        });
+                                        return next(new RouteError(401, 'Not allowed', false));
+                                    } else {
+                                        return next(new RouteError(401, 'Not allowed', false));
+                                    }
+                                })
+                        });
+                    } else {
+                        return next(new RouteError(401, 'Not allowed', false));
+                    }
                 }
             });
         };
