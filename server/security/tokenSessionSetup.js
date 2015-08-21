@@ -20,6 +20,7 @@ module.exports = function (req, res, next) {
             req.session.userId = contents.username; // required for ACL
             req.session.token = token;
             req.session.tenantId = contents.tId;
+            req.session.userDbId = contents.uToken;
             next();
         }).catch(function (err) {
             logger.error(err);

@@ -151,6 +151,20 @@ schema.statics.createNewSignedUpUser = function (newUser) {
                 };
                 var allowedResources = new UserAllowedResources(allowedResources);
                 allowedResources.save(function (err, savedAllowedResources) {
+                    if (err) {
+                        logger.error(err);
+                        savedTenant.remove(function (err) {
+                            if (err) {
+                                logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
+                            }
+                            savedArea.remove(function (err) {
+                                if (err) {
+                                    logger.error('Unable to delete Meeting Area for new user with ID: ' + savedTenant._id);
+                                }
+                                return defer.reject({message: "We're sorry, we could not create your account at this time!"});
+                            });
+                        });
+                    }
                     logger.debug('User Registration successful');
                     db.readOnlyConnection.model('User').findById(savedUser._id).lean().exec(function (err, safeUser) {
                         if (err) {
@@ -187,15 +201,13 @@ schema.statics.addAllowedResource = function (userId, tenantId, resourceId, reso
         resourceId: resourceId,
         resourceType: resourceType
     };
-    var allowedResources = new UserAllowedResources(allowedResources);
+    allowedResources = new UserAllowedResources(allowedResources);
     allowedResources.save(function (err, savedAllowedResources) {
-        db.readOnlyConnection.model('User').findById(userId).lean().exec(function (err, safeUser) {
-            if (err) {
-                logger.error('Error in Saving user: ' + err);
-                return defer.reject({message: "We're sorry, we could not add an allowed resource at this time!"});
-            }
-            defer.resolve();
-        });
+        if (err) {
+            logger.error('Error in Saving allowed resource: ' + err);
+            return defer.reject({message: "We're sorry, we could not add an allowed resource at this time!"});
+        }
+        defer.resolve();
     });
     return defer.promise;
 };
@@ -208,9 +220,13 @@ schema.statics.removeAllowedResource = function (userId, resourceId, resourceTyp
         resourceId: resourceId,
         resourceType: resourceType
     };
-    var allowedResources = new UserAllowedResources(allowedResources);
+    allowedResources = new UserAllowedResources(allowedResources);
 
-    UserAllowedResources.findOneAndRemove({userId: userId, resourceId: resourceId, resourceType: resourceType}, function(err){
+    UserAllowedResources.findOneAndRemove({
+        userId: userId,
+        resourceId: resourceId,
+        resourceType: resourceType
+    }, function (err) {
         if (err) {
             logger.error('Error in Saving user: ' + err);
             return defer.reject({message: "We're sorry, we could not add an allowed resource at this time!"});

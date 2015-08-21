@@ -43,7 +43,7 @@ describe('security/securityUtils', function () {
             new Date(); //=> return the fake Date 'Sat Oct 01 2011 00:00:00'
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.generateAccessToken(identity, '1234232344', [], '127.0.0.1', 'firefox').then(function (accessToken, err) {
+            securityUtils.generateAccessToken(identity, '1234232344', [], '127.0.0.1', 'firefox', 'aaa').then(function (accessToken, err) {
                 expect(err).to.be.undefined;
                 new Date(); //=> will return the real time again (now)
 
@@ -75,7 +75,7 @@ describe('security/securityUtils', function () {
             new Date(); //=> return the fake Date 'Sat Oct 01 2011 00:00:00'
 
             var securityUtils = require('../../../../server/security/securityUtils');
-            securityUtils.generateAccessToken(identity, [], '127.0.0.1', 'firefox').catch(function (err) {
+            securityUtils.generateAccessToken(identity, [], '127.0.0.1', 'firefox', 'aaa').catch(function (err) {
                 expect(err.message).to.equal('Unable to create token');
                 errorLogSpy.args[0][0].should.equal('Failed to create JWT token');
 

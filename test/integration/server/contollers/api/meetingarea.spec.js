@@ -1,6 +1,7 @@
 var Acl = require('../../../../../server/security/acl'),
     expect = require('chai').expect,
     MeetingArea,
+    meetingAreaHandler = require('../../../../../server/controllers/api/handlers/meetingAreasHandler'),
     request = require('supertest'),
     User,
     db = require('../../../../../server/db'),
@@ -118,93 +119,162 @@ describe('meeting area route', function () {
         });
     });
 
+    //beforeEach(function (done) {
+    //    MeetingArea = db.readWriteConnection.model('MeetingArea');
+    //
+    //
+    //    var meetingArea = new MeetingArea({
+    //        title: "Meeting Area Title",
+    //        description: "Meeting Area Description",
+    //        tenantId: userModel1.tenantId
+    //    });
+    //
+    //    meetingArea.save(function (err, savedItem) {
+    //        if (err) {
+    //            return done(err);
+    //        }
+    //
+    //        meetingAreaId = savedItem.id;
+    //        acl.allow('meetingarea-creator', '/api/meetingareas', 'post');
+    //        acl.addUserRoles(userModel1.username, 'meetingarea-creator');
+    //        acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'put');
+    //        acl.addUserRoles(userModel1.username, 'meetingarea-editor-' + meetingAreaId);
+    //        acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'delete');
+    //        acl.addUserRoles(userModel1.username, 'meetingarea-editor-' + meetingAreaId);
+    //        acl.allow('meetingarea-viewer-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'get');
+    //        acl.addUserRoles(userModel1.username, 'meetingarea-viewer-' + meetingAreaId);
+    //
+    //
+    //        var parentMeetingAreaId = user1AllowedResource.resourceId;
+    //        var rootMeetingArea = new MeetingArea({
+    //            title: "Root Meeting Area Title",
+    //            description: "Root Meeting Area Description",
+    //            parentMeetingArea: parentMeetingAreaId,
+    //            tenantId: userModel1.tenantId
+    //        });
+    //
+    //        var a = parentMeetingAreaId.toString();
+    //        rootMeetingArea.save(function (err, savedItem) {
+    //            if (err) {
+    //                return done(err);
+    //            }
+    //
+    //            parentMeetingAreaId = savedItem.id;
+    //            acl.allow('meetingarea-creator', '/api/meetingareas/' + parentMeetingAreaId, 'get');
+    //            acl.addUserRoles(userModel1.username, 'meetingarea-creator');
+    //            acl.allow('meetingarea-creator-parent', '/api/meetingareas', 'get');
+    //            acl.addUserRoles(userModel1.username, 'meetingarea-creator-parent');
+    //
+    //            var firstChildMeetingArea = new MeetingArea({
+    //                title: "First Child Meeting Area Title",
+    //                description: "First Child Meeting Area Description",
+    //                parentMeetingArea: parentMeetingAreaId,
+    //                tenantId: userModel1.tenantId
+    //            });
+    //
+    //            firstChildMeetingArea.save(function (err, savedChildItem) {
+    //                if (err) {
+    //                    return done(err);
+    //                }
+    //                parentMeetingAreaId = savedChildItem.id;
+    //
+    //                var secondChildMeetingArea = new MeetingArea({
+    //                    title: "Second Child Meeting Area Title",
+    //                    description: "Second Child Meeting Area Description",
+    //                    parentMeetingArea: parentMeetingAreaId,
+    //                    tenantId: userModel1.tenantId
+    //                });
+    //
+    //                secondChildMeetingArea.save(function (err, savedChildItem2) {
+    //                    if (err) {
+    //                        return done(err);
+    //                    }
+    //                    parentMeetingAreaId = savedChildItem.id;
+    //
+    //                    var thirdChildMeetingArea = new MeetingArea({
+    //                        title: "Third Child Meeting Area Title",
+    //                        description: "Third Child Meeting Area Description",
+    //                        parentMeetingArea: parentMeetingAreaId,
+    //                        tenantId: userModel1.tenantId
+    //                    });
+    //                    thirdChildMeetingArea.save(function (err, savedChildItem3) {
+    //                        if (err) {
+    //                            return done(err);
+    //                        }
+    //                        done();
+    //                    });
+    //                });
+    //            });
+    //        });
+    //    });
+    //});
+
     beforeEach(function (done) {
-        MeetingArea = db.readWriteConnection.model('MeetingArea');
+        var parentMeetingAreaId = "";
+        var childMeetingAreaId = "";
+        var child2MeetingAreaId = "";
+        var UserAllowedResources = db.readWriteConnection.model('UserAllowedResources'),
+            MeetingArea = db.readWriteConnection.model('MeetingArea');
 
-
-        var meetingArea = new MeetingArea({
-            title: "Meeting Area Title",
-            description: "Meeting Area Description",
+        var firstMeetingArea = new MeetingArea({
+            title: "First Meeting Area Title",
+            description: "First Meeting Area Description",
+            parentMeetingArea: null,
             tenantId: userModel1.tenantId
         });
 
-        meetingArea.save(function (err, savedItem) {
-            if (err) {
-                return done(err);
-            }
+        meetingAreaHandler._createMeetingArea(firstMeetingArea, userModel1.username, db.readWriteConnection).then(function (savedItem, err) {
 
-            meetingAreaId = savedItem.id;
-            acl.allow('meetingarea-creator', '/api/meetingareas', 'post');
-            acl.addUserRoles(userModel1.username, 'meetingarea-creator');
-            acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'put');
-            acl.addUserRoles(userModel1.username, 'meetingarea-editor-' + meetingAreaId);
-            acl.allow('meetingarea-editor-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'delete');
-            acl.addUserRoles(userModel1.username, 'meetingarea-editor-' + meetingAreaId);
-            acl.allow('meetingarea-viewer-' + meetingAreaId, '/api/meetingareas/' + meetingAreaId, 'get');
-            acl.addUserRoles(userModel1.username, 'meetingarea-viewer-' + meetingAreaId);
-
-
-            var parentMeetingAreaId = user1AllowedResource.resourceId;
-            var rootMeetingArea = new MeetingArea({
-                title: "Root Meeting Area Title",
-                description: "Root Meeting Area Description",
-                parentMeetingArea: parentMeetingAreaId,
+            meetingAreaId = savedItem._id;
+            var meetingArea = new MeetingArea({
+                title: "Parent Meeting Area Title",
+                description: "Parent Meeting Area Description",
+                parentMeetingArea: null,
                 tenantId: userModel1.tenantId
             });
 
-            var a = parentMeetingAreaId.toString();
-            rootMeetingArea.save(function (err, savedItem) {
-                if (err) {
-                    return done(err);
-                }
+            meetingAreaHandler._createMeetingArea(meetingArea, userModel1.username, db.readWriteConnection).then(function (savedItem, err) {
 
-                parentMeetingAreaId = savedItem.id;
-                acl.allow('meetingarea-creator', '/api/meetingareas/' + parentMeetingAreaId, 'get');
-                acl.addUserRoles(userModel1.username, 'meetingarea-creator');
-                acl.allow('meetingarea-creator-parent', '/api/meetingareas', 'get');
-                acl.addUserRoles(userModel1.username, 'meetingarea-creator-parent');
+                parentMeetingAreaId = savedItem._id;
+                //acl.allow('meetingarea-creator-parent', '/api/meetingareas', 'get');
+                //acl.addUserRoles(userModel1.username, 'meetingarea-creator-parent');
 
-                var firstChildMeetingArea = new MeetingArea({
-                    title: "First Child Meeting Area Title",
-                    description: "First Child Meeting Area Description",
-                    parentMeetingArea: parentMeetingAreaId,
+                var childMeetingArea = new MeetingArea({
+                    title: "Child Meeting Area Title",
+                    description: "Child Meeting Area Description",
+                    parentMeetingArea: savedItem._id,
                     tenantId: userModel1.tenantId
                 });
 
-                firstChildMeetingArea.save(function (err, savedChildItem) {
-                    if (err) {
-                        return done(err);
-                    }
-                    parentMeetingAreaId = savedChildItem.id;
+                meetingAreaHandler._createMeetingArea(childMeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem, err) {
+                    childMeetingAreaId = savedChildItem._id;
 
-                    var secondChildMeetingArea = new MeetingArea({
-                        title: "Second Child Meeting Area Title",
-                        description: "Second Child Meeting Area Description",
-                        parentMeetingArea: parentMeetingAreaId,
+
+                    var child2MeetingArea = new MeetingArea({
+                        title: "Child 2 Meeting Area Title",
+                        description: "Child 2 Meeting Area Description",
+                        parentMeetingArea: savedChildItem._id,
                         tenantId: userModel1.tenantId
                     });
 
-                    secondChildMeetingArea.save(function (err, savedChildItem2) {
-                        if (err) {
-                            return done(err);
-                        }
-                        parentMeetingAreaId = savedChildItem.id;
-
-                        var thirdChildMeetingArea = new MeetingArea({
-                            title: "Third Child Meeting Area Title",
-                            description: "Third Child Meeting Area Description",
-                            parentMeetingArea: parentMeetingAreaId,
-                            tenantId: userModel1.tenantId
-                        });
-                        thirdChildMeetingArea.save(function (err, savedChildItem2) {
-                            if (err) {
-                                return done(err);
-                            }
-                            done();
-                        });
+                    meetingAreaHandler._createMeetingArea(child2MeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem2) {
+                        child2MeetingAreaId = savedChildItem2._id;
+                        MeetingArea.findById(parentMeetingAreaId)
+                            .select('+tenantId')
+                            .lean()
+                            .exec(function (err, meetingArea) {
+                                if (err) {
+                                    done(err);
+                                }
+                                meetingAreaHandler._grantUserAccess(userModel3._id, meetingArea.tenantId, meetingArea._id, 'editor', db.readWriteConnection).then(function () {
+                                    done();
+                                });
+                            });
                     });
                 });
             });
+        }).catch(function (err) {
+            return done(err);
         });
     });
 
@@ -218,7 +288,7 @@ describe('meeting area route', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result._id).to.equal(meetingAreaId);
+                    expect(result._id.toString()).to.equal(meetingAreaId.toString());
                 })
                 .end(done);
         });
@@ -266,6 +336,7 @@ describe('meeting area route', function () {
                 .expect('Content-Type', /json/)
                 .expect(201)
                 .end(function (err, res) {
+                    expect(err).to.be.null;
                     var result = JSON.parse(res.text);
                     expect(result._id).to.not.be.null;
                     MeetingArea.find({_id: result._id}, function (err, meetingAreas) {
@@ -327,6 +398,7 @@ describe('meeting area route', function () {
                                 .expect('Content-Type', /json/)
                                 .expect(201)
                                 .end(function (err, res) {
+                                    expect(err).to.be.null;
                                     var result = JSON.parse(res.text);
                                     expect(result._id).to.not.be.null;
                                     ma3 = result._id;
@@ -356,6 +428,7 @@ describe('meeting area route', function () {
                 .expect('Content-Type', /json/)
                 .expect(403)
                 .end(function (err, res) {
+                    expect(err).to.be.null;
                     var result = JSON.parse(res.text);
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                     expect(result.status).to.equal(403);
@@ -372,6 +445,7 @@ describe('meeting area route', function () {
                 .set('Accept', 'application/json')
                 .expect(200)
                 .end(function (err, res) {
+                    expect(err).to.be.null;
                     MeetingArea.find({_id: meetingAreaId}, function (err, meetingAreas) {
                         expect(meetingAreas.length).to.be.equal(0);
                         done();
@@ -385,6 +459,7 @@ describe('meeting area route', function () {
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect(403)
                 .end(function (err, res) {
+                    expect(err).to.be.null;
                     var result = JSON.parse(res.text);
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                     expect(result.status).to.equal(403);
@@ -417,6 +492,7 @@ describe('meeting area route', function () {
                 .set('Accept', 'application/json')
                 .expect(200)
                 .end(function (err, res) {
+                    expect(err).to.be.null;
                     var result = JSON.parse(res.text);
                     expect(result.title).to.equal("New Updated Meeting Area");
                     expect(result.description).to.equal("New Updated Meeting Area Description");
@@ -436,6 +512,7 @@ describe('meeting area route', function () {
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect(403)
                 .end(function (err, res) {
+                    expect(err).to.be.null;
                     var result = JSON.parse(res.text);
                     expect(result.msg).to.equal('Insufficient permissions to access resource');
                     expect(result.status).to.equal(403);

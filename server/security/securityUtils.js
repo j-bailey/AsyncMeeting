@@ -11,7 +11,7 @@ var acl = require('../security/acl').getAcl(),
 var releaseTokenCache = {};
 
 module.exports = {
-    generateAccessToken: function (identity, tenantId, basePermissions, clientIp, userAgent) {
+    generateAccessToken: function (identity, tenantId, basePermissions, clientIp, userAgent, userDbId) {
         var defer = Q.defer();
         // TODO figure out how to get supertest to pass client IPs
         //if (!clientIp || clientIp === null || clientIp === '') {
@@ -31,7 +31,8 @@ module.exports = {
             permissions: basePermissions,
             clientIp: clientIp,
             userAgent: userAgent,
-            tId: tenantId
+            tId: tenantId,
+            uToken: userDbId
         };
         try {
             var token = jwt.sign(jwtPayload, nconf.get('accessToken:secret'), jwtOptions);
@@ -170,7 +171,9 @@ module.exports = {
                     logger.warn('This combo is not allowed: ' + req.session.userId + ' - ' + req.baseUrl + ' - ' + req.method);
                     if (req.baseUrl.indexOf('meetingarea') >= 0 && (resourceId !== null || resourceId !== 'null') ) {
                         var MeetingArea = db.readOnlyConnection.model('MeetingArea');
-                        MeetingArea.findById(resourceId).exec(function (err, meetingArea) {
+                        MeetingArea.findById(resourceId)
+                            .select('+tenantId')
+                            .exec(function (err, meetingArea) {
                             if (err){
                                 logger.error('Could not find meeting area for ID: ' + resourceId);
                                 logger.debug(err);
@@ -190,7 +193,8 @@ module.exports = {
                                     if (allowedResources && allowedResources.length > 0) {
                                         allowedResources.forEach(function (allowedResource) {
                                             meetingArea.ancestors.forEach(function (ancestor) {
-                                                if (allowedResource === ancestor) {
+                                                if (allowedResource.resourceId.toString() === ancestor.toString()) {
+                                                    controlledResource = req.baseUrl + '/' + ancestor.toString();
                                                     acl.isAllowed(req.session.userId, controlledResource, req.method.toLowerCase(), function (err, allow) {
                                                         if (err) {
                                                             logger.error(err);
@@ -198,12 +202,14 @@ module.exports = {
                                                         }
                                                         if (allow) {
                                                             return next();
+                                                        } else if (allowedResources[allowedResources.length-1] === allowedResource &&
+                                                        meetingArea.ancestors[meetingArea.ancestors.length-1] === ancestor){
+                                                            return next(new RouteError(401, 'Not allowed', false));
                                                         }
                                                     });
                                                 }
                                             });
                                         });
-                                        return next(new RouteError(401, 'Not allowed', false));
                                     } else {
                                         return next(new RouteError(401, 'Not allowed', false));
                                     }
