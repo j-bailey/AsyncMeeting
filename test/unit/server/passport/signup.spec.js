@@ -52,7 +52,7 @@ describe('signup', function() {
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);
             findOneStub.onCall(1).yields(null, null);
-            var saveStub = sandbox.stub(db.readOnlyConnection.model('User'), 'createNewSignedUpUser');
+            var saveStub = sandbox.stub(require('../../../../server/controllers/api/handlers/usersHandler'), 'createNewSignedUpUser');
             saveStub.returns(Q.resolve(savedUser));
 
             require('../../../../server/passport/signup')(passport);
@@ -253,7 +253,7 @@ describe('signup', function() {
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);
             findOneStub.onCall(1).yields(null, null);
-            var createNewUserStub = sandbox.stub(db.readWriteConnection.model('User'), 'createNewSignedUpUser');
+            var createNewUserStub = sandbox.stub(require('../../../../server/controllers/api/handlers/usersHandler'), 'createNewSignedUpUser');
             createNewUserStub.returns(Q.reject({ message: "We're sorry, we could not create your account at this time!" }));
 
             require('../../../../server/passport/signup')(passport);

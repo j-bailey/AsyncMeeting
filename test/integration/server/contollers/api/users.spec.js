@@ -2,6 +2,7 @@ var Acl = require('../../../../../server/security/acl'),
     expect = require('chai').expect,
     request = require('supertest'),
     User,
+    usersHandler = require('../../../../../server/controllers/api/handlers/usersHandler'),
     bcrypt = require('bcrypt-nodejs'),
     db = require('../../../../../server/db');
 
@@ -48,7 +49,7 @@ describe('controller/api/users', function () {
             userObj3.password = pass3;
             var userObj4 = new User({username: username4, email: email4, password: pass4});
             userObj4.password = pass4;
-            User.createNewSignedUpUser(userObj1).then(function (userObj) {
+            usersHandler.createNewSignedUpUser(userObj1).then(function (userObj) {
                 userId1 = userObj._id;
                 acl.allow('users-creator', '/api/users', 'post');
                 acl.addUserRoles(userObj1.username, 'users-creator');
@@ -58,13 +59,13 @@ describe('controller/api/users', function () {
                 acl.addUserRoles(userObj1.username, 'users-editor-' + userObj._id);
                 acl.allow('users-viewer-' + userObj._id, '/api/users/' + userObj._id, 'get');
                 acl.addUserRoles(userObj1.username, 'users-viewer-' + userObj._id);
-                User.createNewSignedUpUser(userObj2).then(function (userObj) {
+                usersHandler.createNewSignedUpUser(userObj2).then(function (userObj) {
                     userId2 = userObj._id;
-                    User.createNewSignedUpUser(userObj3).then(function (userObj) {
+                    usersHandler.createNewSignedUpUser(userObj3).then(function (userObj) {
                         userId3 = userObj._id;
                         acl.allow('users-editor-' + userObj._id, '/api/users/' + userObj._id, 'put');
                         acl.addUserRoles(userObj1.username, 'users-editor-' + userObj._id);
-                        User.createNewSignedUpUser(userObj4).then(function (userObj) {
+                        usersHandler.createNewSignedUpUser(userObj4).then(function (userObj) {
                             userId4 = userObj._id;
                             acl.allow('users-editor-' + userObj._id, '/api/users/' + userObj._id, 'delete');
                             acl.addUserRoles(userObj1.username, 'users-editor-' + userObj._id);

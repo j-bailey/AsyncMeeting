@@ -2,6 +2,7 @@ var db = require('../../../../server/db');
 require('../../../../server/models/meetingArea');
 require('../../../../server/models/user');
 var User = db.adminConnection.model('User');
+var usersHandler = require('../../../../server/controllers/api/handlers/usersHandler');
 var bcrypt = require('bcrypt-nodejs');
 var chai = require('chai');
 chai.use(require('chai-as-promised'));
@@ -16,7 +17,7 @@ var steps = function () {
         db.adminConnection.db.dropCollection('users', function (err, result) {
             //if (err) next(err);
             var user = new User({ email: email, username: username, password: password});
-            User.createNewSignedUpUser(user).then(function (savedUser, err) {
+            usersHandler.createNewSignedUpUser(user).then(function (savedUser, err) {
                 if (err) {
                     return next(err);
                 }

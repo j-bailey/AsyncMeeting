@@ -4,6 +4,7 @@ var Acl = require('../../../../../server/security/acl'),
     meetingAreaHandler = require('../../../../../server/controllers/api/handlers/meetingAreasHandler'),
     request = require('supertest'),
     User,
+    usersHandler = require('../../../../../server/controllers/api/handlers/usersHandler'),
     db = require('../../../../../server/db'),
     bcrypt = require('bcrypt-nodejs');
 
@@ -48,7 +49,7 @@ describe('meeting area route', function () {
             var user1Obj = new User({username: username1, email: email1, password: pass1});
             var user2Obj = new User({username: username2, email: email2, password: pass2});
             var user3Obj = new User({username: username3, email: email3, password: pass3});
-            User.createNewSignedUpUser(user1Obj).then(function (savedUser1, err) {
+            usersHandler.createNewSignedUpUser(user1Obj).then(function (savedUser1, err) {
                 if (err) {
                     return done(err)
                 }
@@ -57,13 +58,13 @@ describe('meeting area route', function () {
                     var UserAllowedResources = db.readWriteConnection.model('UserAllowedResources');
                     UserAllowedResources.findOne({userId: savedUser1._id}).exec(function (err, resource) {
                         user1AllowedResource = resource;
-                        User.createNewSignedUpUser(user2Obj).then(function (savedUser2, err) {
+                        usersHandler.createNewSignedUpUser(user2Obj).then(function (savedUser2, err) {
                             if (err) {
                                 return done(err)
                             }
                             User.findById(savedUser2._id).select('+tenantId').lean().exec(function (err, savedUser2) {
                                 userModel2 = savedUser2;
-                                User.createNewSignedUpUser(user3Obj).then(function (savedUser3, err) {
+                                usersHandler.createNewSignedUpUser(user3Obj).then(function (savedUser3, err) {
                                     if (err) {
                                         return done(err)
                                     }

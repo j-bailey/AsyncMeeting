@@ -3,6 +3,7 @@
 var LocalStrategy = require('passport-local').Strategy,
     db = require('../db'),
     User = db.readWriteConnection.model('User'),
+    usersHandler = require('../controllers/api/handlers/usersHandler'),
     logger = require('winston');
 
 module.exports = function(passport) {
@@ -51,7 +52,7 @@ module.exports = function(passport) {
                                 newUser.firstName = req.body.firstName;
                                 newUser.lastName = req.body.lastName;
 // save the user
-                                User.createNewSignedUpUser(newUser).then(function(savedUser) {
+                                usersHandler.createNewSignedUpUser(newUser).then(function(savedUser) {
                                     return done(null, savedUser);
                                 }).fail(function(err){
                                     if (err){
