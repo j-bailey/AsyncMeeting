@@ -5,7 +5,7 @@ var db = require('../../../../server/db');
 var Q = require('q');
 var acl = require('../../../security/acl'),
     freeTier = require('../../../security/resources/free-tier-role');
-
+var meetingAreaHandler = require('../../../../server/controllers/api/handlers/meetingAreasHandler');
 
 
 var createNewSignedUpUser = function (newUser) {
@@ -33,39 +33,28 @@ var createNewSignedUpUser = function (newUser) {
             ancestors: [],
             tenantId: savedTenant._id
         });
-        firstMeetingArea.save(function (err, savedArea) {
-            if (err) {
-                logger.error('Error in saving meeing area for new tenant: ' + err);
-                return defer.reject({message: "We're sorry, we could not create your account at this time!"});
-            }
-            acl.getAcl().addUserRoles(newUser.username, freeTier.object.key);
-            newUser.tenantId = savedTenant._id;
+        newUser.tenantId = savedTenant._id;
 
-            newUser.save(function (err, savedUser) {
-                if (err) {
-                    logger.error('Error in Saving user: ' + err);
-                    savedTenant.remove(function (err) {
-                        if (err) {
-                            logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
-                        }
-                        savedArea.remove(function (err) {
-                            if (err) {
-                                logger.error('Unable to delete Meeting Area for new user with ID: ' + savedTenant._id);
-                            }
-                            return defer.reject({message: "We're sorry, we could not create your account at this time!"});
-                        });
-                    });
-                }
-                var allowedResources = {
-                    userId: savedUser._id,
-                    tenantId: savedTenant._id,
-                    resourceId: savedArea._id,
-                    resourceType: 'MeetingArea'
-                };
-                var allowedResources = new UserAllowedResources(allowedResources);
-                allowedResources.save(function (err, savedAllowedResources) {
+        newUser.save(function (err, savedUser) {
+            if (err) {
+                logger.error('Error in Saving user: ' + err);
+                savedTenant.remove(function (err) {
                     if (err) {
-                        logger.error(err);
+                        logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
+                    }
+                    savedArea.remove(function (err) {
+                        if (err) {
+                            logger.error('Unable to delete Meeting Area for new user with ID: ' + savedTenant._id);
+                        }
+                        return defer.reject({message: "We're sorry, we could not create your account at this time!"});
+                    });
+                });
+            }
+            meetingAreaHandler._createMeetingArea(firstMeetingArea, savedUser.username, db.readWriteConnection, true).then(function (savedItem) {
+                logger.debug('User Registration successful');
+                db.readOnlyConnection.model('User').findById(savedUser._id).lean().exec(function (err, safeUser) {
+                    if (err) {
+                        logger.error('Error in Saving user: ' + err);
                         savedTenant.remove(function (err) {
                             if (err) {
                                 logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
@@ -78,25 +67,11 @@ var createNewSignedUpUser = function (newUser) {
                             });
                         });
                     }
-                    logger.debug('User Registration successful');
-                    db.readOnlyConnection.model('User').findById(savedUser._id).lean().exec(function (err, safeUser) {
-                        if (err) {
-                            logger.error('Error in Saving user: ' + err);
-                            savedTenant.remove(function (err) {
-                                if (err) {
-                                    logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
-                                }
-                                savedArea.remove(function (err) {
-                                    if (err) {
-                                        logger.error('Unable to delete Meeting Area for new user with ID: ' + savedTenant._id);
-                                    }
-                                    return defer.reject({message: "We're sorry, we could not create your account at this time!"});
-                                });
-                            });
-                        }
-                        defer.resolve(safeUser);
-                    });
+                    defer.resolve(safeUser);
                 });
+            }).catch(function(err){
+                // TODO review error handling
+                return defer.reject(err);
             });
         });
     });
@@ -104,7 +79,7 @@ var createNewSignedUpUser = function (newUser) {
 };
 
 module.exports = {
-    createNewSignedUpUser:createNewSignedUpUser,
+    createNewSignedUpUser: createNewSignedUpUser,
     createUser: function (req, res, next) {
         var User = req.db.model('User');
         var user = new User(req.body);
@@ -112,7 +87,7 @@ module.exports = {
             User.findById(newUser._id);
             res.status(201).json(newUser);
         }).catch(function (err) {
-            if(err.errors) {
+            if (err.errors) {
                 logger.error(err.errors);
             }
             next(err);

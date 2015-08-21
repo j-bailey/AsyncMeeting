@@ -72,18 +72,12 @@ var _grantUserAccess = function (allowedUserId, resourceTenantId, resourceId, pe
                             if (permission === 'viewer') {
                                 acl.allow('meetingarea-viewer-' + resourceId, '/api/meetingareas/' + resourceId, 'get');
                                 acl.addUserRoles(userObj.username, 'meetingarea-viewer-' + resourceId);
-                                acl.allow('meetingarea-viewer', '/api/meetingareas', 'get');
-                                acl.addUserRoles(userObj.username, 'meetingarea-viewer');
                             } else if (permission === 'editor') {
                                 acl.allow('meetingarea-editor-' + resourceId, '/api/meetingareas/' + resourceId, ['get', 'put']);
                                 acl.addUserRoles(userObj.username, 'meetingarea-editor-' + resourceId);
-                                acl.allow('meetingarea-viewer', '/api/meetingareas', 'get');
-                                acl.addUserRoles(userObj.username, 'meetingarea-viewer');
                             } else if (permission === 'admin') {
                                 acl.allow('meetingarea-admin-' + resourceId, '/api/meetingareas/' + resourceId, ['get', 'post', 'put', 'delete']);
                                 acl.addUserRoles(userObj.username, 'meetingarea-admin-' + resourceId);
-                                acl.allow('meetingarea-viewer', '/api/meetingareas', 'get');
-                                acl.addUserRoles(userObj.username, 'meetingarea-viewer');
                             } else {
                                 logger.error('Got bad permission "' + permission + '" while granting user access to meeting area');
                                 return next(new RouteError(400, 'Invalid permission'));
@@ -141,13 +135,17 @@ var _removeUserAccess = function (resourceId, allowedUserId, permission, dbConn)
     return defer.promise;
 };
 
-var _createMeetingArea = function (meetingArea, ownerName, dbConn) {
+var _createMeetingArea = function (meetingArea, ownerName, dbConn, myFirstMeetingArea) {
     var defer = Q.defer(),
         MeetingArea = dbConn.model('MeetingArea'),
         User = dbConn.model('User');
     User.findOne({username: ownerName})
         .select('+tenantId')
         .lean().exec(function (err, user) {
+            if (err){
+                logger.error(err);
+                return defer.reject(new RouteError(500, 'Internal server issue'));
+            }
         MeetingArea.find({$or: [{_id: meetingArea.parentMeetingArea},
                 {
                     $and: [
@@ -163,9 +161,14 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn) {
                 logger.error(err);
                 return defer.reject(new RouteError(500, 'Internal server issue'));
             }
-            if (parentMeetingArea === null) {
-                logger.error('Need user Tenant Id to create a new meeting area');
-                return defer.reject(new RouteError());
+            if (parentMeetingArea === null || parentMeetingArea.length === 0) {
+                if (myFirstMeetingArea){
+                    meetingArea.tenantId = user.tenantId;
+                    meetingArea.parentMeetingArea = null;
+                } else {
+                    logger.error('Need user Tenant Id to create a new meeting area');
+                    return defer.reject(new RouteError());
+                }
             } else {
                 meetingArea.tenantId = parentMeetingArea[0].tenantId;
                 meetingArea.parentMeetingArea = parentMeetingArea[0]._id;
@@ -184,6 +187,8 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn) {
                     var acl = Acl.getAcl();
                     acl.allow('meetingarea-creator-' + savedMeetingArea._id, '/api/meetingareas/' + savedMeetingArea._id, '*');
                     acl.addUserRoles(user.username, 'meetingarea-creator-' + savedMeetingArea._id);
+                    acl.allow('meetingarea-viewer', '/api/meetingareas', 'get');
+                    acl.addUserRoles(user.username, 'meetingarea-viewer');
 
                     return defer.resolve(savedMeetingArea);
                 }).catch(function (err) {
