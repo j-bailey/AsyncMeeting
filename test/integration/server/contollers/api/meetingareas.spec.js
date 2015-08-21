@@ -39,7 +39,7 @@ var accessToken3,
 var acl = null;
 
 
-describe.only('meeting areas route', function () {
+describe('meeting areas route', function () {
     before(function (done) {
         Acl.init().then(function (aclIns) {
             acl = aclIns;
@@ -366,5 +366,317 @@ describe.only('meeting areas route', function () {
                 })
         });
     });
+    describe('GET \'/\'', function () {
+        it('should return a meeting area', function (done) {
+            user1
+                .get('/api/meetingareas/' + parentMeetingAreaId)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result._id.toString()).to.equal(parentMeetingAreaId.toString());
+                })
+                .end(done);
+        });
+        it('should return a forbidden error', function (done) {
+            user2
+                .get('/api/meetingareas/' + parentMeetingAreaId)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect('Content-Type', /json/)
+                .expect(401)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Not allowed');
+                    expect(result.status).to.equal(401);
+                })
+                .end(done);
+        });
+        it('should return a 403 for an injection attack', function (done) {
+            user1
+                .get('/api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(401)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(res.error.message).to.equal('cannot GET /api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (401)');
+                    expect(result.msg).to.equal('Not allowed');
+                })
+                .end(done);
+        });
+    });
+    describe('POST \'/\'', function () {
+        it('should create a meeting area', function (done) {
+            user1
+                .post('/api/meetingareas')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    title: "New Meeting Area",
+                    description: "New Meeting Area Description"
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result._id).to.not.be.null;
+                    MeetingArea.find({_id: result._id}, function (err, meetingAreas) {
+                        expect(meetingAreas).to.have.length(1);
+                        done();
+                    });
+                });
+        });
+        it('should create multiple meeting areas with the correct hierarchy', function (done) {
+            var expectedAncestors = [],
+                ma1,
+                ma2,
+                ma3;
 
+            user1
+                .post('/api/meetingareas')
+                .send({
+                    title: "New Meeting Area",
+                    description: "New Meeting Area Description",
+                    parentMeetingAreaId: null
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    if (err) {
+                        return done(err);
+                    }
+                    var result = JSON.parse(res.text);
+                    ma1 = result._id;
+                    expect(result._id).to.not.be.null;
+                    MeetingArea.find({$and: [{tenantId: userModel1.tenantId}, {parentMeetingArea: null}]})
+                        .lean()
+                        .exec(function (err, expectedMeetingArea) {
+                            if (err) {
+                                return done(err);
+                            }
+                            expect(expectedMeetingArea.length).to.equal(1);
+                            expect(result.parentMeetingArea).to.equal(expectedMeetingArea[0]._id.toString());
+                            expectedAncestors.push(expectedMeetingArea[0]._id.toString());
+                            expectedAncestors.push(result._id);
+                            expect(result.ancestors.length).to.equal(1);
+                            user1
+                                .post('/api/meetingareas')
+                                .send({
+                                    parentMeetingAreaId: result._id,
+                                    title: "New Meeting Area - 2nd Depth",
+                                    description: "New Meeting Area Description - 2nd Depth"
+                                })
+                                .set('Accept', 'application/json')
+                                .set('Authorization', 'Bearer ' + accessToken1)
+                                .expect('Content-Type', /json/)
+                                .expect(201)
+                                .end(function (err, res) {
+                                    if (err) {
+                                        return done(err);
+                                    }
+                                    var result = JSON.parse(res.text);
+                                    expectedAncestors.push(result._id);
+                                    ma2 = result._id;
+                                    expect(result._id).to.not.be.null;
+                                    expect(result.parentMeetingArea).to.not.be.null;
+                                    expect(result.ancestors.length).to.equal(2);
+                                    user1
+                                        .post('/api/meetingareas')
+                                        .send({
+                                            parentMeetingAreaId: result._id,
+                                            title: "New Meeting Area - 3rd Depth",
+                                            description: "New Meeting Area Description - 3rd Depth"
+                                        })
+                                        .set('Accept', 'application/json')
+                                        .set('Authorization', 'Bearer ' + accessToken1)
+                                        .expect('Content-Type', /json/)
+                                        .expect(201)
+                                        .end(function (err, res) {
+                                            if (err) {
+                                                return done(err);
+                                            }
+                                            var result = JSON.parse(res.text);
+                                            expect(result._id).to.not.be.null;
+                                            ma3 = result._id;
+                                            expect(result.parentMeetingArea).to.not.be.null;
+                                            expect(result.ancestors.length).to.equal(3);
+                                            expect(result.ancestors).to.deep.equal(expectedAncestors);
+                                            expectedAncestors.push(result._id);
+                                            MeetingArea.find({_id: {$in: expectedAncestors}}).lean().exec(function (err, meetingAreas) {
+                                                expect(meetingAreas).to.have.length(expectedAncestors.length);
+                                                done();
+                                            });
+                                        });
+                                });
+
+                        });
+                });
+        });
+        it('should return a forbidden error', function (done) {
+            user2
+                .post('/api/meetingareas')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    title: "New Meeting Area",
+                    description: "New Meeting Area Description"
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect('Content-Type', /json/)
+                .expect(401)
+                .end(function (err, res) {
+                    if (err){
+                        return done(err);
+                    }
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Not allowed');
+                    expect(result.status).to.equal(401);
+                    done();
+                });
+        });
+    });
+    describe('DELETE \'/\'', function () {
+        it('should remove a meeting area', function (done) {
+            user1
+                .delete('/api/meetingareas/' + child2MeetingAreaId)
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(200)
+                .end(function (err, res) {
+                    if (err){
+                        return done(err);
+                    }
+                    MeetingArea.find({_id: child2MeetingAreaId}, function (err, meetingAreas) {
+                        expect(meetingAreas.length).to.be.equal(0);
+                        done();
+                    });
+                });
+        });
+        it('should return a forbidden error for invalid ID', function (done) {
+            user2
+                .delete('/api/meetingareas/' + parentMeetingAreaId + 'a')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect(401)
+                .end(function (err, res) {
+                    if (err){
+                        return done(err);
+                    }
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Not allowed');
+                    expect(result.status).to.equal(401);
+                    done();
+                });
+        });
+        it('should return a forbidden error for unavailable ID', function (done) {
+            user2
+                .delete('/api/meetingareas/a' + parentMeetingAreaId.toString().substring(1))
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect(401)
+                .end(function (err, res) {
+                    if (err){
+                        return done(err);
+                    }
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Not allowed');
+                    expect(result.status).to.equal(401);
+                    done();
+                });
+        });
+        it('should return a forbidden error', function (done) {
+            user2
+                .delete('/api/meetingareas/' + parentMeetingAreaId)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect(401)
+                .end(function (err, res) {
+                    if (err){
+                        return done(err);
+                    }
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Not allowed');
+                    expect(result.status).to.equal(401);
+                    done();
+                });
+        });
+        it('should return a 403 for an injection attack', function (done) {
+            user1
+                .delete('/api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(401)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(res.error.message).to.equal('cannot DELETE /api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (401)');
+                    expect(result.msg).to.equal('Not allowed');
+                })
+                .end(done);
+        });
+    });
+    describe('PUT \'/\'', function () {
+        it('should update a meeting area', function (done) {
+            user1
+                .put('/api/meetingareas/' + parentMeetingAreaId)
+                .send({
+                    title: "New Updated Meeting Area",
+                    description: "New Updated Meeting Area Description"
+                })
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(200)
+                .end(function (err, res) {
+                    if (err){
+                        return done(err);
+                    }
+                    var result = JSON.parse(res.text);
+                    expect(result.title).to.equal("New Updated Meeting Area");
+                    expect(result.description).to.equal("New Updated Meeting Area Description");
+                    MeetingArea.find({_id: parentMeetingAreaId}, function (err, meetingAreas) {
+                        expect(meetingAreas).to.not.be.empty;
+                        expect(meetingAreas[0]._id.toString()).to.equal(parentMeetingAreaId.toString());
+                        expect(meetingAreas[0].title).to.equal("New Updated Meeting Area");
+                        expect(meetingAreas[0].description).to.equal("New Updated Meeting Area Description");
+                        done();
+                    });
+                });
+        });
+        it('should return a forbidden error', function (done) {
+            user2
+                .put('/api/meetingareas/' + parentMeetingAreaId)
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken2)
+                .expect(401)
+                .end(function (err, res) {
+                    if (err){
+                        return done(err);
+                    }
+                    var result = JSON.parse(res.text);
+                    expect(result.msg).to.equal('Not allowed');
+                    expect(result.status).to.equal(401);
+                    done();
+                });
+        });
+        it('should return a 403 for an injection attack', function (done) {
+            user1
+                .put('/api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(401)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(res.error.message).to.equal('cannot PUT /api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (401)');
+                    expect(result.msg).to.equal('Not allowed');
+                })
+                .end(done);
+        });
+    });
 });

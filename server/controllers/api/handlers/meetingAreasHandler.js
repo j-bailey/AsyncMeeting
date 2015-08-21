@@ -304,23 +304,26 @@ module.exports = {
     _removeUserAccess: _removeUserAccess,
     createNewMeetingArea: function (req, res, next) {
         var parentId;
+        var dbConn = req.db;
         if (req.body && req.body.parentMeetingAreaId && req.body.parentMeetingAreaId === 24) {
             return next(new RouteError(400, 'parent meeting area ID is not valid or is missing.  Please provide a valid parent meeting ID.'));
         } else {
             parentId = req.body.parentMeetingAreaId;
         }
 
+
+        var newTenantId = req.session.tenantId,
+            title = req.body.title,
+            description = req.body.description,
+            username = req.session.userId;
+
+        var MeetingArea = dbConn.model('MeetingArea');
         var meetingArea = new MeetingArea({
             title: title,
             description: description,
             parentMeetingArea: parentId ? new ObjectId(parentId) : null,
             tenantId: newTenantId
         });
-
-        var newTenantId = req.session.tenantId,
-            title = req.body.title,
-            description = req.body.description,
-            username = req.session.userId;
         _createMeetingArea(meetingArea, username, req.db).then(function (savedMeetingArea) {
             res.status(201).json(savedMeetingArea);
         }).catch(function (err) {

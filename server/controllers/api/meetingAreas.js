@@ -14,7 +14,7 @@ router.get('/:meetingAreaId',
     secUtils.readOnlyDbConnection, handlers.getMeetingAreaById);
 
 router.post('/',
-    secUtils.isAllowedResourceAccess('parentMeetingArea', true),
+    secUtils.isAllowedResourceAccess('parentMeetingAreaId', true),
     secUtils.determineDbConnection, handlers.createNewMeetingArea);
 
 router.post('/:meetingAreaId/member/:userId',
