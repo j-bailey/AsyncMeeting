@@ -13,6 +13,12 @@
       "maxAge": null
     }
   },
+  "query": {
+    "maxQueryLimit": {
+      "default":100,
+      "meetingArea": 50
+    }
+  },
   "accessToken":{
     "secret": "supersecretkey",
     "timeout": 240,

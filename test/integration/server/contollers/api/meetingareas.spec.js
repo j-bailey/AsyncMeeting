@@ -39,7 +39,7 @@ var accessToken3,
 var acl = null;
 
 
-describe('meeting areas route', function () {
+describe('controller/api/meetingAreas', function () {
     before(function (done) {
         Acl.init().then(function (aclIns) {
             acl = aclIns;
@@ -190,7 +190,7 @@ describe('meeting areas route', function () {
     //});
 
 
-    describe('GET \'/\'', function () {
+    describe('GET \'/\' by query', function () {
         it('should return meeting areas with the given parent id', function (done) {
             user1
                 .get('/api/meetingareas?parentId=' + parentMeetingAreaId)
@@ -205,6 +205,52 @@ describe('meeting areas route', function () {
                 })
                 .end(done);
         });
+        it('should return 2 meeting areas by skip and limit', function (done) {
+            user1
+                .get('/api/meetingareas?parentId=null&skip=2&limit=2')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result).to.have.length(2);
+                    expect(result[0]._id.toString()).to.equal(childMeetingAreaId.toString());
+                    expect(result[1]._id.toString()).to.equal(child2MeetingAreaId.toString());
+                })
+                .end(done);
+        });
+        it('should return 2 meeting areas by skip', function (done) {
+            user1
+                .get('/api/meetingareas?parentId=null&skip=2')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result).to.have.length(2);
+                    expect(result[0]._id.toString()).to.equal(childMeetingAreaId.toString());
+                    expect(result[1]._id.toString()).to.equal(child2MeetingAreaId.toString());
+                })
+                .end(done);
+        });
+        it('should return 2 meeting areas by limit', function (done) {
+            user1
+                .get('/api/meetingareas?parentId=null&limit=2')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result).to.have.length(2);
+                    expect(result[0]._id.toString()).to.equal(firstMeetingAreaId.toString());
+                    expect(result[1]._id.toString()).to.equal(parentMeetingAreaId.toString());
+                })
+                .end(done);
+        });
+
         it('should return meeting areas with the given parent id due to granted access above it', function (done) {
             user1
                 .get('/api/meetingareas?parentId=' + childMeetingAreaId)
@@ -366,7 +412,7 @@ describe('meeting areas route', function () {
                 })
         });
     });
-    describe('GET \'/\'', function () {
+    describe('GET \'/\' by path', function () {
         it('should return a meeting area', function (done) {
             user1
                 .get('/api/meetingareas/' + parentMeetingAreaId)

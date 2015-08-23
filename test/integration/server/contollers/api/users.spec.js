@@ -3,11 +3,10 @@ var Acl = require('../../../../../server/security/acl'),
     request = require('supertest'),
     User,
     usersHandler = require('../../../../../server/controllers/api/handlers/usersHandler'),
-    bcrypt = require('bcrypt-nodejs'),
     db = require('../../../../../server/db');
 
 // Load the models, so they get tied to the DB connections
-require('../../../../../server/models/user')
+require('../../../../../server/models/user');
 
 var userId1 = "",
     accessToken1;
@@ -110,7 +109,7 @@ describe('controller/api/users', function () {
         });
     });
 
-    describe('GET \'/\'', function () {
+    describe('GET \'/\' by path', function () {
         it('should return a user', function (done) {
             user1
                 .get('/api/users/' + userId1)

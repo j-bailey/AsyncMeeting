@@ -4,10 +4,13 @@ var ObjectId = require('mongoose').Types.ObjectId,
     logger = require('winston'),
     Q = require('q'),
     Acl = require('../../../../server/security/acl'),
+    modelUtils = require('../../../models/queryUtils'),
     RouteError = require('./../../../routes/routeError');
 
-var _findAllowedMeetingArea = function (userId, tenantIds, criteria, dbConn) {
+var _findAllowedMeetingArea = function (userId, tenantIds, criteria, requestedSkip, requestedLimit, dbConn) {
     var defer = Q.defer();
+    var skip = requestedSkip || 0;
+    var limit = modelUtils.getMaxQueryLimit('meetingArea', requestedLimit);
     var MeetingArea = dbConn.model('MeetingArea'),
         UserAllowedResources = dbConn.model('UserAllowedResources');
     var tenantIdArray = [];
@@ -38,6 +41,8 @@ var _findAllowedMeetingArea = function (userId, tenantIds, criteria, dbConn) {
                     }
                 ]
             })
+                .skip(skip)
+                .limit(limit)
                 .exec(function (err, meetingAreas) {
                     if (err) {
                         return defer.reject(err);
@@ -203,6 +208,8 @@ module.exports = {
         // TODO: add retrieving only meeting areas the user has access to.
         // Check for parent query parameters.
         var parentId = req.query.parentId;
+        var skip = req.query.skip;
+        var limit = req.query.limit;
         if (parentId === "null") {
             parentId = null;
             //}
@@ -226,7 +233,7 @@ module.exports = {
                     uarObjs.forEach(function (uarObj) {
                         tenantIds.push(uarObj.tenantId);
                     });
-                    _findAllowedMeetingArea(req.session.userDbId, tenantIds, {}, req.db).then(function (meetingAreas) {
+                    _findAllowedMeetingArea(req.session.userDbId, tenantIds, {}, skip, limit, req.db).then(function (meetingAreas) {
                         res.status(200).json(meetingAreas);
                     }).catch(function (err) {
                         next(err);
@@ -243,7 +250,7 @@ module.exports = {
         } else {
             MeetingArea.findOne({_id: parentId}).select('+tenantId').lean().exec(function (err, meetingArea) {
                 _findAllowedMeetingArea(req.session.userDbId, meetingArea.tenantId,
-                    {parentMeetingArea: (new ObjectId(meetingArea._id))}, req.db).then(function (meetingAreas) {
+                    {parentMeetingArea: (new ObjectId(meetingArea._id))}, skip, limit, req.db).then(function (meetingAreas) {
                         res.status(200).json(meetingAreas);
                     }).catch(function (err) {
                         next(err);
