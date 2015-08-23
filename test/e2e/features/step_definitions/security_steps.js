@@ -168,8 +168,7 @@ var steps = function () {
         browser.waitForAngular();
         expect(element(By.className('form-signin-heading')).getText()).to.eventually.equal('Please sign in');
         expect(element(By.className('register')).getText()).to.eventually.equal('Register');
-        expect(element(By.className('login')).getText()).to.eventually.equal('Login');
-        next();
+        expect(element(By.className('login')).getText()).to.eventually.equal('Login').notify(next);
     });
 };
 

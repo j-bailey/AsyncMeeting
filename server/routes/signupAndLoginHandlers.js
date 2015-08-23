@@ -103,7 +103,7 @@ router.post('/signup', function (req, res, next) {
 
         if (!user) {
             logger.debug("res is " + res);
-            return res.status(400).json(info);
+            return res.status(400).json({status:'error', message: info.message});
         }
 
         req.login(user, function (err) {

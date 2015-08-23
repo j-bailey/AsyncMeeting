@@ -83,7 +83,7 @@ acl.init().then(function() {
      */
     var server,
         nEnv = nconf.get('NODE_ENV');
-    if (nEnv === 'development' || nEnv === 'dev-test') {
+    if (!nEnv || nEnv === 'development' || nEnv === 'dev-test') {
         logger.info('Server is running in development mode!');
         server = http.createServer(domainProcessor);
     } else {

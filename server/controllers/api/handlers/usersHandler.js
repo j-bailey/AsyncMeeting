@@ -35,11 +35,12 @@ var createNewSignedUpUser = function (newUser) {
         newUser.save(function (err, savedUser) {
             if (err) {
                 logger.error('Error in Saving user: ' + err);
-                savedTenant.remove(function (err) {
-                    if (err) {
+                savedTenant.remove(function (e) {
+                    if (e) {
                         logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
                     }
                 });
+                return defer.reject(err);
             }
             meetingAreaHandler._createMeetingArea(firstMeetingArea, savedUser.username, db.readWriteConnection, true).then(function () {
                 logger.debug('User Registration successful');

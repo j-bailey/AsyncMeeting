@@ -4,7 +4,7 @@ Feature: Register for an account
   so I can use AsyncMeeting
 
 # TODO need to add an account type to the process
-  @WIP
+  @register @only
   Scenario Outline: Register with valid credentials
     Given System does not have any registration credentials
     And I am at registration point
@@ -17,10 +17,10 @@ Feature: Register for an account
     Then I am offered to login to the system
 
     Examples:
-      | username                      | email                                                   | password                      | description                   |
-      | u                             | u@u.c                                                   | u                             | shortest values               |
-      | abcdefghijklmnopqrstuvxyz     | abcdefghijklmnopqrstuvxyz@abcdefghijklmnopqrstuvxyz.com | abcdefghijklmnopqrstuvxyz     | longest values                |
-      | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | u!$%^&*\|}{'/?`~@user.com                               | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | acceptable special characters |
+      | username                      | email                                                   | password                       | description                   |
+      | u                             | u@u.c                                                   | a                              | shortest values               |
+      | abcdefghijklmnopqrstuvxyz     | abcdefghijklmnopqrstuvxyz@abcdefghijklmnopqrstuvxyz.com | abcdesfghijklmnopqrstuvxy      | longest values                |
+      | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | u!$%^&*\|}{'/?`~@user.com                               | u!a@#$%^&*()\|\]}[{'";:/>?<,`~ | acceptable special characters |
 
 #      TODO Figure out how to handle HTML 5 validation messages
 #  @negative_test
