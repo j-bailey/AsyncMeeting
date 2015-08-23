@@ -11,12 +11,8 @@ var logger = require('winston');
 var db = require('../db');
 require('./tenant');
 require('./userAllowedResources');
-var Tenant = db.readOnlyConnection.model('Tenant');
-var MeetingArea = db.readOnlyConnection.model('MeetingArea');
 var dictValidator = require('../security/dictionary-validator');
 var UserAllowedResources = db.readWriteConnection.model('UserAllowedResources');
-var acl = require('../security/acl'),
-    freeTier = require('../security/resources/free-tier-role');
 
 
 var schema = new mongoose.Schema({
@@ -111,7 +107,7 @@ schema.statics.addAllowedResource = function (userId, tenantId, resourceId, reso
         resourceType: resourceType
     };
     allowedResources = new UserAllowedResources(allowedResources);
-    allowedResources.save(function (err, savedAllowedResources) {
+    allowedResources.save(function (err) {
         if (err) {
             logger.error('Error in Saving allowed resource: ' + err);
             return defer.reject({message: "We're sorry, we could not add an allowed resource at this time!"});

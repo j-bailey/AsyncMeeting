@@ -31,7 +31,8 @@ router.post('/login',
                     });
                 }
             var clientIp = requestIp.getClientIp(req);
-            securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp, req.headers['user-agent'], user._id.toString()).then(function (accessToken) {
+            securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp,
+                req.headers['user-agent'], user._id.toString()).then(function (accessToken) {
                 res.json({
                     user: user, access_token: accessToken,
                     permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
@@ -69,7 +70,8 @@ router.post('/email-login',
             logger.debug("Getting accessToken");
             logger.debug('User = ' + JSON.stringify(user));
             var clientIp = requestIp.getClientIp(req);
-            securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp, req.headers['user-agent'], user._id.toString()).then(function (accessToken) {
+            securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp,
+                req.headers['user-agent'], user._id.toString()).then(function (accessToken) {
                 res.json({
                     user: user, access_token: accessToken,
                     permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']

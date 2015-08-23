@@ -23,7 +23,7 @@ describe('meeting area route', function () {
     });
 
     describe('getMeetingAreasWithParentId', function () {
-        it('should return a meeting area', function (done) {
+        it.only('should return a meeting area', function (done) {
             var parentMeetingArea = new MeetingArea({
                 title: "Parent Meeting Area Title",
                 description: "Parent Meeting Area Description"

@@ -4,7 +4,6 @@ var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
-var logger = require('winston');
 var db = require('../db');
 
 var schema = new mongoose.Schema({

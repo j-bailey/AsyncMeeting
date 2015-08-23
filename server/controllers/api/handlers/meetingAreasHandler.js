@@ -28,14 +28,16 @@ var _findAllowedMeetingArea = function (userId, tenantIds, criteria, dbConn) {
             allowedResources.forEach(function (allowedResource) {
                 allowedArray.push(allowedResource.resourceId);
             });
-            MeetingArea.find({$and:[criteria,
+            MeetingArea.find({
+                $and: [criteria,
                     {
                         $or: [
                             {ancestors: {$in: allowedArray}},
                             {_id: {$in: allowedArray}}
                         ]
                     }
-                ]})
+                ]
+            })
                 .exec(function (err, meetingAreas) {
                     if (err) {
                         return defer.reject(err);
@@ -80,12 +82,13 @@ var _grantUserAccess = function (allowedUserId, resourceTenantId, resourceId, pe
                                 acl.addUserRoles(userObj.username, 'meetingarea-admin-' + resourceId);
                             } else {
                                 logger.error('Got bad permission "' + permission + '" while granting user access to meeting area');
-                                return next(new RouteError(400, 'Invalid permission'));
+                                return defer.reject(new RouteError(400, 'Invalid permission'));
                             }
-                            defer.resolve();
+                            return defer.resolve();
                         }).catch(function (err) {
-                            defer.reject(new RouteError());
-                        })
+                            logger.debug(err);
+                            return defer.reject(new RouteError());
+                        });
                 });
         });
     return defer.promise;
@@ -94,42 +97,31 @@ var _grantUserAccess = function (allowedUserId, resourceTenantId, resourceId, pe
 var _removeUserAccess = function (resourceId, allowedUserId, permission, dbConn) {
     var defer = Q.defer();
 
-    var User = dbConn.model('User'),
-        MeetingArea = dbConn.model('MeetingArea');
-
-    MeetingArea.findById(resourceId)
-        .select('+tenantId')
+    var User = dbConn.model('User');
+    User.findById(allowedUserId)
         .lean()
-        .exec(function (err, meetingArea) {
+        .exec(function (err, userObj) {
             if (err) {
                 logger.debug(err);
                 return defer.reject(new RouteError());
             }
-            User.findById(allowedUserId)
-                .lean()
-                .exec(function (err, userObj) {
-                    if (err) {
-                        logger.debug(err);
-                        return defer.reject(new RouteError());
+            User.removeAllowedResource(allowedUserId, resourceId, User.MEETING_AREA_RESOURCE_TYPE)
+                .then(function () {
+                    var acl = Acl.getAcl();
+                    if (permission === 'viewer') {
+                        acl.removeUserRoles(userObj.username, 'meetingarea-viewer-' + resourceId);
+                    } else if (permission === 'editor') {
+                        acl.removeUserRoles(userObj.username, 'meetingarea-editor-' + resourceId);
+                    } else if (permission === 'admin') {
+                        acl.removeUserRoles(userObj.username, 'meetingarea-admin-' + resourceId);
+                    } else {
+                        logger.error('Got bad permission "' + permission + '" while granting user access to meeting area');
+                        return defer.reject(new RouteError(400, 'Invalid permission'));
                     }
-                    User.removeAllowedResource(allowedUserId, resourceId, User.MEETING_AREA_RESOURCE_TYPE)
-                        .then(function () {
-                            var acl = Acl.getAcl();
-                            if (permission === 'viewer') {
-                                acl.removeUserRoles(userObj.username, 'meetingarea-viewer-' + resourceId);
-                            } else if (permission === 'editor') {
-                                acl.removeUserRoles(userObj.username, 'meetingarea-editor-' + resourceId);
-                            } else if (permission === 'admin') {
-                                acl.removeUserRoles(userObj.username, 'meetingarea-admin-' + resourceId);
-                            } else {
-                                logger.error('Got bad permission "' + permission + '" while granting user access to meeting area');
-                                return defer.reject(new RouteError(400, 'Invalid permission'));
-                            }
-                            defer.resolve();
-                        }).catch(function (err) {
-                            logger.error(err);
-                            return defer.reject(new RouteError());
-                        })
+                    defer.resolve();
+                }).catch(function (err) {
+                    logger.error(err);
+                    return defer.reject(new RouteError());
                 });
         });
     return defer.promise;
@@ -142,63 +134,66 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn, myFirstMeetin
     User.findOne({username: ownerName})
         .select('+tenantId')
         .lean().exec(function (err, user) {
-            if (err){
-                logger.error(err);
-                return defer.reject(new RouteError(500, 'Internal server issue'));
-            }
-        MeetingArea.find({$or: [{_id: meetingArea.parentMeetingArea},
-                {
-                    $and: [
-                        {parentMeetingArea: null},
-                        {tenantId: user.tenantId},
-                        {ancestors: []}
-                        ]
-                }
-            ]})
-            .sort('-parentMeetingArea')
-            .select('+tenantId').lean().exec(function (err, parentMeetingArea) {
             if (err) {
                 logger.error(err);
                 return defer.reject(new RouteError(500, 'Internal server issue'));
             }
-            if (parentMeetingArea === null || parentMeetingArea.length === 0) {
-                if (myFirstMeetingArea){
-                    meetingArea.tenantId = user.tenantId;
-                    meetingArea.parentMeetingArea = null;
-                } else {
-                    logger.error('Need user Tenant Id to create a new meeting area');
-                    return defer.reject(new RouteError());
-                }
-            } else {
-                meetingArea.tenantId = parentMeetingArea[0].tenantId;
-                meetingArea.parentMeetingArea = parentMeetingArea[0]._id;
-            }
-            meetingArea.save(function (err, savedMeetingArea) {
-                if (err) {
-                    logger.error("Error saving meeting area: " + err.message);
-                    return defer.reject(err);
-                }
-                User.addAllowedResource(user._id, savedMeetingArea.tenantId, savedMeetingArea._id, 'MeetingArea').then(function (response, err) {
-                    if (err) {
-                        logger.error("Error saving meeting area: " + err.message);
-                        savedMeetingArea.remove();
-                        return defer.reject(err);
+            MeetingArea.find({
+                $or: [{_id: meetingArea.parentMeetingArea},
+                    {
+                        $and: [
+                            {parentMeetingArea: null},
+                            {tenantId: user.tenantId},
+                            {ancestors: []}
+                        ]
                     }
-                    var acl = Acl.getAcl();
-                    acl.allow('meetingarea-creator-' + savedMeetingArea._id, '/api/meetingareas/' + savedMeetingArea._id, '*');
-                    acl.addUserRoles(user.username, 'meetingarea-creator-' + savedMeetingArea._id);
-                    acl.allow('meetingarea-viewer', '/api/meetingareas', 'get');
-                    acl.addUserRoles(user.username, 'meetingarea-viewer');
+                ]
+            })
+                .sort('-parentMeetingArea')
+                .select('+tenantId').lean().exec(function (err, parentMeetingArea) {
+                    if (err) {
+                        logger.error(err);
+                        return defer.reject(new RouteError(500, 'Internal server issue'));
+                    }
+                    if (parentMeetingArea === null || parentMeetingArea.length === 0) {
+                        if (myFirstMeetingArea) {
+                            meetingArea.tenantId = user.tenantId;
+                            meetingArea.parentMeetingArea = null;
+                        } else {
+                            logger.error('Need user Tenant Id to create a new meeting area');
+                            return defer.reject(new RouteError());
+                        }
+                    } else {
+                        meetingArea.tenantId = parentMeetingArea[0].tenantId;
+                        meetingArea.parentMeetingArea = parentMeetingArea[0]._id;
+                    }
+                    meetingArea.save(function (err, savedMeetingArea) {
+                        if (err) {
+                            logger.error("Error saving meeting area: " + err.message);
+                            return defer.reject(err);
+                        }
+                        User.addAllowedResource(user._id, savedMeetingArea.tenantId,
+                            savedMeetingArea._id, 'MeetingArea').then(function (response, err) {
+                            if (err) {
+                                logger.error("Error saving meeting area: " + err.message);
+                                savedMeetingArea.remove();
+                                return defer.reject(err);
+                            }
+                            var acl = Acl.getAcl();
+                            acl.allow('meetingarea-creator-' + savedMeetingArea._id, '/api/meetingareas/' + savedMeetingArea._id, '*');
+                            acl.addUserRoles(user.username, 'meetingarea-creator-' + savedMeetingArea._id);
+                            acl.allow('meetingarea-viewer', '/api/meetingareas', 'get');
+                            acl.addUserRoles(user.username, 'meetingarea-viewer');
 
-                    return defer.resolve(savedMeetingArea);
-                }).catch(function (err) {
-                    logger.error("Error saving meeting area: " + err.message);
-                    savedMeetingArea.remove();
-                    return defer.reject(err);
+                            return defer.resolve(savedMeetingArea);
+                        }).catch(function (err) {
+                            logger.error("Error saving meeting area: " + err.message);
+                            savedMeetingArea.remove();
+                            return defer.reject(err);
+                        });
+                    });
                 });
-            });
         });
-    });
     return defer.promise;
 };
 
@@ -247,12 +242,12 @@ module.exports = {
             //    });
         } else {
             MeetingArea.findOne({_id: parentId}).select('+tenantId').lean().exec(function (err, meetingArea) {
-                var User = req.db.model('User');
-                _findAllowedMeetingArea(req.session.userDbId, meetingArea.tenantId, {parentMeetingArea: (new ObjectId(meetingArea._id))}, req.db).then(function (meetingAreas) {
-                    res.status(200).json(meetingAreas);
-                }).catch(function (err) {
-                    next(err);
-                });
+                _findAllowedMeetingArea(req.session.userDbId, meetingArea.tenantId,
+                    {parentMeetingArea: (new ObjectId(meetingArea._id))}, req.db).then(function (meetingAreas) {
+                        res.status(200).json(meetingAreas);
+                    }).catch(function (err) {
+                        next(err);
+                    });
             });
         }
     },
@@ -287,7 +282,7 @@ module.exports = {
             res.status(200).json();
         }).catch(function (err) {
             return next(err);
-        })
+        });
     },
     _grantUserAccess: _grantUserAccess,
     removeUserAccess: function (req, res, next) {

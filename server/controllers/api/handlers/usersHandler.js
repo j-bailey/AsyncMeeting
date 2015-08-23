@@ -3,8 +3,6 @@
 var logger = require('winston');
 var db = require('../../../../server/db');
 var Q = require('q');
-var acl = require('../../../security/acl'),
-    freeTier = require('../../../security/resources/free-tier-role');
 var meetingAreaHandler = require('../../../../server/controllers/api/handlers/meetingAreasHandler');
 
 
@@ -12,7 +10,6 @@ var createNewSignedUpUser = function (newUser) {
     var defer = Q.defer();
     var Tenant = db.readOnlyConnection.model('Tenant');
     var MeetingArea = db.readOnlyConnection.model('MeetingArea');
-    var UserAllowedResources = db.readWriteConnection.model('UserAllowedResources');
     var newTenantName = Tenant.createPersonalTenantName(newUser.username);
     var newTenant = new Tenant({
         name: newTenantName,
@@ -42,15 +39,9 @@ var createNewSignedUpUser = function (newUser) {
                     if (err) {
                         logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
                     }
-                    savedArea.remove(function (err) {
-                        if (err) {
-                            logger.error('Unable to delete Meeting Area for new user with ID: ' + savedTenant._id);
-                        }
-                        return defer.reject({message: "We're sorry, we could not create your account at this time!"});
-                    });
                 });
             }
-            meetingAreaHandler._createMeetingArea(firstMeetingArea, savedUser.username, db.readWriteConnection, true).then(function (savedItem) {
+            meetingAreaHandler._createMeetingArea(firstMeetingArea, savedUser.username, db.readWriteConnection, true).then(function () {
                 logger.debug('User Registration successful');
                 db.readOnlyConnection.model('User').findById(savedUser._id).lean().exec(function (err, safeUser) {
                     if (err) {
@@ -59,12 +50,7 @@ var createNewSignedUpUser = function (newUser) {
                             if (err) {
                                 logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
                             }
-                            savedArea.remove(function (err) {
-                                if (err) {
-                                    logger.error('Unable to delete Meeting Area for new user with ID: ' + savedTenant._id);
-                                }
-                                return defer.reject({message: "We're sorry, we could not create your account at this time!"});
-                            });
+                            // TODO need better clean up
                         });
                     }
                     defer.resolve(safeUser);

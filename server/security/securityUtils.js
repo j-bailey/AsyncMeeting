@@ -145,9 +145,9 @@ module.exports = {
                 return next(new RouteError(401, 'Not allowed', false));
             }
             if (req.query && (req.query[resourceKey] || req.query[resourceKey] === null)) {
-                resourceId = req.query[resourceKey]
+                resourceId = req.query[resourceKey];
             } else if (req.body && (req.body[resourceKey] || req.body[resourceKey] === null)) {
-                resourceId = req.body[resourceKey]
+                resourceId = req.body[resourceKey];
             } else if (req.params && (req.params[resourceKey] || req.params[resourceKey] === null)) {
                 resourceId = req.params[resourceKey];
             } else {
@@ -225,7 +225,8 @@ module.exports = {
                                         if (allowedResources && allowedResources.length > 0) {
                                             if (meetingArea.parentMeetingArea === null) {
                                                 controlledResource = req.baseUrl + '/' + meetingArea._id.toString();
-                                                acl.isAllowed(req.session.userId, controlledResource, req.method.toLowerCase(), function (err, allow) {
+                                                acl.isAllowed(req.session.userId,
+                                                    controlledResource, req.method.toLowerCase(), function (err, allow) {
                                                     if (err) {
                                                         logger.error(err);
                                                         return next(err);
@@ -241,7 +242,8 @@ module.exports = {
                                                     meetingArea.ancestors.forEach(function (ancestor) {
                                                         if (allowedResource.resourceId.toString() === ancestor.toString()) {
                                                             controlledResource = req.baseUrl + '/' + ancestor.toString();
-                                                            acl.isAllowed(req.session.userId, controlledResource, req.method.toLowerCase(), function (err, allow) {
+                                                            acl.isAllowed(req.session.userId, controlledResource,
+                                                                req.method.toLowerCase(), function (err, allow) {
                                                                 if (err) {
                                                                     logger.error(err);
                                                                     return next(err);
@@ -260,7 +262,7 @@ module.exports = {
                                         } else {
                                             return next(new RouteError(401, 'Not allowed', false));
                                         }
-                                    })
+                                    });
                             });
                     } else {
                         return next(new RouteError(401, 'Not allowed', false));
