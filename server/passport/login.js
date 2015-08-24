@@ -3,12 +3,15 @@
 var LocalStrategy = require('passport-local').Strategy;
 var db = require('../db');
 var User = db.readOnlyConnection.model('User');
-var bCrypt = require('bcrypt-nodejs');
 var logger = require('winston');
+var scrypt = require("scrypt");
+
+scrypt.verify.config.keyEncoding = "utf8";
+scrypt.verify.config.hashEncoding = "hex";
 
 module.exports = function(passport) {
     var isValidPassword = function(user, password) {
-        return bCrypt.compareSync(password, user.password);
+        return scrypt.verify(user.password, password);
     };
 
     passport.use('login', new LocalStrategy({

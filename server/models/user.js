@@ -6,13 +6,24 @@ var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 var tenantInfo = require('./plugins/tenantInfo');
 var Q = require('q');
-var bcrypt = require('bcrypt');
+var scrypt = require('scrypt');
 var logger = require('winston');
+var nconf = require('nconf');
 var db = require('../db');
 require('./tenant');
 require('./userAllowedResources');
 var dictValidator = require('../security/dictionary-validator');
 var UserAllowedResources = db.readWriteConnection.model('UserAllowedResources');
+
+var scryptParams = null;
+try{
+    scryptParams = scrypt.params(nconf.get('security:scrypt:maxtime'), nconf.get('security:scrypt:maxmem'), nconf.get('security:scrypt:maxmemfrac'));
+    //scrypt.hash.config.keyEncoding = "ascii";
+    scrypt.hash.config.keyEncoding = "utf8";
+    scrypt.hash.config.outputEncoding = "hex";
+} catch (e) {
+    logger.error(e);
+}
 
 
 var schema = new mongoose.Schema({
@@ -35,10 +46,16 @@ schema.pre('validate', function (next) {
     if (dictValidator.isImproper(this.username, this.password)) {
         next(new Error('Either the password cannot contain your username or be on the list of commonly used passwords.'));
     }
-    bcrypt.hash(user.password, 12, function (err, hash) {
+    if (scryptParams === null) {
+        logger.error('Scrypt parameters are null.');
+        return next(new Error('Internal error'));
+    }
+    var N = nconf.get('security:scrypt:N'),
+        r = nconf.get('security:scrypt:r'),
+        p = nconf.get('security:scrypt:p');
+    scrypt.hash(user.password, {N: N, r: r, p: p} , function (err, hash) {
         if (err) {
-            next(err);
-            return;
+            return next(err);
         }
         user.password = hash;
         next();

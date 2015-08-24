@@ -1,4 +1,15 @@
 {
+  "security": {
+    "scrypt": {
+      "maxtime": 1.0,
+      "maxmem": 0,
+      "maxmemfrac": 0.5,
+      "defaultSaltSize": 32,
+      "N": 1,
+      "r": 1,
+      "p": 1
+    }
+  },
   "session": {
     "secret": "b1bce56042e44bb7c491e03d4142b652",
     "timeout": "120",
