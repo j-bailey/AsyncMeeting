@@ -1,7 +1,7 @@
 var router = require('express').Router();
 var handlers = require('./handlers/usersHandler');
 var acl = require('../../security/acl').getAcl();
-var secUtils = require('../../security/securityUtils');
+var secUtils = require('../../utils/securityUtils');
 
 
 router.get('/invalidPassword/:password', secUtils.readOnlyDbConnection, handlers.isInvalidPassword);

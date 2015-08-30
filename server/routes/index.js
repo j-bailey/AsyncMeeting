@@ -1,7 +1,7 @@
 "use strict";
 
 var router = require('express').Router(),
-    routerUtils = require('./routerUtils'),
+    routerUtils = require('./../utils/routerUtils'),
     passport = require('passport'),
     bodyParser = require('body-parser');
 

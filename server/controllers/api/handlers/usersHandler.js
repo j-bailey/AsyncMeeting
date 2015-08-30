@@ -4,9 +4,9 @@ var logger = require('winston');
 var db = require('../../../../server/db');
 var Q = require('q');
 var meetingAreaHandler = require('../../../../server/controllers/api/handlers/meetingAreasHandler');
-var secUtils = require('../../../../server/security/securityUtils');
+var secUtils = require('../../../utils/securityUtils');
 var jsonResponse = require('../../../utils/jsonResponseWrapper');
-var handlerUtils = require('./handlerUtils');
+var handlerUtils = require('./../../../utils/handlerUtils');
 
 
 var createNewSignedUpUser = function (newUser) {

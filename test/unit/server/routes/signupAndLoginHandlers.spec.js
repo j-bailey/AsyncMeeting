@@ -40,10 +40,10 @@ describe.skip('routes/static', function () {
         passportStub.withArgs('email-login').returns('email-login');
         jwtStub = sandbox.stub(require('jwt-simple'), 'encode');
         jwtStub.returns('jwtEncoded');
-        var ss = require('../../../../server/security/securityUtils');
+        var ss = require('../../../../server/utils/securityUtils');
         securityUtilsGetTokenStub = sandbox.stub(ss, 'generateAccessToken');
         securityUtilsGetTokenStub.returns('bigToken');
-        securityUtilsReleaseTokenStub = sandbox.stub(require('../../../../server/security/securityUtils'), 'releaseAccessToken');
+        securityUtilsReleaseTokenStub = sandbox.stub(require('../../../../server/utils/securityUtils'), 'releaseAccessToken');
         UserStub = sandbox.stub(User, 'findPublicUserById');
         UserThenSpy = sandbox.spy();
         UserStub.returns({then:UserThenSpy});

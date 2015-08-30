@@ -2,7 +2,7 @@
 
 var logger = require('winston');
 var nconf = require('nconf');
-var jsonResponse = require('../utils/jsonResponseWrapper');
+var jsonResponse = require('./jsonResponseWrapper');
 
 
 function handleJsonErrorResponse(err, req, res) {

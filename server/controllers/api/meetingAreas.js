@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var handlers = require('./handlers/meetingAreasHandler');
-var secUtils = require('../../security/securityUtils');
+var secUtils = require('../../utils/securityUtils');
 
 
 router.get("/",

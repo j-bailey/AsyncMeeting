@@ -42,7 +42,7 @@ describe('security/securityUtils', function () {
             clock = sinon.useFakeTimers(new Date(2011, 9, 1).getTime());
             new Date(); //=> return the fake Date 'Sat Oct 01 2011 00:00:00'
 
-            var securityUtils = require('../../../../server/security/securityUtils');
+            var securityUtils = require('../../../../server/utils/securityUtils');
             securityUtils.generateAccessToken(identity, '1234232344', [], '127.0.0.1', 'firefox', 'aaa').then(function (accessToken, err) {
                 expect(err).to.be.undefined;
                 new Date(); //=> will return the real time again (now)
@@ -74,7 +74,7 @@ describe('security/securityUtils', function () {
             clock = sinon.useFakeTimers(new Date(2011, 9, 1).getTime());
             new Date(); //=> return the fake Date 'Sat Oct 01 2011 00:00:00'
 
-            var securityUtils = require('../../../../server/security/securityUtils');
+            var securityUtils = require('../../../../server/utils/securityUtils');
             securityUtils.generateAccessToken(identity, [], '127.0.0.1', 'firefox', 'aaa').catch(function (err) {
                 expect(err.message).to.equal('Unable to create token');
                 errorLogSpy.args[0][0].should.equal('Failed to create JWT token');
@@ -94,7 +94,7 @@ describe('security/securityUtils', function () {
             //redisClientSpies.get.returns(identity);
             //redisGetClientStub.returns(redisClientSpies);
 
-            var securityUtils = require('../../../../server/security/securityUtils');
+            var securityUtils = require('../../../../server/utils/securityUtils');
             securityUtils.releaseAccessToken(accessToken);
 
             //redisClientSpies.del.args[0][0].should.equal('ACCESS-TOKEN:' + accessToken);
@@ -113,7 +113,7 @@ describe('security/securityUtils', function () {
 
             jwtStub.returns({clientIp:'1.1.1.1', userAgent: 'firefox'});
 
-            var securityUtils = require('../../../../server/security/securityUtils');
+            var securityUtils = require('../../../../server/utils/securityUtils');
             securityUtils.isValidToken(token, '1.1.1.1', 'firefox').then(function (result, err) {
                 expect(err).to.be.undefined;
 
@@ -131,7 +131,7 @@ describe('security/securityUtils', function () {
 
             jwtStub.returns({clientIp:'1.1.1.1', userAgent: 'firefox'});
 
-            var securityUtils = require('../../../../server/security/securityUtils');
+            var securityUtils = require('../../../../server/utils/securityUtils');
             securityUtils.isValidToken(token, '1.1.1.1', 'firefox').then(function (result, err) {
                 expect(err).to.be.undefined;
 
@@ -149,7 +149,7 @@ describe('security/securityUtils', function () {
 
             jwtStub.returns({clientIp:'1.1.1.1', userAgent: 'firefox'});
 
-            var securityUtils = require('../../../../server/security/securityUtils');
+            var securityUtils = require('../../../../server/utils/securityUtils');
             securityUtils.isValidToken(token, '1.1.1.1', 'firefox').then(function (result, err) {
                 expect(err).to.be.undefined;
 
@@ -160,7 +160,7 @@ describe('security/securityUtils', function () {
         it('should log and throw an error when a token is not provided', function (done) {
             var token = undefined;
 
-            var securityUtils = require('../../../../server/security/securityUtils');
+            var securityUtils = require('../../../../server/utils/securityUtils');
             securityUtils.isValidToken(token, '1.1.1.1', 'firefox').catch(function (err) {
                 expect(err).to.equal('Need a token for isValidToken');
                 errorLogSpy.args[0][0].should.equal('Need a token for isValidToken');
@@ -175,7 +175,7 @@ describe('security/securityUtils', function () {
 
                 jwtStub.throws(new Error('Dummy error'));
 
-            var securityUtils = require('../../../../server/security/securityUtils');
+            var securityUtils = require('../../../../server/utils/securityUtils');
             securityUtils.isValidToken(token, '1.1.1.1', 'firefox').catch(function (err) {
                 expect(err.message).to.equal('Failed to verify token');
                 errorLogSpy.args[0][0].should.equal('Failed to verify token for clientIp ' + clientIp);

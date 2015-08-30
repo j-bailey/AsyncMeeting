@@ -4,9 +4,9 @@ var ObjectId = require('mongoose').Types.ObjectId,
     logger = require('winston'),
     Q = require('q'),
     Acl = require('../../../../server/security/acl'),
-    modelUtils = require('../../../models/queryUtils'),
+    modelUtils = require('../../../utils/queryUtils'),
     jsonResponse = require('../../../utils/jsonResponseWrapper'),
-    handlerUtils = require('./handlerUtils'),
+    handlerUtils = require('./../../../utils/handlerUtils'),
     RouteError = require('./../../../routes/routeError');
 
 var _findAllowedMeetingArea = function (userId, tenantIds, criteria, requestedSkip, requestedLimit, dbConn) {

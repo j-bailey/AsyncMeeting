@@ -6,7 +6,7 @@ var acl = require('../security/acl').getAcl(),
     jwt = require('jsonwebtoken'),
     db = require('../db'),
     RouteError = require('../routes/routeError'),
-    dictValidator = require('./dictionary-validator'),
+    dictValidator = require('./../security/dictionary-validator'),
     Q = require('q');
 
 var releaseTokenCache = {};

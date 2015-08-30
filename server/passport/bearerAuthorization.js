@@ -3,7 +3,7 @@
 var BearerStrategy = require('passport-http-bearer').Strategy,
     logger = require('winston'),
     requestIp = require('request-ip'),
-    securityUtils = require('../security/securityUtils');
+    securityUtils = require('../utils/securityUtils');
 
 module.exports = function (passport) {
 // Use the BearerStrategy within Passport.

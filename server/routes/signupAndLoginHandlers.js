@@ -3,7 +3,7 @@
 var db = require('../db'),
     router = require('express').Router(),
     passport = require('passport'),
-    securityUtils = require('../security/securityUtils'),
+    securityUtils = require('../utils/securityUtils'),
     UserModel = db.readOnlyConnection.model('User'),
     requestIp = require('request-ip'),
     logger = require('winston');
