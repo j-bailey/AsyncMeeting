@@ -36,6 +36,20 @@ var schema = new mongoose.Schema({
     roles: [{type: mongoose.Schema.Types.ObjectId, ref: 'Role'}]
 });
 
+var invalidUsernameMessage = 'Cannot contain ":::" at the beginning or end of the username, must 3-20 character long, ' +
+    'can contain alphanumeric characters and the following: . @ # $ %';
+
+var isInvalidUsername = function(username){
+    if (new RegExp('(^((?=.*^[^:::])(?=.*[^:::]$))(?=.*\\d|[a-z]|[A-Z]|[.@#$%]).{3,20}$)').test(username)) {
+        return false;
+    } else {
+        return invalidUsernameMessage;
+    }
+};
+
+schema.path('username').validate(function (value) {
+    return (!(isInvalidUsername(value)));
+}, invalidUsernameMessage);
 
 schema.pre('validate', function (next) {
     var user = this;
@@ -94,13 +108,7 @@ schema.statics.findPublicUserByEmail = function (email) {
     return defer.promise;
 };
 
-schema.statics.isInvalidUsername = function(username){
-    if (new RegExp('(^((?=.*^[^:::])(?=.*[^:::]$))(?=.*\\d|[a-z]|[A-Z]|[.@#$%]).{5,20}$)').test(username)) {
-        return false;
-    } else {
-        return 'Cannot contain ":::" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %';
-    }
-};
+schema.statics.isInvalidUsername = isInvalidUsername;
 
 schema.statics.quickFind = function (searchCriteria) {
     var defer = Q.defer();

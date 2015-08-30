@@ -172,7 +172,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
@@ -185,7 +185,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
@@ -198,20 +198,20 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
         it('should return error message for not enough characters', function (done) {
             user1
-                .get('/api/users/invalidUsername/' + 'Hell')
+                .get('/api/users/invalidUsername/' + 'He')
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
@@ -224,7 +224,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
