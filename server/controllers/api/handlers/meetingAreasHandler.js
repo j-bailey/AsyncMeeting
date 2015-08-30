@@ -4,15 +4,16 @@ var ObjectId = require('mongoose').Types.ObjectId,
     logger = require('winston'),
     Q = require('q'),
     Acl = require('../../../../server/security/acl'),
-    modelUtils = require('../../../utils/queryUtils'),
+    queryUtils = require('../../../utils/queryUtils'),
     jsonResponse = require('../../../utils/jsonResponseWrapper'),
-    handlerUtils = require('./../../../utils/handlerUtils'),
-    RouteError = require('./../../../routes/routeError');
+    handlerUtils = require('../../../utils/handlerUtils'),
+    modelUtils = require('../../../utils/modelUtils'),
+    RouteError = require('../../../routes/routeError');
 
 var _findAllowedMeetingArea = function (userId, tenantIds, criteria, requestedSkip, requestedLimit, dbConn) {
     var defer = Q.defer();
     var skip = requestedSkip || 0;
-    var limit = modelUtils.getMaxQueryLimit('meetingArea', requestedLimit);
+    var limit = queryUtils.getMaxQueryLimit('meetingArea', requestedLimit);
     var MeetingArea = dbConn.model('MeetingArea'),
         UserAllowedResources = dbConn.model('UserAllowedResources');
     var tenantIdArray = [];
@@ -218,9 +219,8 @@ module.exports = {
                 //}
                 //else if (parentId === null) {
                 //    return next("Error: query parameter for parentId must be specified!");
-            } else if (parentId && parentId.length !== 24) {
-                return next(handlerUtils.catchError(null, "Error: parentId is not correct!", 400));
             }
+            modelUtils.throwErrorIfNotObjectId(parentId, true);
             var MeetingArea = req.db.model('MeetingArea');
             var UserAllowedResources = req.db.model('UserAllowedResources');
             if (parentId === null) {
@@ -265,14 +265,13 @@ module.exports = {
     },
     getMeetingAreaById: function (req, res, next) {
         try {
-            if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
-                return next(handlerUtils.catchError(null, "Error: meetingAreaId is not valid or is missing!", 400));
-            }
             var MeetingArea = req.db.model('MeetingArea'),
                 userTenantId = req.session.tenantId;
 
+            modelUtils.throwErrorIfNotObjectId(req.params.meetingAreaId, false, 'Need a valid Meeting Area ID');
+            var meetingAreaId = req.params.meetingAreaId;
             // TODO: add retrieving only meeting areas the user has access to.
-            MeetingArea.findOne({_id: req.params.meetingAreaId})
+            MeetingArea.findOne({_id: meetingAreaId})
                 .select('tenantId')
                 .exec(function (err, meetingArea) {
                     if (err) {
@@ -293,6 +292,10 @@ module.exports = {
                 resourceId = req.params.meetingAreaId,
                 permission = req.body.permission,
                 dbConn = req.db;
+
+            modelUtils.throwErrorIfNotObjectId(allowedUserId);
+            modelUtils.throwErrorIfNotObjectId(resourceId);
+
             _grantUserAccess(allowedUserId, resourceTenantId, resourceId, permission, dbConn).then(function () {
                 res.status(200).json(jsonResponse.successResponse({}));
             }).catch(function (err) {
@@ -309,6 +312,10 @@ module.exports = {
                 resourceId = req.params.meetingAreaId,
                 permission = req.body.permission,
                 dbConn = req.db;
+
+            modelUtils.throwErrorIfNotObjectId(allowedUserId);
+            modelUtils.throwErrorIfNotObjectId(resourceId);
+
             _removeUserAccess(resourceId, allowedUserId, permission, dbConn).then(function () {
                 res.status(200).json(jsonResponse.successResponse({}));
             }).catch(function (err) {
@@ -323,13 +330,11 @@ module.exports = {
         try {
             var parentId;
             var dbConn = req.db;
-            if (req.body && req.body.parentMeetingAreaId && req.body.parentMeetingAreaId === 24) {
-                return next(handlerUtils.catchError(null, "parent meeting area ID is not valid or is missing.  ' +" +
-                    "Please provide a valid parent meeting ID.", 400));
-            } else {
-                parentId = req.body.parentMeetingAreaId;
-            }
 
+            modelUtils.throwErrorIfNotObjectId((req.body)?req.body.parentMeetingAreaId: '', true, "parent meeting area ID is not valid or is missing.  ' +" +
+                "Please provide a valid parent meeting ID.");
+
+            parentId = req.body.parentMeetingAreaId;
 
             var newTenantId = req.session.tenantId,
                 title = req.body.title,
@@ -355,14 +360,14 @@ module.exports = {
     _createMeetingArea: _createMeetingArea,
     updateMeetingAreaById: function (req, res, next) {
         try {
-            if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
-                return next(handlerUtils.catchError(null, "Error: meetingAreaId is not valid or is missing!", 400));
-            }
-
             var meetingAreaObj = req.body;
             delete meetingAreaObj.parentMeetingArea;
             delete meetingAreaObj.__id;
-            var search = {_id: req.params.meetingAreaId};
+
+            var meetingAreaId = req.params.meetingAreaId;
+            modelUtils.throwErrorIfNotObjectId(meetingAreaId);
+
+            var search = {_id: meetingAreaId};
             var update = meetingAreaObj;
             var options = {new: true};
 
@@ -383,9 +388,7 @@ module.exports = {
     },
     deleteMeetingAreaById: function (req, res, next) {
         try {
-            if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
-                return next(handlerUtils.catchError(null, "Error: meetingAreaId is not valid or is missing!", 400));
-            }
+            modelUtils.throwErrorIfNotObjectId(req.params.meetingAreaId, false, 'Error: meetingAreaId is not valid or is missing!');
 
             var MeetingArea = req.db.model('MeetingArea');
             MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function (err) {

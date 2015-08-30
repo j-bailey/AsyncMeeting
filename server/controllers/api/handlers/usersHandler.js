@@ -1,12 +1,13 @@
 "use strict";
 
-var logger = require('winston');
-var db = require('../../../../server/db');
-var Q = require('q');
-var meetingAreaHandler = require('../../../../server/controllers/api/handlers/meetingAreasHandler');
-var secUtils = require('../../../utils/securityUtils');
-var jsonResponse = require('../../../utils/jsonResponseWrapper');
-var handlerUtils = require('./../../../utils/handlerUtils');
+var logger = require('winston'),
+    db = require('../../../../server/db'),
+    Q = require('q'),
+    meetingAreaHandler = require('../../../../server/controllers/api/handlers/meetingAreasHandler'),
+    secUtils = require('../../../utils/securityUtils'),
+    jsonResponse = require('../../../utils/jsonResponseWrapper'),
+    modelUtils = require('../../../utils/modelUtils'),
+    handlerUtils = require('./../../../utils/handlerUtils');
 
 
 var createNewSignedUpUser = function (newUser) {
@@ -101,24 +102,10 @@ module.exports = {
             next(handlerUtils.catchError(e, 'Unable to check username validity right now, please later.'));
         }
     },
-    quickSearchForUser: function (req, res, next) {
-        try {
-            var serachCriteria = req.body.searchCriteria;
-            var User = req.db.model('User');
-
-            /* jshint ignore:line */
-            User.quickFind(serachCriteria).then(function (users) {
-                res.json(jsonResponse.successResponse(JSON.stringify(users)));
-            }).catch(function (err) {
-                next(handlerUtils.catchError(err, 'Error trying to do a quick search for user with search criteria: ' + serachCriteria));
-            });
-        } catch (e){
-            next(handlerUtils.catchError(e, 'Error trying to do a quick search for user'));
-        }
-    },
     findById: function (req, res, next) {
         try {
             var User = req.db.model('User');
+            modelUtils.throwErrorIfNotObjectId(req.params.id);
             User.findOne({_id: req.params.id})
                 .exec(function (err, user) {
                     if (err) {
@@ -136,6 +123,8 @@ module.exports = {
             var userObj = req.body;
             delete userObj._id;
             delete userObj.id;
+
+            modelUtils.throwErrorIfNotObjectId(id);
 
             var search = {_id: id};
             var update = userObj;
@@ -161,6 +150,8 @@ module.exports = {
         try {
             var id = req.params.id;
             var User = req.db.model('User');
+
+            modelUtils.throwErrorIfNotObjectId(id);
 
             User.findOneAndRemove({_id: id}, function (err) {
                 if (err) {
