@@ -94,8 +94,15 @@ schema.statics.findPublicUserByEmail = function (email) {
     return defer.promise;
 };
 
+schema.statics.isInvalidUsername = function(username){
+    if (new RegExp('(^((?=.*^[^:::])(?=.*[^:::]$))(?=.*\\d|[a-z]|[A-Z]|[.@#$%]).{5,20}$)').test(username)) {
+        return false;
+    } else {
+        return 'Cannot contain ":::" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %';
+    }
+};
 
-schema.static.quickFind = function (searchCriteria) {
+schema.statics.quickFind = function (searchCriteria) {
     var defer = Q.defer();
     this.find().or([
         {'username': {$regex: searchCriteria}},

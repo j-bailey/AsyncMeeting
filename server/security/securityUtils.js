@@ -6,6 +6,7 @@ var acl = require('../security/acl').getAcl(),
     jwt = require('jsonwebtoken'),
     db = require('../db'),
     RouteError = require('../routes/routeError'),
+    dictValidator = require('./dictionary-validator'),
     Q = require('q');
 
 var releaseTokenCache = {};
@@ -134,6 +135,18 @@ module.exports = {
         //
         //}
         next();
+    },
+    isInvalidPassword: function(password, username){
+        var dictResult = dictValidator.isImproper(username, password);
+        if (dictResult) {
+            return dictResult;
+        }
+        var validationRegex = nconf.get('security:passwordValidation:validationRegex');
+        if (new RegExp(validationRegex).test(password)){
+            return false;
+        } else {
+            return nconf.get('security:passwordValidation:validationMessage');
+        }
     },
     isAllowedResourceAccess: function (resourceKey, allowNulls) {
         return function (req, res, next) {

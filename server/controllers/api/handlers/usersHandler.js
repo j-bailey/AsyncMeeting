@@ -4,6 +4,7 @@ var logger = require('winston');
 var db = require('../../../../server/db');
 var Q = require('q');
 var meetingAreaHandler = require('../../../../server/controllers/api/handlers/meetingAreasHandler');
+var secUtils = require('../../../../server/security/securityUtils');
 
 
 var createNewSignedUpUser = function (newUser) {
@@ -67,6 +68,23 @@ var createNewSignedUpUser = function (newUser) {
 
 module.exports = {
     createNewSignedUpUser: createNewSignedUpUser,
+    isInvalidPassword: function(req, res, next) {
+        try {
+            var result = secUtils.isInvalidPassword(req.params.password, req.query.username || req.session.userId);
+            return res.status(200).json({result: result});
+        } catch (e){
+            next(e);
+        }
+    },
+    isInvalidUsername: function(req, res, next) {
+        try {
+            var User = req.db.model('User');
+            var result = User.schema.statics.isInvalidUsername(req.params.username);
+            return res.status(200).json({result: result});
+        } catch (e){
+            next(e);
+        }
+    },
     createUser: function (req, res, next) {
         var User = req.db.model('User');
         var user = new User(req.body);

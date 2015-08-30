@@ -100,15 +100,215 @@ describe('controller/api/users', function () {
                                 });
                         });
                     });
-                }).catch(function(err){
+                }).catch(function (err) {
                     done(err);
                 });
-            }).catch(function(err){
+            }).catch(function (err) {
                 done(err);
             })
         });
     });
 
+    describe('GET inValidUsername', function () {
+        it('should return false for a valid username', function (done) {
+            user1
+                .get('/api/users/invalidUsername/' + 'HelloHello')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal(false);
+                })
+                .end(done);
+        });
+        it('should return false for a valid username with a .', function (done) {
+            user1
+                .get('/api/users/invalidUsername/' + 'Jay.Smith')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal(false);
+                })
+                .end(done);
+        });
+        it('should return false for a valid username with a digit', function (done) {
+            user1
+                .get('/api/users/invalidUsername/' + 'Jay.Smith1')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal(false);
+                })
+                .end(done);
+        });
+        it('should return false for a valid username with a special character', function (done) {
+            user1
+                .get('/api/users/invalidUsername/' + 'Jay.Smith1@')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal(false);
+                })
+                .end(done);
+        });
+
+        it('should return error message for ::: characters in the beginning', function (done) {
+            user1
+                .get('/api/users/invalidUsername/' + ':::HelloHello')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                })
+                .end(done);
+        });
+        it('should return error message for ::: characters at the end', function (done) {
+            user1
+                .get('/api/users/invalidUsername/' + 'HelloHello:::')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                })
+                .end(done);
+        });
+        it('should return error message for ::: characters at the end and beginning', function (done) {
+            user1
+                .get('/api/users/invalidUsername/' + 'HelloHello:::')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                })
+                .end(done);
+        });
+        it('should return error message for not enough characters', function (done) {
+            user1
+                .get('/api/users/invalidUsername/' + 'Hell')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                })
+                .end(done);
+        });
+        it('should return error message for too many characters', function (done) {
+            user1
+                .get('/api/users/invalidUsername/' + 'A12345678901234567890')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 5-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                })
+                .end(done);
+        });
+    });
+    describe('GET inValidPassowrd', function () {
+        it('should return false for a valid password', function (done) {
+            user1
+                .get('/api/users/invalidPassword/' + 'Hello12@')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal(false);
+                })
+                .end(done);
+        });
+        it('should return error message for one character too short password', function (done) {
+            user1
+                .get('/api/users/invalidPassword/' + 'Hell12@')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Password must be between 8-20 in length. Must contain one digit, one lowercase, one uppercase character and one special character (@#$%).');
+                })
+                .end(done);
+        });
+        it('should return error message for one character too long password', function (done) {
+            user1
+                .get('/api/users/invalidPassword/' + 'Aa@123456789012345678')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Password must be between 8-20 in length. Must contain one digit, one lowercase, one uppercase character and one special character (@#$%).');
+                })
+                .end(done);
+        });
+        it('should return error message for password containing username', function (done) {
+            user1
+                .get('/api/users/invalidPassword/' + 'Aa@12345678901234tom')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Password must not contain the username');
+                })
+                .end(done);
+        });
+        it('should return error message for password containing passed in username', function (done) {
+            user1
+                .get('/api/users/invalidPassword/' + 'Aa@bobby' + '?username=bobby')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Password must not contain the username');
+                })
+                .end(done);
+        });
+        it('should return error message for password being in the bad password list', function (done) {
+            user1
+                .get('/api/users/invalidPassword/' + '123456789')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.result).to.equal('Do not use a common password like: 123456789');
+                })
+                .end(done);
+        });
+    });
     describe('GET \'/\' by path', function () {
         it('should return a user', function (done) {
             user1
@@ -276,7 +476,7 @@ describe('controller/api/users', function () {
                 });
         });
         it('should return a 409 on due to user missing', function (done) {
-            User.remove({_id:userId3}).exec(function(err, item) {
+            User.remove({_id: userId3}).exec(function (err, item) {
                 user1
                     .put('/api/users/' + userId3)
                     .send({

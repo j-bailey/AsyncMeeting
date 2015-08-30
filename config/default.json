@@ -1,5 +1,9 @@
 {
   "security": {
+    "passwordValidation": {
+      "validationRegex": "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$)",
+      "validationMessage": "Password must be between 8-20 in length. Must contain one digit, one lowercase, one uppercase character and one special character (@#$%)."
+    },
     "scrypt": {
       "maxtime": 1.0,
       "maxmem": 0,
