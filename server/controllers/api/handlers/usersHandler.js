@@ -5,6 +5,8 @@ var db = require('../../../../server/db');
 var Q = require('q');
 var meetingAreaHandler = require('../../../../server/controllers/api/handlers/meetingAreasHandler');
 var secUtils = require('../../../../server/security/securityUtils');
+var jsonResponse = require('../../../utils/jsonResponseWrapper');
+var handlerUtils = require('./handlerUtils');
 
 
 var createNewSignedUpUser = function (newUser) {
@@ -71,87 +73,103 @@ module.exports = {
     isInvalidPassword: function(req, res, next) {
         try {
             var result = secUtils.isInvalidPassword(req.params.password, req.query.username || req.session.userId);
-            return res.status(200).json({result: result});
+            return res.status(200).json(jsonResponse.successResponse({result: result}));
         } catch (e){
-            next(e);
+            next(handlerUtils.catchError(e, 'Unable to check password validity right now, please later.'));
         }
     },
     isInvalidUsername: function(req, res, next) {
         try {
             var User = req.db.model('User');
             var result = User.schema.statics.isInvalidUsername(req.params.username);
-            return res.status(200).json({result: result});
+            return res.status(200).json(jsonResponse.successResponse({result: result}));
         } catch (e){
-            next(e);
+            next(handlerUtils.catchError(e, 'Unable to check username validity right now, please later.'));
         }
     },
     createUser: function (req, res, next) {
-        var User = req.db.model('User');
-        var user = new User(req.body);
-        createNewSignedUpUser(user).then(function (newUser) {
-            User.findById(newUser._id);
-            res.status(201).json(newUser);
-        }).catch(function (err) {
-            if (err.errors) {
-                logger.error(err.errors);
-            }
-            next(err);
-        });
+        try {
+            var User = req.db.model('User');
+            var user = new User(req.body);
+            createNewSignedUpUser(user).then(function (newUser) {
+                User.findById(newUser._id);
+                res.status(201).json(jsonResponse.successResponse(newUser));
+            }).catch(function (err) {
+                next(handlerUtils.catchError(err, 'Unable to create user right now, please try again later.'));
+            });
+        } catch(e){
+            next(handlerUtils.catchError(e, 'Unable to check username validity right now, please later.'));
+        }
     },
     quickSearchForUser: function (req, res, next) {
-        var serachCriteria = req.body.searchCriteria;
-        var User = req.db.model('User');
+        try {
+            var serachCriteria = req.body.searchCriteria;
+            var User = req.db.model('User');
 
-        /* jshint ignore:line */
-        User.quickFind(serachCriteria).then(function (users) {
-            res.json(JSON.stringify(users));
-        }).catch(function (err) {
-            logger.error('Error trying to do a quick search for user with search criteria: ' + serachCriteria + ' with error: ' + err);
-            return next(err);
-        });
+            /* jshint ignore:line */
+            User.quickFind(serachCriteria).then(function (users) {
+                res.json(jsonResponse.successResponse(JSON.stringify(users)));
+            }).catch(function (err) {
+                next(handlerUtils.catchError(err, 'Error trying to do a quick search for user with search criteria: ' + serachCriteria));
+            });
+        } catch (e){
+            next(handlerUtils.catchError(e, 'Error trying to do a quick search for user'));
+        }
     },
     findById: function (req, res, next) {
-        var User = req.db.model('User');
-        User.findOne({_id: req.params.id})
-            .exec(function (err, user) {
-                if (err) {
-                    return next(err);
-                }
-                res.status(200).json(user);
-            });
+        try {
+            var User = req.db.model('User');
+            User.findOne({_id: req.params.id})
+                .exec(function (err, user) {
+                    if (err) {
+                        return next(handlerUtils.catchError(err, 'Error trying to find user, please try again later'));
+                    }
+                    res.status(200).json(jsonResponse.successResponse(user));
+                });
+        } catch (e){
+            next(handlerUtils.catchError(e, 'Error trying to find user, please try again later'));
+        }
     },
     updateById: function (req, res, next) {
-        var id = req.params.id;
-        var userObj = req.body;
-        delete userObj._id;
-        delete userObj.id;
+        try {
+            var id = req.params.id;
+            var userObj = req.body;
+            delete userObj._id;
+            delete userObj.id;
 
-        var search = {_id: id};
-        var update = userObj;
-        var options = {new: true};
+            var search = {_id: id};
+            var update = userObj;
+            var options = {new: true};
 
-        var User = req.db.model('User');
-        User.findOneAndUpdate(search, update, options)
-            .exec(function (err, updatedUser) {
-                if (err) {
-                    next(err);
-                }
-                if (updatedUser === null) {
-                    res.status(409).json({});
-                } else {
-                    res.status(200).json(updatedUser);
-                }
-            });
+            var User = req.db.model('User');
+            User.findOneAndUpdate(search, update, options)
+                .exec(function (err, updatedUser) {
+                    if (err) {
+                        next(err);
+                    }
+                    if (updatedUser === null) {
+                        res.status(409).json(jsonResponse.successResponse({}));
+                    } else {
+                        res.status(200).json(jsonResponse.successResponse(updatedUser));
+                    }
+                });
+        } catch (e){
+            next(handlerUtils.catchError(e, 'Error trying to update user, please try again later'));
+        }
     },
     deleteById: function (req, res, next) {
-        var id = req.params.id;
-        var User = req.db.model('User');
+        try {
+            var id = req.params.id;
+            var User = req.db.model('User');
 
-        User.findOneAndRemove({_id: id}, function (err) {
-            if (err) {
-                return next(err);
-            }
-            res.sendStatus(200);
-        });
+            User.findOneAndRemove({_id: id}, function (err) {
+                if (err) {
+                    return next(handlerUtils.catchError(err, 'Error trying to update user, please try again later'));
+                }
+                res.sendStatus(200);
+            });
+        } catch (e){
+            next(handlerUtils.catchError(e, 'Error trying to update user, please try again later'));
+        }
     }
 };

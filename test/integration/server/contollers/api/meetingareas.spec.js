@@ -200,8 +200,8 @@ describe('controller/api/meetingAreas', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result).to.have.length(1);
-                    expect(result[0]._id.toString()).to.equal(childMeetingAreaId.toString());
+                    expect(result.data).to.have.length(1);
+                    expect(result.data[0]._id.toString()).to.equal(childMeetingAreaId.toString());
                 })
                 .end(done);
         });
@@ -214,9 +214,9 @@ describe('controller/api/meetingAreas', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result).to.have.length(2);
-                    expect(result[0]._id.toString()).to.equal(childMeetingAreaId.toString());
-                    expect(result[1]._id.toString()).to.equal(child2MeetingAreaId.toString());
+                    expect(result.data).to.have.length(2);
+                    expect(result.data[0]._id.toString()).to.equal(childMeetingAreaId.toString());
+                    expect(result.data[1]._id.toString()).to.equal(child2MeetingAreaId.toString());
                 })
                 .end(done);
         });
@@ -229,9 +229,9 @@ describe('controller/api/meetingAreas', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result).to.have.length(2);
-                    expect(result[0]._id.toString()).to.equal(childMeetingAreaId.toString());
-                    expect(result[1]._id.toString()).to.equal(child2MeetingAreaId.toString());
+                    expect(result.data).to.have.length(2);
+                    expect(result.data[0]._id.toString()).to.equal(childMeetingAreaId.toString());
+                    expect(result.data[1]._id.toString()).to.equal(child2MeetingAreaId.toString());
                 })
                 .end(done);
         });
@@ -244,9 +244,9 @@ describe('controller/api/meetingAreas', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result).to.have.length(2);
-                    expect(result[0]._id.toString()).to.equal(firstMeetingAreaId.toString());
-                    expect(result[1]._id.toString()).to.equal(parentMeetingAreaId.toString());
+                    expect(result.data).to.have.length(2);
+                    expect(result.data[0]._id.toString()).to.equal(firstMeetingAreaId.toString());
+                    expect(result.data[1]._id.toString()).to.equal(parentMeetingAreaId.toString());
                 })
                 .end(done);
         });
@@ -260,8 +260,8 @@ describe('controller/api/meetingAreas', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result).to.have.length(1);
-                    expect(result[0]._id.toString()).to.equal(child2MeetingAreaId.toString());
+                    expect(result.data).to.have.length(1);
+                    expect(result.data[0]._id.toString()).to.equal(child2MeetingAreaId.toString());
                 })
                 .end(done);
         });
@@ -274,9 +274,9 @@ describe('controller/api/meetingAreas', function () {
                 .expect(401)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result).to.not.be.null;
-                    expect(result.msg).to.equal('Not allowed');
-                    expect(result.status).to.equal(401);
+                    expect(result.data).to.not.be.null;
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
                 })
                 .end(done);
         });
@@ -294,10 +294,10 @@ describe('controller/api/meetingAreas', function () {
                         {$and: [{tenantId: userModel1.tenantId}, {parentMeetingArea: null}]}]})
                         .sort('_id')
                         .exec(function (err, meetingAreas) {
-                        expect(result).to.have.length(meetingAreas.length);
-                        expect(result[1]._id.toString()).to.equal(parentMeetingAreaId.toString());
-                        expect(result[2]._id.toString()).to.equal(childMeetingAreaId.toString());
-                        expect(result[3]._id.toString()).to.equal(child2MeetingAreaId.toString());
+                        expect(result.data).to.have.length(meetingAreas.length);
+                        expect(result.data[1]._id.toString()).to.equal(parentMeetingAreaId.toString());
+                        expect(result.data[2]._id.toString()).to.equal(childMeetingAreaId.toString());
+                        expect(result.data[3]._id.toString()).to.equal(child2MeetingAreaId.toString());
                         done();
                     });
                 });
@@ -319,9 +319,9 @@ describe('controller/api/meetingAreas', function () {
                         })
                         .sort('_id')
                         .exec(function (err, meetingAreas) {
-                            expect(result).to.have.length(meetingAreas.length);
-                            expect(result[1]._id.toString()).to.equal(childMeetingAreaId.toString());
-                            expect(result[2]._id.toString()).to.equal(child2MeetingAreaId.toString());
+                            expect(result.data).to.have.length(meetingAreas.length);
+                            expect(result.data[1]._id.toString()).to.equal(childMeetingAreaId.toString());
+                            expect(result.data[2]._id.toString()).to.equal(child2MeetingAreaId.toString());
                             done();
                         });
                 });
@@ -335,8 +335,8 @@ describe('controller/api/meetingAreas', function () {
                 .expect(401)
                 .expect(function (res) {
                     expect(res.error.message).to.equal('cannot GET /api/meetingareas?parentId=' + parentMeetingAreaId + '%3Bvar%20date%3Dnew%20Date()%3B%20do%7BcurDate%20%3D%20new%20Date()%3B%7Dwhile(cur-Date-date%3C10000 (401)');
-                    expect(JSON.parse(res.error.text).status).to.equal(401);
-                    expect(JSON.parse(res.error.text).msg).to.equal('Not allowed');
+                    expect(JSON.parse(res.text).status).to.equal('error');
+                    expect(JSON.parse(res.text).message).to.equal('Not allowed');
                 })
                 .end(done);
         });
@@ -350,8 +350,8 @@ describe('controller/api/meetingAreas', function () {
                 //.expect(401)
                 .expect(function (res) {
                     expect(res.error.message).to.equal('cannot GET /api/meetingareas?parentId=null' + '%3Bvar%20date%3Dnew%20Date()%3B%20do%7BcurDate%20%3D%20new%20Date()%3B%7Dwhile(cur-Date-date%3C10000 (401)');
-                    expect(JSON.parse(res.error.text).status).to.equal(401);
-                    expect(JSON.parse(res.error.text).msg).to.equal('Not allowed');
+                    expect(JSON.parse(res.text).status).to.equal('error');
+                    expect(JSON.parse(res.text).message).to.equal('Not allowed');
                 })
                 .end(done);
         });
@@ -422,7 +422,7 @@ describe('controller/api/meetingAreas', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result._id.toString()).to.equal(parentMeetingAreaId.toString());
+                    expect(result.data._id.toString()).to.equal(parentMeetingAreaId.toString());
                 })
                 .end(done);
         });
@@ -435,8 +435,9 @@ describe('controller/api/meetingAreas', function () {
                 .expect(401)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Not allowed');
-                    expect(result.status).to.equal(401);
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                 })
                 .end(done);
         });
@@ -450,7 +451,7 @@ describe('controller/api/meetingAreas', function () {
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
                     expect(res.error.message).to.equal('cannot GET /api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (401)');
-                    expect(result.msg).to.equal('Not allowed');
+                    expect(result.message).to.equal('Not allowed');
                 })
                 .end(done);
         });
@@ -471,8 +472,8 @@ describe('controller/api/meetingAreas', function () {
                 .end(function (err, res) {
                     expect(err).to.be.null;
                     var result = JSON.parse(res.text);
-                    expect(result._id).to.not.be.null;
-                    MeetingArea.find({_id: result._id}, function (err, meetingAreas) {
+                    expect(result.data._id).to.not.be.null;
+                    MeetingArea.find({_id: result.data._id}, function (err, meetingAreas) {
                         expect(meetingAreas).to.have.length(1);
                         done();
                     });
@@ -500,8 +501,8 @@ describe('controller/api/meetingAreas', function () {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
-                    ma1 = result._id;
-                    expect(result._id).to.not.be.null;
+                    ma1 = result.data._id;
+                    expect(result.data._id).to.not.be.null;
                     MeetingArea.find({$and: [{tenantId: userModel1.tenantId}, {parentMeetingArea: null}]})
                         .lean()
                         .exec(function (err, expectedMeetingArea) {
@@ -509,14 +510,14 @@ describe('controller/api/meetingAreas', function () {
                                 return done(err);
                             }
                             expect(expectedMeetingArea.length).to.equal(1);
-                            expect(result.parentMeetingArea).to.equal(expectedMeetingArea[0]._id.toString());
+                            expect(result.data.parentMeetingArea).to.equal(expectedMeetingArea[0]._id.toString());
                             expectedAncestors.push(expectedMeetingArea[0]._id.toString());
-                            expectedAncestors.push(result._id);
-                            expect(result.ancestors.length).to.equal(1);
+                            expectedAncestors.push(result.data._id);
+                            expect(result.data.ancestors.length).to.equal(1);
                             user1
                                 .post('/api/meetingareas')
                                 .send({
-                                    parentMeetingAreaId: result._id,
+                                    parentMeetingAreaId: result.data._id,
                                     title: "New Meeting Area - 2nd Depth",
                                     description: "New Meeting Area Description - 2nd Depth"
                                 })
@@ -529,15 +530,15 @@ describe('controller/api/meetingAreas', function () {
                                         return done(err);
                                     }
                                     var result = JSON.parse(res.text);
-                                    expectedAncestors.push(result._id);
-                                    ma2 = result._id;
-                                    expect(result._id).to.not.be.null;
-                                    expect(result.parentMeetingArea).to.not.be.null;
-                                    expect(result.ancestors.length).to.equal(2);
+                                    expectedAncestors.push(result.data._id);
+                                    ma2 = result.data._id;
+                                    expect(result.data._id).to.not.be.null;
+                                    expect(result.data.parentMeetingArea).to.not.be.null;
+                                    expect(result.data.ancestors.length).to.equal(2);
                                     user1
                                         .post('/api/meetingareas')
                                         .send({
-                                            parentMeetingAreaId: result._id,
+                                            parentMeetingAreaId: result.data._id,
                                             title: "New Meeting Area - 3rd Depth",
                                             description: "New Meeting Area Description - 3rd Depth"
                                         })
@@ -550,12 +551,12 @@ describe('controller/api/meetingAreas', function () {
                                                 return done(err);
                                             }
                                             var result = JSON.parse(res.text);
-                                            expect(result._id).to.not.be.null;
-                                            ma3 = result._id;
-                                            expect(result.parentMeetingArea).to.not.be.null;
-                                            expect(result.ancestors.length).to.equal(3);
-                                            expect(result.ancestors).to.deep.equal(expectedAncestors);
-                                            expectedAncestors.push(result._id);
+                                            expect(result.data._id).to.not.be.null;
+                                            ma3 = result.data._id;
+                                            expect(result.data.parentMeetingArea).to.not.be.null;
+                                            expect(result.data.ancestors.length).to.equal(3);
+                                            expect(result.data.ancestors).to.deep.equal(expectedAncestors);
+                                            expectedAncestors.push(result.data._id);
                                             MeetingArea.find({_id: {$in: expectedAncestors}}).lean().exec(function (err, meetingAreas) {
                                                 expect(meetingAreas).to.have.length(expectedAncestors.length);
                                                 done();
@@ -583,8 +584,9 @@ describe('controller/api/meetingAreas', function () {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Not allowed');
-                    expect(result.status).to.equal(401);
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                     done();
                 });
         });
@@ -617,8 +619,9 @@ describe('controller/api/meetingAreas', function () {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Not allowed');
-                    expect(result.status).to.equal(401);
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                     done();
                 });
         });
@@ -633,8 +636,9 @@ describe('controller/api/meetingAreas', function () {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Not allowed');
-                    expect(result.status).to.equal(401);
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                     done();
                 });
         });
@@ -649,8 +653,9 @@ describe('controller/api/meetingAreas', function () {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Not allowed');
-                    expect(result.status).to.equal(401);
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                     done();
                 });
         });
@@ -663,7 +668,9 @@ describe('controller/api/meetingAreas', function () {
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
                     expect(res.error.message).to.equal('cannot DELETE /api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (401)');
-                    expect(result.msg).to.equal('Not allowed');
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                 })
                 .end(done);
         });
@@ -684,8 +691,8 @@ describe('controller/api/meetingAreas', function () {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
-                    expect(result.title).to.equal("New Updated Meeting Area");
-                    expect(result.description).to.equal("New Updated Meeting Area Description");
+                    expect(result.data.title).to.equal("New Updated Meeting Area");
+                    expect(result.data.description).to.equal("New Updated Meeting Area Description");
                     MeetingArea.find({_id: parentMeetingAreaId}, function (err, meetingAreas) {
                         expect(meetingAreas).to.not.be.empty;
                         expect(meetingAreas[0]._id.toString()).to.equal(parentMeetingAreaId.toString());
@@ -706,8 +713,9 @@ describe('controller/api/meetingAreas', function () {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Not allowed');
-                    expect(result.status).to.equal(401);
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                     done();
                 });
         });
@@ -720,7 +728,9 @@ describe('controller/api/meetingAreas', function () {
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
                     expect(res.error.message).to.equal('cannot PUT /api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (401)');
-                    expect(result.msg).to.equal('Not allowed');
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                 })
                 .end(done);
         });

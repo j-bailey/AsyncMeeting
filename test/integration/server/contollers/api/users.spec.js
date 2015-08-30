@@ -119,7 +119,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal(false);
+                    expect(result.data.result).to.equal(false);
                 })
                 .end(done);
         });
@@ -132,7 +132,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal(false);
+                    expect(result.data.result).to.equal(false);
                 })
                 .end(done);
         });
@@ -145,7 +145,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal(false);
+                    expect(result.data.result).to.equal(false);
                 })
                 .end(done);
         });
@@ -158,7 +158,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal(false);
+                    expect(result.data.result).to.equal(false);
                 })
                 .end(done);
         });
@@ -172,7 +172,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.data.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
@@ -185,7 +185,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.data.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
@@ -198,7 +198,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.data.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
@@ -211,7 +211,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.data.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
@@ -224,7 +224,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
+                    expect(result.data.result).to.equal('Cannot contain \":::\" at the beginning or end of the username, must 3-20 character long, can contain alphanumeric characters and the following: . @ # $ %');
                 })
                 .end(done);
         });
@@ -239,7 +239,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal(false);
+                    expect(result.data.result).to.equal(false);
                 })
                 .end(done);
         });
@@ -252,7 +252,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Password must be between 8-20 in length. Must contain one digit, one lowercase, one uppercase character and one special character (@#$%).');
+                    expect(result.data.result).to.equal('Password must be between 8-20 in length. Must contain one digit, one lowercase, one uppercase character and one special character (@#$%).');
                 })
                 .end(done);
         });
@@ -265,7 +265,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Password must be between 8-20 in length. Must contain one digit, one lowercase, one uppercase character and one special character (@#$%).');
+                    expect(result.data.result).to.equal('Password must be between 8-20 in length. Must contain one digit, one lowercase, one uppercase character and one special character (@#$%).');
                 })
                 .end(done);
         });
@@ -278,7 +278,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Password must not contain the username');
+                    expect(result.data.result).to.equal('Password must not contain the username');
                 })
                 .end(done);
         });
@@ -291,7 +291,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Password must not contain the username');
+                    expect(result.data.result).to.equal('Password must not contain the username');
                 })
                 .end(done);
         });
@@ -304,7 +304,7 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result.result).to.equal('Do not use a common password like: 123456789');
+                    expect(result.data.result).to.equal('Do not use a common password like: 123456789');
                 })
                 .end(done);
         });
@@ -319,8 +319,8 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
-                    expect(result._id).to.equal(userId1.toString());
-                    expect(result.password).to.be.empty;
+                    expect(result.data._id).to.equal(userId1.toString());
+                    expect(result.data.password).to.be.empty;
                 })
                 .end(done);
         });
@@ -333,9 +333,9 @@ describe('controller/api/users', function () {
                 .expect(403)
                 .end(function (err, res) {
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Insufficient permissions to access resource');
-                    expect(result.status).to.equal(403);
-                    expect(result.password).to.be.empty;
+                    expect(result.message).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                     done();
                 });
         });
@@ -349,8 +349,9 @@ describe('controller/api/users', function () {
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
                     expect(res.error.message).to.equal('cannot GET /api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
-                    expect(result.msg).to.equal('Insufficient permissions to access resource');
-                    expect(result.password).to.be.empty;
+                    expect(result.message).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                 })
                 .end(done);
         });
@@ -373,8 +374,8 @@ describe('controller/api/users', function () {
                 .expect(201)
                 .end(function (err, res) {
                     var result = JSON.parse(res.text);
-                    expect(result._id).to.not.be.null;
-                    expect(result.password).to.be.empty;
+                    expect(result.data._id).to.not.be.null;
+                    expect(result.data.password).to.be.empty;
                     User.find({_id: userId1}, function (err, user) {
                         expect(user).to.have.length(1);
                         done();
@@ -397,9 +398,9 @@ describe('controller/api/users', function () {
                 .expect(403)
                 .end(function (err, res) {
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Insufficient permissions to access resource');
-                    expect(result.status).to.equal(403);
-                    expect(result.password).to.be.empty;
+                    expect(result.message).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                     done();
                 });
         });
@@ -429,9 +430,9 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .end(function (err, res) {
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Insufficient permissions to access resource');
-                    expect(result.status).to.equal(403);
-                    expect(result.password).to.be.empty;
+                    expect(result.message).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                     done();
                 });
         });
@@ -444,8 +445,8 @@ describe('controller/api/users', function () {
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
                     expect(res.error.message).to.equal('cannot DELETE /api/users/' + userId4 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
-                    expect(result.msg).to.equal('Insufficient permissions to access resource');
-                    expect(result.password).to.be.empty;
+                    expect(result.message).to.equal('Insufficient permissions to access resource');
+                    expect(result.data).to.be.empty;
                 })
                 .end(done);
         });
@@ -464,9 +465,9 @@ describe('controller/api/users', function () {
                 .end(function (err, res) {
                     expect(err).to.be.null;
                     var result = JSON.parse(res.text);
-                    expect(result.firstName).to.equal('Kelly2');
-                    expect(result.lastName).to.equal('Thomas2');
-                    expect(result.password).to.be.empty;
+                    expect(result.data.firstName).to.equal('Kelly2');
+                    expect(result.data.lastName).to.equal('Thomas2');
+                    expect(result.data.password).to.be.empty;
                     User.find({_id: userId1}, function (err, user) {
                         expect(user).to.not.be.empty;
                         expect(user[0].firstName).to.equal('Kelly2');
@@ -489,9 +490,9 @@ describe('controller/api/users', function () {
                     .end(function (err, res) {
                         expect(err).to.be.null;
                         var result = JSON.parse(res.text);
-                        expect(result.firstName).to.be.empty;
-                        expect(result.lastName).to.be.empty;
-                        expect(result.password).to.be.empty;
+                        expect(result.data.firstName).to.be.empty;
+                        expect(result.data.lastName).to.be.empty;
+                        expect(result.data.password).to.be.empty;
                         User.find({_id: userId3}, function (err, user) {
                             expect(user).to.be.empty;
                             done();
@@ -507,9 +508,9 @@ describe('controller/api/users', function () {
                 .expect(200)
                 .end(function (err, res) {
                     var result = JSON.parse(res.text);
-                    expect(result.msg).to.equal('Insufficient permissions to access resource');
-                    expect(result.status).to.equal(403);
-                    expect(result.password).to.be.empty;
+                    expect(result.message).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                     done();
                 });
         });
@@ -522,8 +523,9 @@ describe('controller/api/users', function () {
                 .expect(function (res) {
                     var result = JSON.parse(res.text);
                     expect(res.error.message).to.equal('cannot PUT /api/users/' + userId1 + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date%3C10000 (403)');
-                    expect(result.msg).to.equal('Insufficient permissions to access resource');
-                    expect(result.password).to.be.empty;
+                    expect(result.message).to.equal('Insufficient permissions to access resource');
+                    expect(result.status).to.equal('error');
+                    expect(result.data).to.be.empty;
                 })
                 .end(done);
         });

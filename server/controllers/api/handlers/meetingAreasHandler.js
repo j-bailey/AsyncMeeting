@@ -5,6 +5,8 @@ var ObjectId = require('mongoose').Types.ObjectId,
     Q = require('q'),
     Acl = require('../../../../server/security/acl'),
     modelUtils = require('../../../models/queryUtils'),
+    jsonResponse = require('../../../utils/jsonResponseWrapper'),
+    handlerUtils = require('./handlerUtils'),
     RouteError = require('./../../../routes/routeError');
 
 var _findAllowedMeetingArea = function (userId, tenantIds, criteria, requestedSkip, requestedLimit, dbConn) {
@@ -179,23 +181,23 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn, myFirstMeetin
                         }
                         User.addAllowedResource(user._id, savedMeetingArea.tenantId,
                             savedMeetingArea._id, 'MeetingArea').then(function (response, err) {
-                            if (err) {
+                                if (err) {
+                                    logger.error("Error saving meeting area: " + err.message);
+                                    savedMeetingArea.remove();
+                                    return defer.reject(err);
+                                }
+                                var acl = Acl.getAcl();
+                                acl.allow('meetingarea-creator-' + savedMeetingArea._id, '/api/meetingareas/' + savedMeetingArea._id, '*');
+                                acl.addUserRoles(user.username, 'meetingarea-creator-' + savedMeetingArea._id);
+                                acl.allow('meetingarea-viewer', '/api/meetingareas', 'get');
+                                acl.addUserRoles(user.username, 'meetingarea-viewer');
+
+                                return defer.resolve(savedMeetingArea);
+                            }).catch(function (err) {
                                 logger.error("Error saving meeting area: " + err.message);
                                 savedMeetingArea.remove();
                                 return defer.reject(err);
-                            }
-                            var acl = Acl.getAcl();
-                            acl.allow('meetingarea-creator-' + savedMeetingArea._id, '/api/meetingareas/' + savedMeetingArea._id, '*');
-                            acl.addUserRoles(user.username, 'meetingarea-creator-' + savedMeetingArea._id);
-                            acl.allow('meetingarea-viewer', '/api/meetingareas', 'get');
-                            acl.addUserRoles(user.username, 'meetingarea-viewer');
-
-                            return defer.resolve(savedMeetingArea);
-                        }).catch(function (err) {
-                            logger.error("Error saving meeting area: " + err.message);
-                            savedMeetingArea.remove();
-                            return defer.reject(err);
-                        });
+                            });
                     });
                 });
         });
@@ -205,171 +207,195 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn, myFirstMeetin
 
 module.exports = {
     getMeetingAreasWithParentId: function (req, res, next) {
-        // TODO: add retrieving only meeting areas the user has access to.
-        // Check for parent query parameters.
-        var parentId = req.query.parentId;
-        var skip = req.query.skip;
-        var limit = req.query.limit;
-        if (parentId === "null") {
-            parentId = null;
-            //}
-            //else if (parentId === null) {
-            //    return next("Error: query parameter for parentId must be specified!");
-        } else if (parentId && parentId.length !== 24) {
-            res.status(400).json(new Error("Error: parentId is not correct!"));
-            return next();
-        }
-        var MeetingArea = req.db.model('MeetingArea');
-        var UserAllowedResources = req.db.model('UserAllowedResources');
-        if (parentId === null) {
-            UserAllowedResources.find({userId: req.session.userDbId})
-                .lean()
-                .exec(function (err, uarObjs) {
-                    if (err) {
-                        next(err);
-                    }
+        try {
+            // TODO: add retrieving only meeting areas the user has access to.
+            // Check for parent query parameters.
+            var parentId = req.query.parentId;
+            var skip = req.query.skip;
+            var limit = req.query.limit;
+            if (parentId === "null") {
+                parentId = null;
+                //}
+                //else if (parentId === null) {
+                //    return next("Error: query parameter for parentId must be specified!");
+            } else if (parentId && parentId.length !== 24) {
+                return next(handlerUtils.catchError(null, "Error: parentId is not correct!", 400));
+            }
+            var MeetingArea = req.db.model('MeetingArea');
+            var UserAllowedResources = req.db.model('UserAllowedResources');
+            if (parentId === null) {
+                UserAllowedResources.find({userId: req.session.userDbId})
+                    .lean()
+                    .exec(function (err, uarObjs) {
+                        if (err) {
+                           return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
+                        }
 
-                    var tenantIds = [];
-                    uarObjs.forEach(function (uarObj) {
-                        tenantIds.push(uarObj.tenantId);
+                        var tenantIds = [];
+                        uarObjs.forEach(function (uarObj) {
+                            tenantIds.push(uarObj.tenantId);
+                        });
+                        _findAllowedMeetingArea(req.session.userDbId, tenantIds, {}, skip, limit, req.db).then(function (meetingAreas) {
+                            res.status(200).json(jsonResponse.successResponse(meetingAreas));
+                        }).catch(function (err) {
+                            return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
+                        });
                     });
-                    _findAllowedMeetingArea(req.session.userDbId, tenantIds, {}, skip, limit, req.db).then(function (meetingAreas) {
-                        res.status(200).json(meetingAreas);
-                    }).catch(function (err) {
-                        next(err);
-                    });
+
+                //MeetingArea.find({parentMeetingArea: null})
+                //    .exec(function (err, meetingAreas) {
+                //        if (err) {
+                //            return handlerUtils.catchError(err, 'replace me');
+                //        }
+                //        res.status(200).json(meetingAreas);
+                //    });
+            } else {
+                MeetingArea.findOne({_id: parentId}).select('+tenantId').lean().exec(function (err, meetingArea) {
+                    _findAllowedMeetingArea(req.session.userDbId, meetingArea.tenantId,
+                        {parentMeetingArea: (new ObjectId(meetingArea._id))}, skip, limit, req.db).then(function (meetingAreas) {
+                            res.status(200).json(jsonResponse.successResponse(meetingAreas));
+                        }).catch(function (err) {
+                            return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
+                        });
                 });
-
-            //MeetingArea.find({parentMeetingArea: null})
-            //    .exec(function (err, meetingAreas) {
-            //        if (err) {
-            //            return next(err);
-            //        }
-            //        res.status(200).json(meetingAreas);
-            //    });
-        } else {
-            MeetingArea.findOne({_id: parentId}).select('+tenantId').lean().exec(function (err, meetingArea) {
-                _findAllowedMeetingArea(req.session.userDbId, meetingArea.tenantId,
-                    {parentMeetingArea: (new ObjectId(meetingArea._id))}, skip, limit, req.db).then(function (meetingAreas) {
-                        res.status(200).json(meetingAreas);
-                    }).catch(function (err) {
-                        next(err);
-                    });
-            });
+            }
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to retrieve meeting areas right now, please again later.'));
         }
     },
     getMeetingAreaById: function (req, res, next) {
-        if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
-            res.status(400).json(new Error("Error: meetingAreaId is not valid or is missing!"));
-            return next();
-        }
-        var MeetingArea = req.db.model('MeetingArea'),
-            userTenantId = req.session.tenantId;
+        try {
+            if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
+                return next(handlerUtils.catchError(null, "Error: meetingAreaId is not valid or is missing!", 400));
+            }
+            var MeetingArea = req.db.model('MeetingArea'),
+                userTenantId = req.session.tenantId;
 
-        // TODO: add retrieving only meeting areas the user has access to.
-        MeetingArea.findOne({_id: req.params.meetingAreaId})
-            .select('tenantId')
-            .exec(function (err, meetingArea) {
-                if (err) {
-                    return next(err);
-                }
-                if (meetingArea.tenantId.toString() === userTenantId) {
-                    res.status(200).json(meetingArea);
-                }
-            });
+            // TODO: add retrieving only meeting areas the user has access to.
+            MeetingArea.findOne({_id: req.params.meetingAreaId})
+                .select('tenantId')
+                .exec(function (err, meetingArea) {
+                    if (err) {
+                        return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
+                    }
+                    if (meetingArea.tenantId.toString() === userTenantId) {
+                        res.status(200).json(jsonResponse.successResponse(meetingArea));
+                    }
+                });
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to retrieve meeting areas right now, please again later.'));
+        }
     },
     grantUserAccess: function (req, res, next) {
-
-        var allowedUserId = req.params.userId,
-            resourceTenantId = '',
-            resourceId = req.params.meetingAreaId,
-            permission = req.body.permission,
-            dbConn = req.db;
-        _grantUserAccess(allowedUserId, resourceTenantId, resourceId, permission, dbConn).then(function () {
-            res.status(200).json();
-        }).catch(function (err) {
-            return next(err);
-        });
+        try {
+            var allowedUserId = req.params.userId,
+                resourceTenantId = '',
+                resourceId = req.params.meetingAreaId,
+                permission = req.body.permission,
+                dbConn = req.db;
+            _grantUserAccess(allowedUserId, resourceTenantId, resourceId, permission, dbConn).then(function () {
+                res.status(200).json(jsonResponse.successResponse({}));
+            }).catch(function (err) {
+                return handlerUtils.catchError(err, 'Unable to grant user access right now, please again later.');
+            });
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to grant user access right now, please again later.'));
+        }
     },
     _grantUserAccess: _grantUserAccess,
     removeUserAccess: function (req, res, next) {
-        var allowedUserId = req.params.userId,
-            resourceId = req.params.meetingAreaId,
-            permission = req.body.permission,
-            dbConn = req.db;
-        _removeUserAccess(resourceId, allowedUserId, permission, dbConn).then(function () {
-            res.status(200).json();
-        }).catch(function (err) {
-            return next(err);
-        });
+        try {
+            var allowedUserId = req.params.userId,
+                resourceId = req.params.meetingAreaId,
+                permission = req.body.permission,
+                dbConn = req.db;
+            _removeUserAccess(resourceId, allowedUserId, permission, dbConn).then(function () {
+                res.status(200).json(jsonResponse.successResponse({}));
+            }).catch(function (err) {
+                return next(handlerUtils.catchError(err, 'Unable to remove user access right now, please again later.'));
+            });
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to remove user access right now, please again later.'));
+        }
     },
     _removeUserAccess: _removeUserAccess,
     createNewMeetingArea: function (req, res, next) {
-        var parentId;
-        var dbConn = req.db;
-        if (req.body && req.body.parentMeetingAreaId && req.body.parentMeetingAreaId === 24) {
-            return next(new RouteError(400, 'parent meeting area ID is not valid or is missing.  Please provide a valid parent meeting ID.'));
-        } else {
-            parentId = req.body.parentMeetingAreaId;
+        try {
+            var parentId;
+            var dbConn = req.db;
+            if (req.body && req.body.parentMeetingAreaId && req.body.parentMeetingAreaId === 24) {
+                return next(handlerUtils.catchError(null, "parent meeting area ID is not valid or is missing.  ' +" +
+                    "Please provide a valid parent meeting ID.", 400));
+            } else {
+                parentId = req.body.parentMeetingAreaId;
+            }
+
+
+            var newTenantId = req.session.tenantId,
+                title = req.body.title,
+                description = req.body.description,
+                username = req.session.userId;
+
+            var MeetingArea = dbConn.model('MeetingArea');
+            var meetingArea = new MeetingArea({
+                title: title,
+                description: description,
+                parentMeetingArea: parentId ? new ObjectId(parentId) : null,
+                tenantId: newTenantId
+            });
+            _createMeetingArea(meetingArea, username, req.db).then(function (savedMeetingArea) {
+                res.status(201).json(jsonResponse.successResponse(savedMeetingArea));
+            }).catch(function (err) {
+                return next(handlerUtils.catchError(err, 'Unable to create new meeting area right now, please again later.'));
+            });
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to create new meeting area right now, please again later.'));
         }
-
-
-        var newTenantId = req.session.tenantId,
-            title = req.body.title,
-            description = req.body.description,
-            username = req.session.userId;
-
-        var MeetingArea = dbConn.model('MeetingArea');
-        var meetingArea = new MeetingArea({
-            title: title,
-            description: description,
-            parentMeetingArea: parentId ? new ObjectId(parentId) : null,
-            tenantId: newTenantId
-        });
-        _createMeetingArea(meetingArea, username, req.db).then(function (savedMeetingArea) {
-            res.status(201).json(savedMeetingArea);
-        }).catch(function (err) {
-            return next(err);
-        });
     },
     _createMeetingArea: _createMeetingArea,
     updateMeetingAreaById: function (req, res, next) {
-        if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
-            res.status(400).json(new Error("Error: meetingAreaId is not valid or is missing!"));
-            return next();
+        try {
+            if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
+                return next(handlerUtils.catchError(null, "Error: meetingAreaId is not valid or is missing!", 400));
+            }
+
+            var meetingAreaObj = req.body;
+            delete meetingAreaObj.parentMeetingArea;
+            delete meetingAreaObj.__id;
+            var search = {_id: req.params.meetingAreaId};
+            var update = meetingAreaObj;
+            var options = {new: true};
+
+            var MeetingArea = req.db.model('MeetingArea');
+            MeetingArea.findOneAndUpdate(search, update, options, function (err, meetingArea) {
+                if (err) {
+                    return handlerUtils.catchError(err, 'Unable to update meeting area right now, please again later.');
+                }
+                if (meetingArea === null) {
+                    res.status(409).json(jsonResponse.successResponse({}));
+                } else {
+                    res.status(200).json(jsonResponse.successResponse(meetingArea));
+                }
+            });
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to update meeting area right now, please again later.'));
         }
-
-        var meetingAreaObj = req.body;
-        delete meetingAreaObj.parentMeetingArea;
-        delete meetingAreaObj.__id;
-        var search = {_id: req.params.meetingAreaId};
-        var update = meetingAreaObj;
-        var options = {new: true};
-
-        var MeetingArea = req.db.model('MeetingArea');
-        MeetingArea.findOneAndUpdate(search, update, options, function (err, meetingArea) {
-            if (err) {
-                return next(err);
-            }
-            if (meetingArea === null) {
-                res.status(409).json({});
-            } else {
-                res.status(200).json(meetingArea);
-            }
-        });
     },
     deleteMeetingAreaById: function (req, res, next) {
-        if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
-            res.status(400).json(new Error("Error: meetingAreaId is not valid or is missing!"));
-            return next();
-        }
-
-        var MeetingArea = req.db.model('MeetingArea');
-        MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function (err) {
-            if (err) {
-                return next(err);
+        try {
+            if (req.params && req.params.meetingAreaId && req.params.meetingAreaId === 24) {
+                return next(handlerUtils.catchError(null, "Error: meetingAreaId is not valid or is missing!", 400));
             }
-            res.status(200).json({});
-        });
+
+            var MeetingArea = req.db.model('MeetingArea');
+            MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function (err) {
+                if (err) {
+                    return handlerUtils.catchError(err, 'Unable to delete meeting area right now, please again later.');
+                }
+                res.status(200).json(jsonResponse.successResponse({}));
+            });
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to delete meeting area right now, please again later.'));
+        }
     }
 };
