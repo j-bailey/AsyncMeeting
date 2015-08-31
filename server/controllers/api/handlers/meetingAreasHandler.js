@@ -16,14 +16,18 @@ var _findAllowedMeetingArea = function (userId, tenantIds, criteria, requestedSk
     var limit = queryUtils.getMaxQueryLimit('meetingArea', requestedLimit);
     var MeetingArea = dbConn.model('MeetingArea'),
         UserAllowedResources = dbConn.model('UserAllowedResources');
+    var uarCriteria = {userId: new ObjectId(userId)};
     var tenantIdArray = [];
-    if (tenantIds.constructor !== Array) {
-        tenantIdArray[0] = tenantIds;
-    } else {
-        tenantIdArray = tenantIds;
+    if (tenantIds && tenantIds != null) {
+        if (tenantIds.constructor !== Array) {
+            tenantIdArray[0] = tenantIds;
+        } else {
+            tenantIdArray = tenantIds;
+        }
+        uarCriteria = {$and: [{userId: uarCriteria.userId}, {tenantId: {$in: tenantIdArray}}]};
     }
-    UserAllowedResources.find({userId: new ObjectId(userId)})
-        .and([{tenantId: {$in: tenantIdArray}}])
+
+    UserAllowedResources.find(uarCriteria)
         .select('resourceId')
         .lean()
         .exec(function (err, allowedResources) {
@@ -228,7 +232,7 @@ module.exports = {
                     .lean()
                     .exec(function (err, uarObjs) {
                         if (err) {
-                           return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
+                            return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
                         }
 
                         var tenantIds = [];
@@ -277,8 +281,10 @@ module.exports = {
                     if (err) {
                         return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
                     }
-                    if (meetingArea.tenantId.toString() === userTenantId) {
+                    if (meetingArea && meetingArea.tenantId && meetingArea.tenantId.toString() === userTenantId) {
                         res.status(200).json(jsonResponse.successResponse(meetingArea));
+                    } else {
+                        res.status(200).json(jsonResponse.successResponse({}));
                     }
                 });
         } catch (e) {
@@ -331,7 +337,7 @@ module.exports = {
             var parentId;
             var dbConn = req.db;
 
-            modelUtils.throwErrorIfNotObjectId((req.body)?req.body.parentMeetingAreaId: '', true, "parent meeting area ID is not valid or is missing.  ' +" +
+            modelUtils.throwErrorIfNotObjectId((req.body) ? req.body.parentMeetingAreaId : '', true, "parent meeting area ID is not valid or is missing.  ' +" +
                 "Please provide a valid parent meeting ID.");
 
             parentId = req.body.parentMeetingAreaId;
