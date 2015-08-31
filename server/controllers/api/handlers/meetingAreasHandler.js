@@ -213,16 +213,11 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn, myFirstMeetin
 module.exports = {
     getMeetingAreasWithParentId: function (req, res, next) {
         try {
-            // TODO: add retrieving only meeting areas the user has access to.
-            // Check for parent query parameters.
             var parentId = req.query.parentId;
             var skip = req.query.skip;
             var limit = req.query.limit;
             if (parentId === "null") {
                 parentId = null;
-                //}
-                //else if (parentId === null) {
-                //    return next("Error: query parameter for parentId must be specified!");
             }
             modelUtils.throwErrorIfNotObjectId(parentId, true);
             var MeetingArea = req.db.model('MeetingArea');
@@ -234,7 +229,6 @@ module.exports = {
                         if (err) {
                             return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
                         }
-
                         var tenantIds = [];
                         uarObjs.forEach(function (uarObj) {
                             tenantIds.push(uarObj.tenantId);
@@ -245,14 +239,6 @@ module.exports = {
                             return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
                         });
                     });
-
-                //MeetingArea.find({parentMeetingArea: null})
-                //    .exec(function (err, meetingAreas) {
-                //        if (err) {
-                //            return handlerUtils.catchError(err, 'replace me');
-                //        }
-                //        res.status(200).json(meetingAreas);
-                //    });
             } else {
                 MeetingArea.findOne({_id: parentId}).select('+tenantId').lean().exec(function (err, meetingArea) {
                     _findAllowedMeetingArea(req.session.userDbId, meetingArea.tenantId,
@@ -274,18 +260,15 @@ module.exports = {
 
             modelUtils.throwErrorIfNotObjectId(req.params.meetingAreaId, false, 'Need a valid Meeting Area ID');
             var meetingAreaId = req.params.meetingAreaId;
-            // TODO: add retrieving only meeting areas the user has access to.
-            MeetingArea.findOne({_id: meetingAreaId})
-                .select('tenantId')
-                .exec(function (err, meetingArea) {
-                    if (err) {
-                        return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
-                    }
-                    if (meetingArea && meetingArea.tenantId && meetingArea.tenantId.toString() === userTenantId) {
-                        res.status(200).json(jsonResponse.successResponse(meetingArea));
+            _findAllowedMeetingArea(req.session.userDbId, null, {_id: (new ObjectId(meetingAreaId))},
+                0, 1, req.db).then(function (meetingAreas) {
+                    if (meetingAreas && meetingAreas.length > 0) {
+                        res.status(200).json(jsonResponse.successResponse(meetingAreas[0]));
                     } else {
                         res.status(200).json(jsonResponse.successResponse({}));
                     }
+                }).catch(function (err) {
+                    return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
                 });
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to retrieve meeting areas right now, please again later.'));
