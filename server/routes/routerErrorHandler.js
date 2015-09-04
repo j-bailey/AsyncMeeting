@@ -24,7 +24,7 @@ module.exports.handleRouteErrors = function (err, req, res, next) {
             return next(err);
         }
         var message = err.message,
-            httpCode = err.errorCode,
+            httpCode = err.httpCode,
             runSilent = err.runSilent;
 
         err.handled = true;

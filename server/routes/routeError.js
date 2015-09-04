@@ -1,14 +1,13 @@
 "use strict";
 
-var RouteError = function(errorCode, msg, runSilent){
+var RouteError = function(httpCode, msg, runSilent){
     this.name = 'RouteError'
-    this.errorCode = errorCode || 500;
+    this.httpCode = httpCode || 500;
     this.message = msg || 'Unknown error';
-    this.stack = (new Error()).stack;
+    Error.captureStackTrace(this);
+    Error.call(this, msg);
     this.runSilent = (runSilent === undefined)? false: runSilent;
 };
-
-RouteError.prototype = new Error;
 
 module.exports = RouteError;
 
