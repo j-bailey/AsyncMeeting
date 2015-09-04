@@ -18,7 +18,7 @@ var _findAllowedMeetingArea = function (userId, tenantIds, criteria, requestedSk
         UserAllowedResources = dbConn.model('UserAllowedResources');
     var uarCriteria = {userId: new ObjectId(userId)};
     var tenantIdArray = [];
-    if (tenantIds && tenantIds != null) {
+    if (tenantIds && tenantIds !== null) {
         if (tenantIds.constructor !== Array) {
             tenantIdArray[0] = tenantIds;
         } else {
@@ -255,9 +255,6 @@ module.exports = {
     },
     getMeetingAreaById: function (req, res, next) {
         try {
-            var MeetingArea = req.db.model('MeetingArea'),
-                userTenantId = req.session.tenantId;
-
             modelUtils.throwErrorIfNotObjectId(req.params.meetingAreaId, false, 'Need a valid Meeting Area ID');
             var meetingAreaId = req.params.meetingAreaId;
             _findAllowedMeetingArea(req.session.userDbId, null, {_id: (new ObjectId(meetingAreaId))},
@@ -320,7 +317,8 @@ module.exports = {
             var parentId;
             var dbConn = req.db;
 
-            modelUtils.throwErrorIfNotObjectId((req.body) ? req.body.parentMeetingAreaId : '', true, "parent meeting area ID is not valid or is missing.  ' +" +
+            modelUtils.throwErrorIfNotObjectId((req.body) ? req.body.parentMeetingAreaId : '', true,
+                "parent meeting area ID is not valid or is missing.  ' +" +
                 "Please provide a valid parent meeting ID.");
 
             parentId = req.body.parentMeetingAreaId;

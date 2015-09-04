@@ -1,3 +1,4 @@
+"use strict";
 
 var HandlerError = function(httpCode, msg){
     this.name = 'HandlerError';

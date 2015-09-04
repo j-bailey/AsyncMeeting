@@ -1,3 +1,5 @@
+"use strict";
+
 var HandlerError = require('../controllers/api/handlers/handlerError');
 
 var checkForValidObjectId = new RegExp("^[0-9a-fA-F]{24}$");
