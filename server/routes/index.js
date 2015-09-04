@@ -1,7 +1,7 @@
 "use strict";
 
 var router = require('express').Router(),
-    routerUtils = require('./routerErrorHandler'),
+    routerErrorHandler = require('./routerErrorHandler'),
     passport = require('passport'),
     bodyParser = require('body-parser');
 
@@ -25,6 +25,8 @@ router.use(function(req, res, next) {
     next(err);
 });
 
-router.use(routerUtils.handleErrors);
+router.use(routerErrorHandler.handleRouteErrors);
+router.use(routerErrorHandler.handleAclHttpErrors);
+router.use(routerErrorHandler.handleGenericErrors);
 
 module.exports = router;
