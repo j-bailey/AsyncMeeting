@@ -17,8 +17,8 @@ run `npm run dev`
 # Testing
 
 This project has three types of tests.
-- Unit tests
-- Integration Tests
+- Unit tests (server and client)
+- Integration Tests (server and client)
 - end-to-end (e2e) tests
 
 Unit tests have no external dependencies to run including the files system, they run super fast, and only set a small unit of the system.  
@@ -34,9 +34,9 @@ More details are available at [Google Testing Blog: Test Size](http://googletest
 - To use the test configuration change the env to test.  This will do things like use the test.json configuration file
   which will point to a test instance of the database instead of the dev or production one.  `export NODE_ENV=test`
 - `npm test` will run unit and if possible integration tests to include coverage for unit tests
-- `npm unit-tests:server` to run server unit tests 
-- `npm unit-tests:client` to run client unit tests
-- `npm e2e` to run end-to-end tests
+- `npm run unit-tests:server` to run server unit tests 
+- `npm run unit-tests:client` to run client unit tests
+- `npm run e2e` to run end-to-end tests
 
 ## e2e Testing
 
@@ -79,21 +79,6 @@ and the reference image.  Any value above zero is a measure the difference betwe
 - run `export NODE_ENV=production`
 - run `npm start`
 
-# Directories
-
--  /controllers - server controllers
--  /layouts - page layouts with Angular syntax processed by the client
--  /models - server models
--  /templates - Angular containers servered up by the server
-
--  /ng - client Angular code
--  /css - client css
-
--  /gulp - gulp task files
--  /assets - is the build area
--  /node_modules - node library files
--  /test - tests e2e, Angular unit and Node level testing
-
 # Logging
 Client/AngularJS Logging
 - Use the $log service.  This service can be injected into any controller, service, etc by adding $log to the 
@@ -103,6 +88,4 @@ Server/NodeJS Logging
 - Use the winston logger.
 - In each JS file you need logging just do `var logger = require('winston')`
 - Call the logger.  Ex. logger.debug(""), logger.error(""), logger.info(""), logger.log(""), etc.
-
-# Bugs
 
