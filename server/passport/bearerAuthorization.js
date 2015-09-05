@@ -26,7 +26,7 @@ module.exports = function (passport) {
                     logger.debug('No token found');
                     done(null, false);
                 }
-            }).catch(function(err){
+            }).fail(function(err){
                 done(err, 'error');
             });
         }

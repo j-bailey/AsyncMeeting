@@ -1,7 +1,6 @@
 "use strict";
 
-var HandlerError = require('../controllers/api/handlers/handlerError');
-
+var RouteError = require('../routes/routeError');
 var checkForValidObjectId = new RegExp("^[0-9a-fA-F]{24}$");
 
 module.exports = {
@@ -14,7 +13,7 @@ module.exports = {
             return;
         }
         if ((!checkForValidObjectId.test(objectId))) {
-            throw new HandlerError(400, msg || 'Not a valid ID');
+            throw new RouteError(400, msg || 'Not a valid ID');
         }
     }
 };

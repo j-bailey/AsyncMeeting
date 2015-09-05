@@ -54,11 +54,11 @@ describe('viewing meeting areas', function() {
             expect($scope.currentUser).to.equal('testUser');
 
             childMeetingAreasDeferred.resolve(
-                { data: [{ title: "Child 1", description: "" }, { title: "Child 2", description: "" }] });
+                { data:{data: [{ title: "Child 1", description: "" }, { title: "Child 2", description: "" }] }});
             $scope.$digest();
             expect($scope.meetingAreas).to.have.length(2);
 
-            meetingAreaDeferred.resolve({ data: { title: "Parent", description: "" } });
+            meetingAreaDeferred.resolve({data: { data: { title: "Parent", description: "" } }});
             $scope.$digest();
             expect($scope.currentMeetingArea.title).to.equal("Parent");
         });
@@ -81,13 +81,13 @@ describe('viewing meeting areas', function() {
         });
 
         it('should create a new meeting area', function() {
-            createMeetingAreaDeferred.resolve({ title: "New Meeting Area", description: "New Meeting Area Description", parentMeetingAreaId: "123" });
+            createMeetingAreaDeferred.resolve({data: { title: "New Meeting Area", description: "New Meeting Area Description", parentMeetingAreaId: "123" }});
             $scope.$digest();
             createMeetingAreaSpy.should.have.been.calledOnce;
         });
 
         it('should retrieve the list of child meeting areas', function() {
-            childMeetingAreasDeferred.resolve({ data: [{ title: "Child 1", description: "" }, { title: "Child 2", description: "" }] });
+            childMeetingAreasDeferred.resolve({data:{ data: [{ title: "Child 1", description: "" }, { title: "Child 2", description: "" }]} });
             $scope.$digest();
             expect($scope.meetingAreas).to.have.length(2);
         })

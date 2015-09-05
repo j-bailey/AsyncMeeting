@@ -18,16 +18,16 @@
 
             // Call server to get current meeting area details and direct children.
             meetingAreaService.getChildMeetingAreas($scope.currentMeetingAreaId).then(function(meetingAreas) {
-                $scope.meetingAreas = meetingAreas.data;
+                $scope.meetingAreas = meetingAreas.data.data;
                 $scope.currentMeetingArea = null;
 
                 // Retrieve the current meeting area data.
                 if ( $scope.currentMeetingAreaId ) {
                     meetingAreaService.getMeetingArea($scope.currentMeetingAreaId).then(function(meetingArea) {
-                        $scope.currentMeetingArea = meetingArea.data;
+                        $scope.currentMeetingArea = meetingArea.data.data;
 
                         // Customize breadcrumb label
-                        $scope.breadcrumbs.setLabel(meetingArea.data.title);
+                        $scope.breadcrumbs.setLabel(meetingArea.data.data.title);
 
                         // Reset the form data.
                         $scope.resetForms($scope.currentMeetingArea);
@@ -94,10 +94,10 @@
                         // of the one just created.
                         meetingAreaService.getChildMeetingAreas($scope.currentMeetingAreaId)
                             .then(function(meetingAreas) {
-                            $scope.meetingAreas = meetingAreas.data;
+                            $scope.meetingAreas = meetingAreas.data.data;
                         }, function() {
                             $scope.meetingAreas = null;
-                            $scope.errorMsg = "Encountered error retrieving meeting areas for '" + createdMeetingArea.data.title + "'.";
+                            $scope.errorMsg = "Encountered error retrieving meeting areas for '" + createdMeetingArea.data.data.title + "'.";
                         });
                     },
                     function() {

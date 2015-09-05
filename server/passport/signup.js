@@ -56,7 +56,7 @@ module.exports = function(passport) {
                                     return done(null, savedUser);
                                 }).fail(function(err){
                                     if (err){
-                                        return done(null, false, err);
+                                        return done(err, false);
                                     }
                                 });
 

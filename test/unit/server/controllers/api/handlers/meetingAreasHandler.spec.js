@@ -4,7 +4,7 @@ var logger = require('winston'),
     meetingAreaHandler = require('../../../../../../server/controllers/api/handlers/meetingAreasHandler');
 
 
-describe('meeting area route', function () {
+describe.skip('meeting area route', function () {
     var sandbox,
         prevError,
         errorLogSpy;
@@ -23,7 +23,7 @@ describe('meeting area route', function () {
     });
 
     describe('getMeetingAreasWithParentId', function () {
-        it.only('should return a meeting area', function (done) {
+        it('should return a meeting area', function (done) {
             var parentMeetingArea = new MeetingArea({
                 title: "Parent Meeting Area Title",
                 description: "Parent Meeting Area Description"

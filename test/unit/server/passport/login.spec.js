@@ -2,7 +2,7 @@ var mongoose = require('mongoose'),
     User = mongoose.model('User')? mongoose.model('User'): mongoose.model('User', require('../../../../server/models/user').schema),
     db = require('../../../../server/db');
 
-describe('login', function() {
+describe.skip('login', function() {
     var sandbox;
 
     beforeEach(function() {

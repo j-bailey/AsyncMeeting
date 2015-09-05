@@ -18,7 +18,6 @@ var UserAllowedResources = db.readWriteConnection.model('UserAllowedResources');
 var scryptParams = null;
 try{
     scryptParams = scrypt.params(nconf.get('security:scrypt:maxtime'), nconf.get('security:scrypt:maxmem'), nconf.get('security:scrypt:maxmemfrac'));
-    //scrypt.hash.config.keyEncoding = "ascii";
     scrypt.hash.config.keyEncoding = "utf8";
     scrypt.hash.config.outputEncoding = "hex";
 } catch (e) {

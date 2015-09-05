@@ -83,7 +83,7 @@ acl.init().then(function() {
      */
     var server,
         nEnv = nconf.get('NODE_ENV');
-    if (!nEnv || nEnv === 'development' || nEnv === 'dev-test') {
+    if (!nEnv || nEnv === 'development' || nEnv === 'dev-test' || nEnv === 'dev' ) {
         logger.info('Server is running in development mode!');
         server = http.createServer(domainProcessor);
     } else {
@@ -117,7 +117,7 @@ acl.init().then(function() {
     function onListening() {
         debug('Listening on port ' + server.address().port);
     }
-}).catch(function(err){
+}).fail(function(err){
     console.error('Error on start up: ' + err);
     console.error(err.stack);
 });

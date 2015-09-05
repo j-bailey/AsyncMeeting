@@ -15,7 +15,7 @@ var steps = function () {
 
     this.Given(/^I have a valid and active account with username (.*), email (.*), and password (.*)$/, function (username, email, password, next) {
         db.adminConnection.db.dropCollection('users', function (err, result) {
-            //if (err) next(err);
+            if (err && err.message !== 'ns not found') return next(err);
             var user = new User({ email: email, username: username, password: password});
             usersHandler.createNewSignedUpUser(user).then(function (savedUser, err) {
                 if (err) {
@@ -65,7 +65,7 @@ var steps = function () {
 
     this.Given(/^I have an invalid account$/, function (next) {
         db.adminConnection.db.dropCollection('users', function (err, result) {
-            //if (err) next(err);
+            if (err) return next(err);
             var user = new User({ email: email + 1, username: 'user1', password: pass });
             user.save(function (err) {
                 if (err) {
@@ -83,7 +83,7 @@ var steps = function () {
 
     this.Given(/^System does not have any registration credentials$/, function (next) {
         db.adminConnection.db.dropCollection('users', function (err, result) {
-            //if (err) next(err);
+            if (err && err.message !== 'ns not found') return next(err);
             next();
         });
     });

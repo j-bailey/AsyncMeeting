@@ -97,7 +97,7 @@ var _grantUserAccess = function (allowedUserId, resourceTenantId, resourceId, pe
                                 return defer.reject(new RouteError(400, 'Invalid permission'));
                             }
                             return defer.resolve();
-                        }).catch(function (err) {
+                        }).fail(function (err) {
                             logger.debug(err);
                             return defer.reject(new RouteError());
                         });
@@ -131,7 +131,7 @@ var _removeUserAccess = function (resourceId, allowedUserId, permission, dbConn)
                         return defer.reject(new RouteError(400, 'Invalid permission'));
                     }
                     defer.resolve();
-                }).catch(function (err) {
+                }).fail(function (err) {
                     logger.error(err);
                     return defer.reject(new RouteError());
                 });
@@ -198,7 +198,7 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn, myFirstMeetin
                                 acl.addUserRoles(user.username, 'meetingarea-viewer');
 
                                 return defer.resolve(savedMeetingArea);
-                            }).catch(function (err) {
+                            }).fail(function (err) {
                                 logger.error("Error saving meeting area: " + err.message);
                                 savedMeetingArea.remove();
                                 return defer.reject(err);

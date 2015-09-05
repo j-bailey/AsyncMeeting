@@ -17,10 +17,11 @@ Feature: Register for an account
     Then I am offered to login to the system
 
     Examples:
-      | username                      | email                                                   | password                       | description                   |
-      | u                             | u@u.c                                                   | a                              | shortest values               |
-      | abcdefghijklmnopqrstuvxyz     | abcdefghijklmnopqrstuvxyz@abcdefghijklmnopqrstuvxyz.com | abcdesfghijklmnopqrstuvxy      | longest values                |
-      | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | u!$%^&*\|}{'/?`~@user.com                               | u!a@#$%^&*()\|\]}[{'";:/>?<,`~ | acceptable special characters |
+      | username               | email                                                   | password | description                   |
+      | Us#1                   | u@u.c                                                   | aA123#   | shortest values               |
+      | Abcdefghijklmnopq1#    | abcdefghijklmnopqrstuvxyz@abcdefghijklmnopqrstuvxyz.com | aA123#   | longest values                |
+#      | u!@#$%^&*()\|\]}[{'";: | u!$%^&*\|}{'/?`~@user.com                               | aA123#   | acceptable special characters |
+#      | u:/>?<,`~              | u!$%^&*\|}{'/?`~@user.com                               | aA123#   | acceptable special characters |
 
 #      TODO Figure out how to handle HTML 5 validation messages
 #  @negative_test

@@ -15,7 +15,7 @@ module.exports = function(grunt) {
         console.log('NODE_ENV = ' + process.env.NODE_ENV);
 
         if (testFolder.indexOf('integration') > -1){
-            grunt.task.run(['start-external-services', 'file-launch:gulpTestServer:gulp:[\'test|server\']:2']);
+            grunt.task.run(['start-external-services', 'file-launch:gulpTestServer:gulp:[\'test|server\']:3']);
         }
         grunt.task.run(['launch-mocha-process:' + testFolder]);
 

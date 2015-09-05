@@ -25,6 +25,7 @@ router.use(function(req, res, next) {
     next(err);
 });
 
+router.use(routerErrorHandler.handleValidationErrors);
 router.use(routerErrorHandler.handleRouteErrors);
 router.use(routerErrorHandler.handleAclHttpErrors);
 router.use(routerErrorHandler.handleGenericErrors);

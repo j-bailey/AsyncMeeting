@@ -22,7 +22,7 @@ module.exports = function (req, res, next) {
             req.session.tenantId = contents.tId;
             req.session.userDbId = contents.uToken;
             next();
-        }).catch(function (err) {
+        }).fail(function (err) {
             logger.error(err);
             next(err);
         });

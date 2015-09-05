@@ -78,7 +78,7 @@ describe('controller/api/users', function () {
                                 .end(function (err, res) {
                                     // user1 will manage its own cookies
                                     // res.redirects contains an Array of redirects
-                                    if (err) console.error('err = ' + err);
+                                    if (err) done(err);
 
                                     accessToken1 = res.body.access_token;
                                     user2
@@ -90,7 +90,7 @@ describe('controller/api/users', function () {
                                         .end(function (err, res) {
                                             // user1 will manage its own cookies
                                             // res.redirects contains an Array of redirects
-                                            if (err) console.error('err = ' + err);
+                                            if (err) done(err);
 
                                             accessToken2 = res.body.access_token;
 
@@ -100,10 +100,10 @@ describe('controller/api/users', function () {
                                 });
                         });
                     });
-                }).catch(function (err) {
+                }).fail(function (err) {
                     done(err);
                 });
-            }).catch(function (err) {
+            }).fail(function (err) {
                 done(err);
             })
         });

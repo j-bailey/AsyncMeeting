@@ -18,6 +18,7 @@ function handleJsonErrorResponse(errMsg, httpCode, runSilent, res) {
 }
 
 
+
 module.exports.handleRouteErrors = function (err, req, res, next) {
     try {
         if (!err || !(err.name) || err.name !== 'RouteError' || res.headersSent) {
@@ -29,10 +30,45 @@ module.exports.handleRouteErrors = function (err, req, res, next) {
 
         err.handled = true;
 
-        if (req.headers.accept === 'application/json') {
-            handleJsonErrorResponse(message, httpCode, runSilent, res);
+        if (req.headers.accept.indexOf('application/json') >= 0) {
+            return handleJsonErrorResponse(message, httpCode, runSilent, res);
+        } else if (req.headers.accept.indexOf('text/html') >= 0) {
+            res.status(httpCode || 500);
+            res.render(nconf.get('errors:view'), {
+                message: message
+            });
             return;
-        } else if (req.headers.accept === 'text/html') {
+        }
+    } catch (e){
+        logger.error('Fix router error handler NOW!!!');
+        logger.error(e);
+    }
+    next();
+};
+
+module.exports.handleValidationErrors = function (err, req, res, next) {
+    try {
+        if (!err || !(err.name) || err.name !== 'ValidationError' || res.headersSent) {
+            return next(err);
+        }
+        var message = err.message,
+            httpCode = 400,
+            runSilent = false;
+
+        err.handled = true;
+
+        if (err.errors) {
+            for (var p in err.errors) {
+                if( err.errors.hasOwnProperty(p) ) {
+                    message = message + ':  ' + err.errors[p].message + '\n';
+                }
+            }
+        }
+
+
+        if (req.headers.accept.indexOf('application/json') >= 0) {
+            return handleJsonErrorResponse(message, httpCode, runSilent, res);
+        } else if (req.headers.accept.indexOf('text/html') >= 0) {
             res.status(httpCode || 500);
             res.render(nconf.get('errors:view'), {
                 message: message
@@ -57,9 +93,9 @@ module.exports.handleAclHttpErrors = function (err, req, res, next) {
 
         err.handled = true;
 
-        if (req.headers.accept === 'application/json') {
+        if (req.headers.accept.indexOf('application/json') >= 0) {
             return handleJsonErrorResponse(message, httpCode, undefined, res);
-        } else if (req.headers.accept === 'text/html') {
+        } else if (req.headers.accept.indexOf('text/html') >= 0) {
             res.status(err.httpCode || err.errorCode || err.status || 500);
             res.render(nconf.get('errors:view'), {
                 message: err.msg || err.err.msg || err.message
@@ -79,16 +115,16 @@ module.exports.handleGenericErrors = function (err, req, res, next) {
             return next(err);
         }
 
-        var message = err.msg || err.err.msg || err.err.message,
+        var message = err.message || err.msg || err.err.msg || err.err.message,
             httpCode = err.httpCode || err.errorCode || err.status,
-            stack = err.err.errors || err.err.stack;
+            stack = err.stack || err.err.errors || err.err.stack;
 
         if (stack && nconf.get('NODE_ENV').toLowerCase() !== 'production') {
             logger.error(stack);
         }
-        if (req.headers.accept === 'application/json') {
+        if (req.headers.accept.indexOf('application/json') >= 0) {
             return handleJsonErrorResponse(message, httpCode, undefined, res);
-        } else if (req.headers.accept === 'text/html') {
+        } else if (req.headers.accept.indexOf('text/html') >= 0) {
             res.status(httpCode || 500);
             res.render(nconf.get('errors:view'), {
                 message: message

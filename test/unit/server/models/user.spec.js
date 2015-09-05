@@ -1,4 +1,5 @@
 var mongoose = require('mongoose'),
+    data_driven = require('data-driven'),
     db = require('../../../../server/db');
 
 describe('model/user', function () {
@@ -14,7 +15,7 @@ describe('model/user', function () {
         sandbox.restore();
     });
 
-    describe('findPublicUserByUserName', function () {
+    describe.skip('findPublicUserByUserName', function () {
         it('should return public user information for a given ID', function (done) {
             var userObj = {_id:1, username: "myName"},
                 populateStub1 = sandbox.stub(),
@@ -36,7 +37,7 @@ describe('model/user', function () {
             done();
         });
     });
-    describe('findPublicUserByEmail', function () {
+    describe.skip('findPublicUserByEmail', function () {
         it('should return public user information for a given ID', function (done) {
             var userObj = {_id:1, username: "myName"},
                 populateStub1 = sandbox.stub(),
@@ -59,7 +60,7 @@ describe('model/user', function () {
             done();
         });
     });
-    describe('quickFind', function () {
+    describe.skip('quickFind', function () {
         it('should limited user data based on search criteria', function (done) {
             var userObj = {_id:1, username: "myName"},
                 populateStub1 = sandbox.stub(),
@@ -83,6 +84,20 @@ describe('model/user', function () {
         });
     });
 
+    describe.only('isInvalidUsername', function(){
+        data_driven(['Abcdefghijklmnopqr#1', 'aA1#', 'aA1@'], function() {
+            it('should return false for valid usernames', function(username, done){
+                expect(user.schema.statics.isInvalidUsername(username)).to.equal(false);
+                done();
+            });
+        });
+        data_driven(['Abcdefghijklmnopqr#1s', ':::aa1#', 'aA1:::'], function() {
+            it('should return non false for invalid usernames', function(username, done){
+                expect(user.schema.statics.isInvalidUsername(username)).to.not.equal(false);
+                done();
+            });
+        });
+    });
 });
 
 
