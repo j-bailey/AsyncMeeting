@@ -117,7 +117,7 @@ acl.init().then(function() {
     function onListening() {
         debug('Listening on port ' + server.address().port);
     }
-}).fail(function(err){
+}).catch(function(err){
     console.error('Error on start up: ' + err);
     console.error(err.stack);
 });

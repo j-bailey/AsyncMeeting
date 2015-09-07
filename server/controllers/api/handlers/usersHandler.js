@@ -60,7 +60,7 @@ var createNewSignedUpUser = function (newUser) {
                     }
                     defer.resolve(safeUser);
                 });
-            }).fail(function(err){
+            }).catch(function(err){
                 // TODO review error handling
                 return defer.reject(err);
             });
@@ -97,7 +97,7 @@ module.exports = {
                 res.status(201).json(jsonResponse.successResponse(newUser));
             }, function(err){
                 next(handlerUtils.catchError(err, 'Unable to create user right now, please try again later.'));
-            }).fail(function (err) {
+            }).catch(function (err) {
                 next(handlerUtils.catchError(err, 'Unable to create user right now, please try again later.'));
             });
         } catch(e){

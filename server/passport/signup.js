@@ -54,7 +54,7 @@ module.exports = function(passport) {
 // save the user
                                 usersHandler.createNewSignedUpUser(newUser).then(function(savedUser) {
                                     return done(null, savedUser);
-                                }).fail(function(err){
+                                }).catch(function(err){
                                     if (err){
                                         return done(err, false);
                                     }
