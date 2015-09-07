@@ -37,7 +37,7 @@ var user3 = {
     email: 'berry@berry.com',
     password: 'pword1234',
     username: 'berry',
-    lastName: 'Smith',
+    lastName: 'Wade',
     firstName: 'Berry'
 };
 
@@ -51,7 +51,7 @@ var user4 = {
 };
 
 
-describe.only('controller/api/users', function () {
+describe('controller/api/users', function () {
     before(function (done) {
         Acl.init().then(function (aclIns) {
             acl = aclIns;
@@ -371,7 +371,106 @@ describe.only('controller/api/users', function () {
     });
 
     describe('GET by query', function() {
-        //it('should return a'
+        it('should return a list of users based on search criteria on case correct last name', function(done){
+            user1.request
+                .get('/api/users/?searchCriteria=Smith')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + user1.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.status).to.equal('success');
+                    expect(result.data.length).to.equal(2);
+                })
+                .end(done);
+        });
+        it('should return a list of users based on search criteria on case correct last name, limit to one', function(done){
+            user1.request
+                .get('/api/users/?searchCriteria=Smith&limit=1')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + user1.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.status).to.equal('success');
+                    expect(result.data.length).to.equal(1);
+                })
+                .end(done);
+        });
+        it('should return a list of users based on search criteria on case correct last name skip 1', function(done){
+            user1.request
+                .get('/api/users/?searchCriteria=Smith&skip=1')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + user1.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.status).to.equal('success');
+                    expect(result.data.length).to.equal(1);
+                })
+                .end(done);
+        });
+        it('should return a list of users based on search criteria on case correct last name, skip one and limit 1', function(done){
+            user1.request
+                .get('/api/users/?searchCriteria=Smith&limit=1&skip=1')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + user1.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.status).to.equal('success');
+                    expect(result.data.length).to.equal(1);
+                })
+                .end(done);
+        });
+
+        it('should return a list of users based on search criteria for lower case last name', function(done){
+            user1.request
+                .get('/api/users/?searchCriteria=smith')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + user1.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.status).to.equal('success');
+                    expect(result.data.length).to.equal(2);
+                })
+                .end(done);
+        });
+        it('should return a list of users based on search criteria for middle of last name', function(done){
+            user1.request
+                .get('/api/users/?searchCriteria=mit')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + user1.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.status).to.equal('success');
+                    expect(result.data.length).to.equal(2);
+                })
+                .end(done);
+        });
+        it('should return a list of users based on search criteria for lower case first name', function(done){
+            user1.request
+                .get('/api/users/?searchCriteria=tom')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + user1.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .expect(function (res) {
+                    var result = JSON.parse(res.text);
+                    expect(result.status).to.equal('success');
+                    expect(result.data.length).to.equal(1);
+                })
+                .end(done);
+        });
+
     });
 
     describe('POST \'/\'', function () {

@@ -2,6 +2,7 @@
 
 var logger = require('winston'),
     db = require('../../../../server/db'),
+    queryUtils = require('../../../utils/queryUtils'),
     Q = require('q'),
     meetingAreaHandler = require('../../../../server/controllers/api/handlers/meetingAreasHandler'),
     secUtils = require('../../../utils/securityUtils'),
@@ -102,6 +103,28 @@ module.exports = {
             }).done();
         } catch(e){
             next(handlerUtils.catchError(e, 'Unable to check username validity right now, please later.'));
+        }
+    },
+    findByNameSearch: function (req, res, next){
+        try {
+            var User = req.db.model('User');
+            var skip = req.query.skip || 0,
+                limit = queryUtils.getMaxQueryLimit('user', req.query.limit),
+                searchCriteria = req.query.searchCriteria;
+
+            // FIXME add checks on input, so hacks do not make it to the query
+            var regexCriteria = new RegExp(searchCriteria.toLowerCase());
+            User.find({ $or: [{ searchFirstName: regexCriteria}, { searchLastName: regexCriteria}]})
+                .skip(skip)
+                .limit(limit)
+                .exec(function (err, users) {
+                    if (err) {
+                        return next(handlerUtils.catchError(err, 'Error trying to find user, please try again later'));
+                    }
+                    res.status(200).json(jsonResponse.successResponse(users));
+                });
+        } catch (e){
+            next(handlerUtils.catchError(e, 'Error trying to find user, please try again later'));
         }
     },
     findById: function (req, res, next) {

@@ -8,6 +8,8 @@ router.get('/invalidPassword/:password', secUtils.readOnlyDbConnection, handlers
 
 router.get('/invalidUsername/:username', secUtils.readOnlyDbConnection, handlers.isInvalidUsername);
 
+router.get('/', secUtils.readOnlyDbConnection, handlers.findByNameSearch);
+
 router.get('/:id', acl.middleware(), secUtils.readOnlyDbConnection, handlers.findById);
 
 router.post('/', acl.middleware(), secUtils.determineDbConnection, handlers.createUser);

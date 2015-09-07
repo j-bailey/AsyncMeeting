@@ -24,13 +24,15 @@ try{
     logger.error(e);
 }
 
-
+// FIXME add constraints to firstname and lastname
 var schema = new mongoose.Schema({
     username: {type: String, required: false, select: true},
     password: {type: String, required: true, select: false},
     email: {type: String, required: true},
     firstName: String,
     lastName: String,
+    searchLastName: String,
+    searchFirstName: String,
     permissions: [{type: mongoose.Schema.Types.ObjectId, ref: 'Permission'}],
     roles: [{type: mongoose.Schema.Types.ObjectId, ref: 'Role'}]
 });
@@ -49,6 +51,22 @@ var isInvalidUsername = function(username){
 schema.path('username').validate(function (value) {
     return (!(isInvalidUsername(value)));
 }, invalidUsernameMessage);
+
+schema.pre('validate', function (next) {
+    var user = this;
+// only hash the password if it has been modified (or is new)
+    if (!user.isModified('lastName') && !user.isModified('firstName')) {
+        return next();
+    }
+
+    if (user.isModified('lastName')) {
+        user.searchLastName = user.lastName.toLowerCase();
+    }
+    if (user.isModified('firstName')) {
+        user.searchFirstName = user.firstName.toLowerCase();
+    }
+    next();
+});
 
 schema.pre('validate', function (next) {
     var user = this;
