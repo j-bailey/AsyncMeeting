@@ -318,14 +318,13 @@ describe('controller/api/meetingAreas', function () {
                 })
                 .end(done);
         });
-        it('should return 401 with no parent meeting area and injection attack', function (done) {
+        it.only('should return 401 with no parent meeting area and injection attack', function (done) {
             user1
                 .get('/api/meetingareas?parentId=null' + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
                 .set('Accept', 'application/json')
                 .set('Authorization', 'Bearer ' + accessToken1)
-                // FIXME need to get the 401 to show up in the http code
-                //.expect('Content-Type', /json/)
-                //.expect(401)
+                .expect('Content-Type', /json/)
+                .expect(401)
                 .expect(function (res) {
                     expect(res.error.message).to.equal('cannot GET /api/meetingareas?parentId=null' + '%3Bvar%20date%3Dnew%20Date()%3B%20do%7BcurDate%20%3D%20new%20Date()%3B%7Dwhile(cur-Date-date%3C10000 (401)');
                     expect(JSON.parse(res.text).status).to.equal('error');
