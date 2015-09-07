@@ -42,7 +42,7 @@ var acl = null;
 
 describe('controller/api/meetingAreas', function () {
 
-    var getUserWithTentantIdByUserId = function(userId){
+    var getUserWithTentantIdByUserId = function (userId) {
         var defer = Q.defer();
         User.findById(userId).select('+tenantId').lean().exec(function (err, savedUser) {
             if (err) {
@@ -52,7 +52,7 @@ describe('controller/api/meetingAreas', function () {
         });
         return defer.promise;
     };
-    var loginToServer = function(user, email, password){
+    var loginToServer = function (user, email, password) {
         var defer = Q.defer();
         user
             .post('/email-login')
@@ -90,13 +90,13 @@ describe('controller/api/meetingAreas', function () {
                 usersHandler.createNewSignedUpUser(user1Obj),
                 usersHandler.createNewSignedUpUser(user2Obj),
                 usersHandler.createNewSignedUpUser(user3Obj)
-            ]).spread(function(savedUser1, savedUser2, savedUser3){
+            ]).spread(function (savedUser1, savedUser2, savedUser3) {
                 Q.allSettled([
                         getUserWithTentantIdByUserId(savedUser1.value._id),
                         getUserWithTentantIdByUserId(savedUser2.value._id),
                         getUserWithTentantIdByUserId(savedUser3.value._id)
                     ]
-                ).spread(function(u1, u2, u3) {
+                ).spread(function (u1, u2, u3) {
                         userModel1 = u1.value;
                         userModel2 = u2.value;
                         userModel3 = u3.value;
@@ -104,7 +104,7 @@ describe('controller/api/meetingAreas', function () {
                             loginToServer(user1, email1, pass1),
                             loginToServer(user2, email2, pass2),
                             loginToServer(user3, email3, pass3)
-                        ]).spread(function(token1, token2, token3) {
+                        ]).spread(function (token1, token2, token3) {
                             accessToken1 = token1.value;
                             accessToken2 = token2.value;
                             accessToken3 = token3.value;
@@ -112,6 +112,7 @@ describe('controller/api/meetingAreas', function () {
                                 title: "Parent Meeting Area Title",
                                 description: "Parent Meeting Area Description",
                                 parentMeetingArea: null,
+                                inheritsParentAccess: true,
                                 tenantId: userModel1.tenantId
                             });
 
@@ -123,6 +124,7 @@ describe('controller/api/meetingAreas', function () {
                                     title: "Child Meeting Area Title",
                                     description: "Child Meeting Area Description",
                                     parentMeetingArea: savedItem._id,
+                                    inheritsParentAccess: true,
                                     tenantId: userModel1.tenantId
                                 });
 
@@ -134,12 +136,13 @@ describe('controller/api/meetingAreas', function () {
                                         title: "Child 2 Meeting Area Title",
                                         description: "Child 2 Meeting Area Description",
                                         parentMeetingArea: savedChildItem._id,
+                                        inheritsParentAccess: true,
                                         tenantId: userModel1.tenantId
                                     });
 
                                     meetingAreaHandler._createMeetingArea(child2MeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem2) {
                                         child2MeetingAreaId = savedChildItem2._id;
-                                        MeetingArea.findById(childMeetingAreaId)
+                                        MeetingArea.findById(parentMeetingAreaId)
                                             .select('+tenantId')
                                             .lean()
                                             .exec(function (err, meetingArea) {
@@ -159,7 +162,7 @@ describe('controller/api/meetingAreas', function () {
                         }).done()
                     }).done()
             }).done();
-        }).catch(function(err){
+        }).catch(function (err) {
             return done(err);
         }).done();
     });
@@ -243,6 +246,52 @@ describe('controller/api/meetingAreas', function () {
                 })
                 .end(done);
         });
+        it('should get access denied for a given parent id due to granted access above it, but inheritsParentAccess set to false', function (done) {
+            MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: false}, function (err, raw) {
+                if (err) return done(err);
+                user1
+                    .get('/api/meetingareas?parentId=' + childMeetingAreaId)
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + accessToken3)
+                    .expect('Content-Type', /json/)
+                    .expect(401)
+                    .expect(function (res) {
+                        var result = JSON.parse(res.text);
+                        expect(result.status).to.equal('error');
+                        expect(result.message).to.equal('Not allowed');
+                    })
+                    .end(function () {
+                        MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: true}, function (err, raw) {
+                            if (err) return done(err);
+                            done();
+                        });
+                    });
+
+            })
+        });
+        it('should get access denied for a given parent id due to granted access above it, but inheritsParentAccess set to false on parent', function (done) {
+            MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: false}, function (err, raw) {
+                if (err) return done(err);
+                user1
+                    .get('/api/meetingareas?parentId=' + parentMeetingAreaId)
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + accessToken3)
+                    .expect('Content-Type', /json/)
+                    .expect(401)
+                    .expect(function (res) {
+                        var result = JSON.parse(res.text);
+                        expect(result.status).to.equal('error');
+                        expect(result.message).to.equal('Not allowed');
+                    })
+                    .end(function () {
+                        MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: true}, function (err, raw) {
+                            if (err) return done(err);
+                            done();
+                        });
+                    });
+
+            })
+        });
         it('should be denied access', function (done) {
             user2
                 .get('/api/meetingareas?parentId=' + parentMeetingAreaId)
@@ -268,16 +317,18 @@ describe('controller/api/meetingAreas', function () {
                 .end(function (err, res) {
                     expect(err).to.be.null;
                     var result = JSON.parse(res.text);
-                    MeetingArea.find({$or: [{ancestors: firstMeetingAreaId}, {_id: firstMeetingAreaId},
-                        {$and: [{tenantId: userModel1.tenantId}, {parentMeetingArea: null}]}]})
+                    MeetingArea.find({
+                        $or: [{ancestors: firstMeetingAreaId}, {_id: firstMeetingAreaId},
+                            {$and: [{tenantId: userModel1.tenantId}, {parentMeetingArea: null}]}]
+                    })
                         .sort('_id')
                         .exec(function (err, meetingAreas) {
-                        expect(result.data).to.have.length(meetingAreas.length);
-                        expect(result.data[1]._id.toString()).to.equal(parentMeetingAreaId.toString());
-                        expect(result.data[2]._id.toString()).to.equal(childMeetingAreaId.toString());
-                        expect(result.data[3]._id.toString()).to.equal(child2MeetingAreaId.toString());
-                        done();
-                    });
+                            expect(result.data).to.have.length(meetingAreas.length);
+                            expect(result.data[1]._id.toString()).to.equal(parentMeetingAreaId.toString());
+                            expect(result.data[2]._id.toString()).to.equal(childMeetingAreaId.toString());
+                            expect(result.data[3]._id.toString()).to.equal(child2MeetingAreaId.toString());
+                            done();
+                        });
                 });
         });
         it('should return limited meeting areas based on granted access with no parent meeting area', function (done) {
@@ -297,9 +348,10 @@ describe('controller/api/meetingAreas', function () {
                         })
                         .sort('_id')
                         .exec(function (err, meetingAreas) {
-                            expect(result.data).to.have.length(meetingAreas.length);
-                            expect(result.data[1]._id.toString()).to.equal(childMeetingAreaId.toString());
-                            expect(result.data[2]._id.toString()).to.equal(child2MeetingAreaId.toString());
+                            expect(result.data).to.have.length(meetingAreas.length + 1);
+                            expect(result.data[1]._id.toString()).to.equal(parentMeetingAreaId.toString());
+                            expect(result.data[2]._id.toString()).to.equal(childMeetingAreaId.toString());
+                            expect(result.data[3]._id.toString()).to.equal(child2MeetingAreaId.toString());
                             done();
                         });
                 });
@@ -318,7 +370,7 @@ describe('controller/api/meetingAreas', function () {
                 })
                 .end(done);
         });
-        it.only('should return 401 with no parent meeting area and injection attack', function (done) {
+        it('should return 401 with no parent meeting area and injection attack', function (done) {
             user1
                 .get('/api/meetingareas?parentId=null' + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
                 .set('Accept', 'application/json')
@@ -418,6 +470,55 @@ describe('controller/api/meetingAreas', function () {
                 })
                 .end(done);
         });
+        it('should return a forbidden error', function (done) {
+            MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: false}, function (err, raw) {
+                if (err) return done(err);
+
+                user2
+                    .get('/api/meetingareas/' + parentMeetingAreaId)
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + accessToken3)
+                    .expect('Content-Type', /json/)
+                    .expect(401)
+                    .expect(function (res) {
+                        var result = JSON.parse(res.text);
+                        expect(result.message).to.equal('Not allowed');
+                        expect(result.status).to.equal('error');
+                        expect(result.data).to.be.empty;
+                    })
+                    .end(function() {
+                        MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: false}, function (err, raw) {
+                            if (err) return done(err);
+                            done();
+                        });
+                    });
+            });
+        });
+        it('should return a forbidden error', function (done) {
+            MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: false}, function (err, raw) {
+                if (err) return done(err);
+
+                user2
+                    .get('/api/meetingareas/' + childMeetingAreaId)
+                    .set('Accept', 'application/json')
+                    .set('Authorization', 'Bearer ' + accessToken3)
+                    .expect('Content-Type', /json/)
+                    .expect(401)
+                    .expect(function (res) {
+                        var result = JSON.parse(res.text);
+                        expect(result.message).to.equal('Not allowed');
+                        expect(result.status).to.equal('error');
+                        expect(result.data).to.be.empty;
+                    })
+                    .end(function() {
+                        MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: false}, function (err, raw) {
+                            if (err) return done(err);
+                            done();
+                        });
+                    });
+            });
+        });
+
         it('should return a 403 for an injection attack', function (done) {
             user1
                 .get('/api/meetingareas/' + parentMeetingAreaId + ';var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
@@ -557,7 +658,7 @@ describe('controller/api/meetingAreas', function () {
                 .expect('Content-Type', /json/)
                 .expect(401)
                 .end(function (err, res) {
-                    if (err){
+                    if (err) {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
@@ -576,7 +677,7 @@ describe('controller/api/meetingAreas', function () {
                 .set('Accept', 'application/json')
                 .expect(200)
                 .end(function (err, res) {
-                    if (err){
+                    if (err) {
                         return done(err);
                     }
                     MeetingArea.find({_id: child2MeetingAreaId}, function (err, meetingAreas) {
@@ -592,7 +693,7 @@ describe('controller/api/meetingAreas', function () {
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect(401)
                 .end(function (err, res) {
-                    if (err){
+                    if (err) {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
@@ -609,7 +710,7 @@ describe('controller/api/meetingAreas', function () {
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect(401)
                 .end(function (err, res) {
-                    if (err){
+                    if (err) {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
@@ -626,7 +727,7 @@ describe('controller/api/meetingAreas', function () {
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect(401)
                 .end(function (err, res) {
-                    if (err){
+                    if (err) {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
@@ -664,7 +765,7 @@ describe('controller/api/meetingAreas', function () {
                 .set('Accept', 'application/json')
                 .expect(200)
                 .end(function (err, res) {
-                    if (err){
+                    if (err) {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);
@@ -686,7 +787,7 @@ describe('controller/api/meetingAreas', function () {
                 .set('Authorization', 'Bearer ' + accessToken2)
                 .expect(401)
                 .end(function (err, res) {
-                    if (err){
+                    if (err) {
                         return done(err);
                     }
                     var result = JSON.parse(res.text);

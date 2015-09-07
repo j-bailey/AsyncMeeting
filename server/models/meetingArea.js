@@ -11,6 +11,7 @@ var db = require('../db');
 var schema = new mongoose.Schema({
     title: { type: String, required: true, select: true },
     description: { type: String, required: false, select: true },
+    inheritsParentAccess: {type: Boolean, required: true, default: true, select: true},
     parentMeetingArea: { type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea', select: true },
     ancestors: {type: [mongoose.Schema.Types.ObjectId], ref: 'MeetingArea', default:[], select:true}
 });

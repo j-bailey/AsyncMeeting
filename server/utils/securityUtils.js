@@ -190,7 +190,7 @@ module.exports = {
                     logger.warn('This combo is not allowed: ' + req.session.userId + ' - ' + req.baseUrl + ' - ' + req.method);
                     if (req.baseUrl.indexOf('meetingarea') >= 0 && (resourceId !== null || resourceId !== 'null')) {
                         var MeetingArea = db.readOnlyConnection.model('MeetingArea');
-                        // FIXME all injection hacks should not make to a DB query
+                        // FIXME all injection hacks should not make it to a DB query
                         MeetingArea.find({
                             $or: [
                                 {_id: resourceId},
@@ -230,6 +230,9 @@ module.exports = {
                                 } else {
                                     return next(new RouteError(401, 'Not allowed', false));
                                 }
+                                if (!meetingArea.inheritsParentAccess){
+                                    return next(new RouteError(401, 'Not allowed', false));
+                                }
                                 UserAllowedResources.find({$and: [{userId: req.session.userDbId}, {tenantId: meetingArea.tenantId}]})
                                     .exec(function (err, allowedResources) {
                                         if (err) {
@@ -253,7 +256,10 @@ module.exports = {
                                             } else {
                                                 allowedResources.forEach(function (allowedResource) {
                                                     meetingArea.ancestors.forEach(function (ancestor) {
-                                                        if (allowedResource.resourceId.toString() === ancestor.toString()) {
+                                                        var resourceIdStr = allowedResource.resourceId.toString(),
+                                                            ancestorIdStr = ancestor.toString();
+
+                                                        if (resourceIdStr === ancestorIdStr) {
                                                             controlledResource = req.baseUrl + '/' + ancestor.toString();
                                                             acl.isAllowed(req.session.userId, controlledResource,
                                                                 req.method.toLowerCase(), function (err, allow) {
