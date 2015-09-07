@@ -1,6 +1,7 @@
 var Acl = require('../../../../../server/security/acl'),
     expect = require('chai').expect,
     MeetingArea,
+    Q = require('q'),
     UserAllowedResources,
     meetingAreaHandler = require('../../../../../server/controllers/api/handlers/meetingAreasHandler'),
     usersHandler = require('../../../../../server/controllers/api/handlers/usersHandler'),
@@ -40,6 +41,36 @@ var acl = null;
 
 
 describe('controller/api/meetingAreas', function () {
+
+    var getUserWithTentantIdByUserId = function(userId){
+        var defer = Q.defer();
+        User.findById(userId).select('+tenantId').lean().exec(function (err, savedUser) {
+            if (err) {
+                return defer.reject(err);
+            }
+            defer.resolve(savedUser);
+        });
+        return defer.promise;
+    };
+    var loginToServer = function(user, email, password){
+        var defer = Q.defer();
+        user
+            .post('/email-login')
+            .set('Accept', 'application/json, text/plain, */*')
+            .set('Accept-encoding', 'gzip, deflate')
+            .set('Content-type', 'application/json;charset=UTF-8')
+            .send({email: email, password: password})
+            .end(function (err, res) {
+                // user1 will manage its own cookies
+                // res.redirects contains an Array of redirects
+                if (err) {
+                    return defer.reject(err);
+                }
+                defer.resolve(res.body.access_token);
+            });
+        return defer.promise;
+    };
+
     before(function (done) {
         Acl.init().then(function (aclIns) {
             acl = aclIns;
@@ -54,136 +85,83 @@ describe('controller/api/meetingAreas', function () {
             var user1Obj = new User({username: username1, email: email1, password: pass1});
             var user2Obj = new User({username: username2, email: email2, password: pass2});
             var user3Obj = new User({username: username3, email: email3, password: pass3});
-            usersHandler.createNewSignedUpUser(user1Obj).then(function (savedUser1, err) {
-                if (err) {
-                    return done(err)
-                }
-                User.findById(savedUser1._id).select('+tenantId').lean().exec(function (err, savedUser1) {
-                    userModel1 = savedUser1;
-                    usersHandler.createNewSignedUpUser(user2Obj).then(function (savedUser2, err) {
-                        if (err) {
-                            return done(err)
-                        }
-                        User.findById(savedUser2._id).select('+tenantId').lean().exec(function (err, savedUser2) {
-                            if (err) {
-                                return done(err)
-                            }
-                            userModel2 = savedUser2;
-                            usersHandler.createNewSignedUpUser(user3Obj).then(function (savedUser3, err) {
-                                if (err) {
-                                    return done(err)
-                                }
-                                User.findById(savedUser3._id).select('+tenantId').lean().exec(function (err, savedUser3) {
-                                    if (err) {
-                                        return done(err)
-                                    }
-                                    userModel3 = savedUser3;
-                                    user1
-                                        .post('/email-login')
-                                        .set('Accept', 'application/json, text/plain, */*')
-                                        .set('Accept-encoding', 'gzip, deflate')
-                                        .set('Content-type', 'application/json;charset=UTF-8')
-                                        .send({email: email1, password: pass1})
-                                        .end(function (err, res) {
-                                            // user1 will manage its own cookies
-                                            // res.redirects contains an Array of redirects
-                                            if (err) {
-                                                return done(err)
-                                            }
 
-                                            accessToken1 = res.body.access_token;
-                                            user2
-                                                .post('/email-login')
-                                                .set('Accept', 'application/json, text/plain, */*')
-                                                .set('Accept-encoding', 'gzip, deflate')
-                                                .set('Content-type', 'application/json;charset=UTF-8')
-                                                .send({email: email2, password: pass2})
-                                                .end(function (err, res) {
-                                                    // user1 will manage its own cookies
-                                                    // res.redirects contains an Array of redirects
-                                                    if (err) {
-                                                        return done(err)
-                                                    }
-
-                                                    accessToken2 = res.body.access_token;
-                                                    user3
-                                                        .post('/email-login')
-                                                        .set('Accept', 'application/json, text/plain, */*')
-                                                        .set('Accept-encoding', 'gzip, deflate')
-                                                        .set('Content-type', 'application/json;charset=UTF-8')
-                                                        .send({email: email3, password: pass3})
-                                                        .end(function (err, res) {
-                                                            // user1 will manage its own cookies
-                                                            // res.redirects contains an Array of redirects
-                                                            if (err) {
-                                                                return done(err)
-                                                            }
-
-                                                            accessToken3 = res.body.access_token;
-                                                            parentMeetingAreaId = "";
-                                                            childMeetingAreaId = "";
-                                                            child2MeetingAreaId = "";
-
-                                                            var meetingArea = new MeetingArea({
-                                                                title: "Parent Meeting Area Title",
-                                                                description: "Parent Meeting Area Description",
-                                                                parentMeetingArea: null,
-                                                                tenantId: userModel1.tenantId
-                                                            });
-
-                                                            meetingAreaHandler._createMeetingArea(meetingArea, userModel1.username, db.readWriteConnection).then(function (savedItem, err) {
-                                                                firstMeetingAreaId = savedItem.parentMeetingArea;
-                                                                parentMeetingAreaId = savedItem._id;
-
-                                                                var childMeetingArea = new MeetingArea({
-                                                                    title: "Child Meeting Area Title",
-                                                                    description: "Child Meeting Area Description",
-                                                                    parentMeetingArea: savedItem._id,
-                                                                    tenantId: userModel1.tenantId
-                                                                });
-
-                                                                meetingAreaHandler._createMeetingArea(childMeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem, err) {
-                                                                    childMeetingAreaId = savedChildItem._id;
-
-
-                                                                    var child2MeetingArea = new MeetingArea({
-                                                                        title: "Child 2 Meeting Area Title",
-                                                                        description: "Child 2 Meeting Area Description",
-                                                                        parentMeetingArea: savedChildItem._id,
-                                                                        tenantId: userModel1.tenantId
-                                                                    });
-
-                                                                    meetingAreaHandler._createMeetingArea(child2MeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem2) {
-                                                                        child2MeetingAreaId = savedChildItem2._id;
-                                                                        MeetingArea.findById(childMeetingAreaId)
-                                                                            .select('+tenantId')
-                                                                            .lean()
-                                                                            .exec(function (err, meetingArea) {
-                                                                                if (err) {
-                                                                                    done(err);
-                                                                                }
-                                                                                meetingAreaHandler._grantUserAccess(userModel3._id, meetingArea.tenantId, meetingArea._id, 'editor', db.readWriteConnection).then(function () {
-                                                                                    done();
-                                                                                });
-                                                                            });
-                                                                    });
-                                                                });
-
-                                                            }).catch(function (err) {
-                                                                return done(err);
-                                                            });
-                                                        });
-                                                });
-                                        });
-                                });
+            Q.allSettled([
+                usersHandler.createNewSignedUpUser(user1Obj),
+                usersHandler.createNewSignedUpUser(user2Obj),
+                usersHandler.createNewSignedUpUser(user3Obj)
+            ]).spread(function(savedUser1, savedUser2, savedUser3){
+                Q.allSettled([
+                        getUserWithTentantIdByUserId(savedUser1.value._id),
+                        getUserWithTentantIdByUserId(savedUser2.value._id),
+                        getUserWithTentantIdByUserId(savedUser3.value._id)
+                    ]
+                ).spread(function(u1, u2, u3) {
+                        userModel1 = u1.value;
+                        userModel2 = u2.value;
+                        userModel3 = u3.value;
+                        Q.allSettled([
+                            loginToServer(user1, email1, pass1),
+                            loginToServer(user2, email2, pass2),
+                            loginToServer(user3, email3, pass3)
+                        ]).spread(function(token1, token2, token3) {
+                            accessToken1 = token1.value;
+                            accessToken2 = token2.value;
+                            accessToken3 = token3.value;
+                            var meetingArea = new MeetingArea({
+                                title: "Parent Meeting Area Title",
+                                description: "Parent Meeting Area Description",
+                                parentMeetingArea: null,
+                                tenantId: userModel1.tenantId
                             });
-                        });
-                    });
-                });
-            });
+
+                            meetingAreaHandler._createMeetingArea(meetingArea, userModel1.username, db.readWriteConnection).then(function (savedItem, err) {
+                                firstMeetingAreaId = savedItem.parentMeetingArea;
+                                parentMeetingAreaId = savedItem._id;
+
+                                var childMeetingArea = new MeetingArea({
+                                    title: "Child Meeting Area Title",
+                                    description: "Child Meeting Area Description",
+                                    parentMeetingArea: savedItem._id,
+                                    tenantId: userModel1.tenantId
+                                });
+
+                                meetingAreaHandler._createMeetingArea(childMeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem, err) {
+                                    childMeetingAreaId = savedChildItem._id;
+
+
+                                    var child2MeetingArea = new MeetingArea({
+                                        title: "Child 2 Meeting Area Title",
+                                        description: "Child 2 Meeting Area Description",
+                                        parentMeetingArea: savedChildItem._id,
+                                        tenantId: userModel1.tenantId
+                                    });
+
+                                    meetingAreaHandler._createMeetingArea(child2MeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem2) {
+                                        child2MeetingAreaId = savedChildItem2._id;
+                                        MeetingArea.findById(childMeetingAreaId)
+                                            .select('+tenantId')
+                                            .lean()
+                                            .exec(function (err, meetingArea) {
+                                                if (err) {
+                                                    done(err);
+                                                }
+                                                meetingAreaHandler._grantUserAccess(userModel3._id, meetingArea.tenantId, meetingArea._id, 'editor', db.readWriteConnection).then(function () {
+                                                    done();
+                                                });
+                                            });
+                                    });
+                                });
+
+                            }).catch(function (err) {
+                                return done(err);
+                            });
+                        }).done()
+                    }).done()
+            }).done();
         }).catch(function(err){
             return done(err);
-        });
+        }).done();
     });
 
     //beforeEach(function (done) {
