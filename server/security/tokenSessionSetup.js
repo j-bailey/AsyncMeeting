@@ -25,7 +25,7 @@ module.exports = function (req, res, next) {
         }).catch(function (err) {
             logger.error(err);
             next(err);
-        });
+        }).done();
     } else {
         req.session = {};
         next();

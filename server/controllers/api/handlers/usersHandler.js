@@ -63,7 +63,7 @@ var createNewSignedUpUser = function (newUser) {
             }).catch(function(err){
                 // TODO review error handling
                 return defer.reject(err);
-            });
+            }).done();
         });
     });
     return defer.promise;
@@ -99,7 +99,7 @@ module.exports = {
                 next(handlerUtils.catchError(err, 'Unable to create user right now, please try again later.'));
             }).catch(function (err) {
                 next(handlerUtils.catchError(err, 'Unable to create user right now, please try again later.'));
-            });
+            }).done();
         } catch(e){
             next(handlerUtils.catchError(e, 'Unable to check username validity right now, please later.'));
         }

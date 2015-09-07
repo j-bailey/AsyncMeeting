@@ -100,7 +100,7 @@ var _grantUserAccess = function (allowedUserId, resourceTenantId, resourceId, pe
                         }).catch(function (err) {
                             logger.debug(err);
                             return defer.reject(new RouteError());
-                        });
+                        }).done();
                 });
         });
     return defer.promise;
@@ -134,7 +134,7 @@ var _removeUserAccess = function (resourceId, allowedUserId, permission, dbConn)
                 }).catch(function (err) {
                     logger.error(err);
                     return defer.reject(new RouteError());
-                });
+                }).done();
         });
     return defer.promise;
 };
@@ -202,7 +202,7 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn, myFirstMeetin
                                 logger.error("Error saving meeting area: " + err.message);
                                 savedMeetingArea.remove();
                                 return defer.reject(err);
-                            });
+                            }).done();
                     });
                 });
         });
@@ -237,7 +237,7 @@ module.exports = {
                             res.status(200).json(jsonResponse.successResponse(meetingAreas));
                         }).catch(function (err) {
                             return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
-                        });
+                        }).done();
                     });
             } else {
                 MeetingArea.findOne({_id: parentId}).select('+tenantId').lean().exec(function (err, meetingArea) {
@@ -246,7 +246,7 @@ module.exports = {
                             res.status(200).json(jsonResponse.successResponse(meetingAreas));
                         }).catch(function (err) {
                             return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
-                        });
+                        }).done();
                 });
             }
         } catch (e) {
@@ -266,7 +266,7 @@ module.exports = {
                     }
                 }).catch(function (err) {
                     return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
-                });
+                }).done();
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to retrieve meeting areas right now, please again later.'));
         }
@@ -286,7 +286,7 @@ module.exports = {
                 res.status(200).json(jsonResponse.successResponse({}));
             }).catch(function (err) {
                 return handlerUtils.catchError(err, 'Unable to grant user access right now, please again later.');
-            });
+            }).done();
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to grant user access right now, please again later.'));
         }
@@ -306,7 +306,7 @@ module.exports = {
                 res.status(200).json(jsonResponse.successResponse({}));
             }).catch(function (err) {
                 return next(handlerUtils.catchError(err, 'Unable to remove user access right now, please again later.'));
-            });
+            }).done();
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to remove user access right now, please again later.'));
         }
@@ -339,7 +339,7 @@ module.exports = {
                 res.status(201).json(jsonResponse.successResponse(savedMeetingArea));
             }).catch(function (err) {
                 return next(handlerUtils.catchError(err, 'Unable to create new meeting area right now, please again later.'));
-            });
+            }).done();
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to create new meeting area right now, please again later.'));
         }

@@ -28,7 +28,7 @@ module.exports = function (passport) {
                 }
             }).catch(function(err){
                 done(err, 'error');
-            });
+            }).done();
         }
     ));
 };

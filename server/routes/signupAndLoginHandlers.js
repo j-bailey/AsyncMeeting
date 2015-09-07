@@ -38,7 +38,7 @@ router.post('/login',
                     permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
                 });
                 // TODO test permissions need to be removed after permissions are fixed
-            });
+            }).done();
 
         });
     }
@@ -77,7 +77,7 @@ router.post('/email-login',
                     permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
                 });
                 // TODO test permissions need to be removed after permissions are fixed
-            });
+            }).done();
         });
     }
 );

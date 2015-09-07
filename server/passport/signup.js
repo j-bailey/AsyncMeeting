@@ -58,7 +58,7 @@ module.exports = function(passport) {
                                     if (err){
                                         return done(err, false);
                                     }
-                                });
+                                }).done();
 
                             });
                         }

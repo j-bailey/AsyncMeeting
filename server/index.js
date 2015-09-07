@@ -120,4 +120,4 @@ acl.init().then(function() {
 }).catch(function(err){
     console.error('Error on start up: ' + err);
     console.error(err.stack);
-});
+}).done();
