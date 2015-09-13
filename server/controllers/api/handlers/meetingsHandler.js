@@ -13,51 +13,36 @@ var _createMeeting = function (meeting, ownerName, dbConn) {
     var defer = Q.defer(),
         MeetingArea = dbConn.model('MeetingArea'),
         User = dbConn.model('User');
+    var foundUser, newMeeting;
     User.findOne({username: ownerName})
         .select('+tenantId')
-        .lean().exec(function (err, user) {
-            if (err) {
-                logger.error(err);
-                return defer.reject(new RouteError(500, 'Internal server issue'));
+        .lean().exec()
+        .then(function (user) {
+            foundUser = user;
+            return MeetingArea.findOne({_id: new ObjectId(meeting.parentMeetingAreaId)}).select('+tenantId').lean().exec();
+        }).then(function (parentMeetingArea) {
+            if (!parentMeetingArea) {
+                return defer.reject(new RouteError(404));
             }
-            MeetingArea.findOne({_id: new ObjectId(meeting.parentMeetingAreaId)})
-                .select('+tenantId').lean().exec(function (err, parentMeetingArea) {
-                    if (err) {
-                        logger.error(err);
-                        return defer.reject(new RouteError(500, 'Internal server issue'));
-                    }
-                    if (!parentMeetingArea) {
-                        return defer.reject(new RouteError(404));
-                    }
-                    meeting.tenantId = parentMeetingArea.tenantId;
-                    meeting.parentMeetingArea = parentMeetingArea._id;
-                    meeting.save(function (err, savedMeeting) {
-                        if (err) {
-                            logger.error("Error saving meeting area: " + err.message);
-                            return defer.reject(err);
-                        }
-                        User.addAllowedResource(user._id, savedMeeting.tenantId,
-                            savedMeeting._id, 'Meeting').then(function (response, err) {
-                                if (err) {
-                                    logger.error("Error saving meeting area: " + err.message);
-                                    savedMeeting.remove();
-                                    return defer.reject(err);
-                                }
-                                var acl = Acl.getAcl();
-                                acl.allow('meeting-creator-' + savedMeeting._id, '/api/meetings/' + savedMeeting._id, '*');
-                                acl.addUserRoles(user.username, 'meeting-creator-' + savedMeeting._id);
-                                acl.allow('meeting-viewer', '/api/meetings', 'get');
-                                acl.addUserRoles(user.username, 'meeting-viewer');
+            meeting.tenantId = parentMeetingArea.tenantId;
+            meeting.parentMeetingArea = parentMeetingArea._id;
+            return meeting.save();
+        }).then(function (savedMeeting) {
+            newMeeting = savedMeeting;
+            return User.addAllowedResource(foundUser._id, savedMeeting.tenantId, savedMeeting._id, 'Meeting');
+        }).then(function () {
+            var acl = Acl.getAcl();
+            acl.allow('meeting-creator-' + newMeeting._id, '/api/meetings/' + newMeeting._id, '*');
+            acl.addUserRoles(foundUser.username, 'meeting-creator-' + newMeeting._id);
+            acl.allow('meeting-viewer', '/api/meetings', 'get');
+            acl.addUserRoles(foundUser.username, 'meeting-viewer');
 
-                                return defer.resolve(savedMeeting);
-                            }).catch(function (err) {
-                                logger.error("Error saving meeting area: " + err.message);
-                                savedMeeting.remove();
-                                return defer.reject(err);
-                            }).done();
-                    });
-                });
-        });
+            return defer.resolve(newMeeting);
+        }).catch(function () {
+            logger.error("Error saving meeting area: " + err.message);
+            newMeeting.remove();
+            return defer.reject(err);
+        }).done();
     return defer.promise;
 };
 

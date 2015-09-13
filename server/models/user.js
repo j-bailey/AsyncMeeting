@@ -162,7 +162,7 @@ schema.statics.addAllowedResource = function (userId, tenantId, resourceId, reso
             logger.error('Error in Saving allowed resource: ' + err);
             return defer.reject({message: "We're sorry, we could not add an allowed resource at this time!"});
         }
-        defer.resolve();
+        defer.resolve({});
     });
     return defer.promise;
 };
