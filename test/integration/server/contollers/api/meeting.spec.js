@@ -86,13 +86,14 @@ describe('controller/api/meetings', function () {
     });
 
     describe('POST', function () {
-        it.only('should get back a saved meeting when providing the minimal data', function (done) {
+        it('should get back a saved meeting when providing the minimal data', function (done) {
             user1
                 .post('/api/meetings')
                 .send({
                     parentMeetingAreaId: parentMeetingAreaId,
                     name: "My First Meeting",
-                    type: 'Presentation',
+                    type: {name:'Presentation'},
+                    format: {name:'Screencast'},
                     endDate: new Date()
                 })
                 .set('Accept', 'application/json')
@@ -107,6 +108,27 @@ describe('controller/api/meetings', function () {
                         expect(meetingAreas).to.have.length(1);
                         done();
                     });
+                });
+        });
+        it('should throw an error due to lack of data', function (done) {
+            user1
+                .post('/api/meetings')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    type: {name:'Presentation'},
+                    format: {name:'Screencast'},
+                    endDate: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(400)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.status).to.equal('error');
+                    expect(result.message).to.equal('Meeting validation failed:  Path `name` is required.\n');
+                    done();
                 });
         });
     });

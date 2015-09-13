@@ -14,20 +14,94 @@ var agendaItemSchema = new mongoose.Schema({
     owner: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true}
 });
 
+var reminderSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    description: {type: String, required: true}
+});
+
+var meetingTypeDef = {
+    name: {type: String, required: true},
+    description: {type: String, required: true}
+};
+
+var meetingFormatDef = {
+    name: {type: String, required: true},
+    description: {type: String, required: true}
+};
 
 
 var schema = new mongoose.Schema({
     name: {type: String, required: true},
-    type: { type: String, required: true },
-    format: { type: String, required: false },
+    type: meetingTypeDef,
+    format: meetingFormatDef,
     objective: { type: String, required: false },
     agendaItems: [agendaItemSchema],
     invitees: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false}],
     inviteesOnly: {type: Boolean, required: true, default: false},
-    reminders: [{type:String, required: false, select:true}],
+    reminders: [reminderSchema],
     endDate: {type: Date, required: true, select:true},
     parentMeetingAreaId: {type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea', required: true}
 });
+
+// Schema Methods
+
+var convertReminders = function(meeting){
+    for ( var i = 0; meeting.reminders.length > i; i++){
+        var validReminder = false;
+        for (var ii = 0;  schema.statics.allowedReminders.length > ii; ii++) {
+            if (meeting.reminders[i].name === schema.statics.allowedReminders[ii].name){
+                meeting.reminders[i] = schema.statics.allowedReminders[ii];
+                validReminder = true;
+            }
+        }
+        if (!validReminder){
+            throw new Error('Not a valid reminder for a meeting: ' + meeting.reminders[i]);
+        }
+    }
+};
+
+var convertMeetingType = function(meeting){
+    var validType = false;
+    for (var i = 0;  schema.statics.allowedMeetingTypes.length > i; i++) {
+        if (meeting.type.name === schema.statics.allowedMeetingTypes[i].name){
+            meeting.type = schema.statics.allowedMeetingTypes[i];
+            validType = true;
+        }
+    }
+    if (!validType){
+        throw new Error('Not a valid meeting type for a meeting: ' + meeting.type);
+    }
+};
+
+var convertMeetingFormat = function(meeting){
+    var validFormat = false;
+    for (var i = 0;  schema.statics.allowedMeetingFormats.length > i; i++) {
+        if (meeting.format.name === schema.statics.allowedMeetingFormats[i].name){
+            meeting.format = schema.statics.allowedMeetingTypes[i];
+            validFormat = true;
+        }
+    }
+    if (!validFormat){
+        throw new Error('Not a valid meeting format for a meeting: ' + meeting.format);
+    }
+};
+
+schema.pre('validate', function(next){
+    var meeting = this;
+    if (meeting.isNew){
+        if (meeting.reminders || meeting.reminders.length > 0) {
+            convertReminders(meeting);
+        }
+        if (meeting.type) {
+            convertMeetingType(meeting);
+        }
+        if (meeting.type) {
+            convertMeetingFormat(meeting);
+        }
+    }
+    next();
+});
+
 
 // Add static methods
 
@@ -61,7 +135,7 @@ schema.statics.allowedReminders = [
         id: 250,
         name: "1 hour left",
         description: "Send a reminder when there is 1 hour left"
-    },
+    }
 ];
 
 schema.statics.allowedMeetingTypes = [
@@ -82,7 +156,7 @@ schema.statics.allowedMeetingTypes = [
     }
 ];
 
-schema.statics.meetingTypes = [
+schema.statics.allowedMeetingFormats = [
     {
         id: 100,
         name: "Screencast",

@@ -38,9 +38,11 @@ var _createMeeting = function (meeting, ownerName, dbConn) {
             acl.addUserRoles(foundUser.username, 'meeting-viewer');
 
             return defer.resolve(newMeeting);
-        }).catch(function () {
+        }).catch(function (err) {
             logger.error("Error saving meeting area: " + err.message);
-            newMeeting.remove();
+            if (newMeeting) {
+                newMeeting.remove();
+            }
             return defer.reject(err);
         }).done();
     return defer.promise;
