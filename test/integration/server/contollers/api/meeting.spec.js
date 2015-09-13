@@ -92,8 +92,9 @@ describe('controller/api/meetings', function () {
                 .send({
                     parentMeetingAreaId: parentMeetingAreaId,
                     name: "My First Meeting",
-                    type: {name:'Presentation'},
-                    format: {name:'Screencast'},
+                    objective: "Create more meetings!",
+                    type: 'Presentation',
+                    format: 'Screencast',
                     endDate: new Date()
                 })
                 .set('Accept', 'application/json')
@@ -110,13 +111,14 @@ describe('controller/api/meetings', function () {
                     });
                 });
         });
-        it('should throw an error due to lack of data', function (done) {
+        it('should throw a validation error due to lack of data', function (done) {
             user1
                 .post('/api/meetings')
                 .send({
                     parentMeetingAreaId: parentMeetingAreaId,
-                    type: {name:'Presentation'},
-                    format: {name:'Screencast'},
+                    type: 'Presentation',
+                    objective: "Create more meetings!",
+                    format: 'Screencast',
                     endDate: new Date()
                 })
                 .set('Accept', 'application/json')
@@ -129,6 +131,75 @@ describe('controller/api/meetings', function () {
                     expect(result.status).to.equal('error');
                     expect(result.message).to.equal('Meeting validation failed:  Path `name` is required.\n');
                     done();
+                });
+        });
+        it('should get back a saved meeting when providing the minimal data with one agenda item', function (done) {
+            user1
+                .post('/api/meetings')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    name: "My First Meeting",
+                    objective: "Create more meetings!",
+                    type: 'Presentation',
+                    format: 'Screencast',
+                    agendaItems: [{
+                        name: 'How new meetings created to date',
+                        description: 'Show how many new meetings were created from first quarter to now',
+                        approvalRequest: false,
+                        owner: userModel2._id
+                    }],
+                    endDate: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    Meeting.find({_id: result.data._id}, function (err, meetings) {
+                        expect(meetings).to.have.length(1);
+                        expect(meetings[0].agendaItems.length).to.equal(1);
+                        expect(meetings[0].invitees.indexOf(userModel2._id)).to.not.equal('-1');
+                        done();
+                    });
+                });
+        });
+        it('should get back a saved meeting when providing a full data set for a meeting', function (done) {
+            user1
+                .post('/api/meetings')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    name: "My First Meeting",
+                    objective: "Create more meetings!",
+                    type: 'Presentation',
+                    format: 'Screencast',
+                    agendaItems: [{
+                        name: 'How many new meetings created to date',
+                        description: 'Show how many new meetings were created from first quarter to now',
+                        approvalRequest: false,
+                        owner: userModel2._id
+                    }],
+                    invitees: [userModel3._id],
+                    inviteesOnly: true,
+                    reminders: ['1/4', '1/2','3/4'],
+                    endDate: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    Meeting.find({_id: result.data._id}, function (err, meetings) {
+                        expect(meetings).to.have.length(1);
+                        expect(meetings[0].agendaItems.length).to.equal(1);
+                        expect(meetings[0].invitees.indexOf(userModel2._id)).to.not.equal('-1');
+                        done();
+                    });
                 });
         });
     });

@@ -65,6 +65,7 @@ module.exports.handleValidationErrors = function (err, req, res, next) {
             }
         }
 
+        logger.error(message);
 
         if (req.headers.accept.indexOf('application/json') >= 0) {
             return handleJsonErrorResponse(message, httpCode, runSilent, res);
