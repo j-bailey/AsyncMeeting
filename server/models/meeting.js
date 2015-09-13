@@ -16,22 +16,6 @@ var agendaItemSchema = new mongoose.Schema({
     owner: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true}
 });
 
-var reminderSchema = new mongoose.Schema({
-    name: {type: String, required: true},
-    description: {type: String, required: true}
-});
-
-var meetingTypeDef = {
-    name: {type: String, required: true},
-    description: {type: String, required: true}
-};
-
-var meetingFormatDef = {
-    name: {type: String, required: true},
-    description: {type: String, required: true}
-};
-
-
 var schema = new mongoose.Schema({
     name: {type: String, required: true},
     type: {type: String, enum: ['Presentation', 'Collaboration', 'In-Person']},
