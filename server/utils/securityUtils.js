@@ -148,7 +148,7 @@ module.exports = {
             return nconf.get('security:passwordValidation:validationMessage');
         }
     },
-    isAllowedResourceAccess: function (resourceKey, allowNulls) {
+    isAllowedResourceAccess: function (resourceType, resourceKey, allowNulls) {
         return function (req, res, next) {
             var resourceId,
                 controlledResource;
@@ -173,7 +173,11 @@ module.exports = {
             } else {
                 var checkForValidObjectId = new RegExp("^[0-9a-fA-F]{24}$");
                 if (checkForValidObjectId.test(resourceId)) {
-                    controlledResource = req.baseUrl + '/' + resourceId;
+                    if (resourceType.toLowerCase() === 'meeting') {
+                        controlledResource = '/api/meetingareas/' + resourceId;
+                    } else {
+                        controlledResource = req.baseUrl + '/' + resourceId;
+                    }
                 } else {
                     logger.debug('Possible attack with invalid resource ID "' + resourceKey + '" in isAllowedResourceAccess');
                     return next(new RouteError(401, 'Not allowed', false));

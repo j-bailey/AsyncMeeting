@@ -47,21 +47,29 @@ var createNewSignedUpUser = function (newUser) {
                 });
                 return defer.reject(err);
             }
-            meetingAreaHandler._createMeetingArea(firstMeetingArea, savedUser.username, db.readWriteConnection, true).then(function () {
+            meetingAreaHandler._createMeetingArea(firstMeetingArea, savedUser.username, db.readWriteConnection, true).then(function (newMA) {
                 logger.debug('User Registration successful');
-                db.readOnlyConnection.model('User').findById(savedUser._id).lean().exec(function (err, safeUser) {
-                    if (err) {
-                        logger.error('Error in Saving user: ' + err);
-                        savedTenant.remove(function (err) {
-                            if (err) {
-                                logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
-                            }
-                            // TODO need better clean up
-                        });
+                db.readOnlyConnection.model('User').update({_id: newUser._id}, {$set: {rootTenantMeetingArea: newMA._id}}, function (err) {
+                    if (err){
+                        // TODO clean up saved objects
+                        logger.error(err);
+                        return defer.reject(err);
                     }
-                    defer.resolve(safeUser);
+                    db.readOnlyConnection.model('User').findById(savedUser._id).lean().exec(function (err, safeUser) {
+                        if (err) {
+                            logger.error('Error in Saving user: ' + err);
+                            savedTenant.remove(function (err) {
+                                if (err) {
+                                    logger.error('Unable to delete Tenant for new user with ID: ' + savedTenant._id);
+                                }
+                                // TODO need better clean up
+                            });
+                        }
+                        defer.resolve(safeUser);
+                    });
                 });
-            }).catch(function(err){
+
+            }).catch(function (err) {
                 // TODO review error handling
                 return defer.reject(err);
             }).done();
@@ -72,20 +80,20 @@ var createNewSignedUpUser = function (newUser) {
 
 module.exports = {
     createNewSignedUpUser: createNewSignedUpUser,
-    isInvalidPassword: function(req, res, next) {
+    isInvalidPassword: function (req, res, next) {
         try {
             var result = secUtils.isInvalidPassword(req.params.password, req.query.username || req.session.userId);
             return res.status(200).json(jsonResponse.successResponse({result: result}));
-        } catch (e){
+        } catch (e) {
             next(handlerUtils.catchError(e, 'Unable to check password validity right now, please later.'));
         }
     },
-    isInvalidUsername: function(req, res, next) {
+    isInvalidUsername: function (req, res, next) {
         try {
             var User = req.db.model('User');
             var result = User.schema.statics.isInvalidUsername(req.params.username);
             return res.status(200).json(jsonResponse.successResponse({result: result}));
-        } catch (e){
+        } catch (e) {
             next(handlerUtils.catchError(e, 'Unable to check username validity right now, please later.'));
         }
     },
@@ -96,16 +104,16 @@ module.exports = {
             createNewSignedUpUser(user).then(function (newUser) {
                 User.findById(newUser._id);
                 res.status(201).json(jsonResponse.successResponse(newUser));
-            }, function(err){
+            }, function (err) {
                 next(handlerUtils.catchError(err, 'Unable to create user right now, please try again later.'));
             }).catch(function (err) {
                 next(handlerUtils.catchError(err, 'Unable to create user right now, please try again later.'));
             }).done();
-        } catch(e){
+        } catch (e) {
             next(handlerUtils.catchError(e, 'Unable to check username validity right now, please later.'));
         }
     },
-    findByNameSearch: function (req, res, next){
+    findByNameSearch: function (req, res, next) {
         try {
             var User = req.db.model('User');
             var skip = req.query.skip || 0,
@@ -114,7 +122,7 @@ module.exports = {
 
             // FIXME add checks on input, so hacks do not make it to the query
             var regexCriteria = new RegExp(searchCriteria.toLowerCase());
-            User.find({ $or: [{ searchFirstName: regexCriteria}, { searchLastName: regexCriteria}]})
+            User.find({$or: [{searchFirstName: regexCriteria}, {searchLastName: regexCriteria}]})
                 .skip(skip)
                 .limit(limit)
                 .exec(function (err, users) {
@@ -123,7 +131,7 @@ module.exports = {
                     }
                     res.status(200).json(jsonResponse.successResponse(users));
                 });
-        } catch (e){
+        } catch (e) {
             next(handlerUtils.catchError(e, 'Error trying to find user, please try again later'));
         }
     },
@@ -138,7 +146,7 @@ module.exports = {
                     }
                     res.status(200).json(jsonResponse.successResponse(user));
                 });
-        } catch (e){
+        } catch (e) {
             next(handlerUtils.catchError(e, 'Error trying to find user, please try again later'));
         }
     },
@@ -167,7 +175,7 @@ module.exports = {
                         res.status(200).json(jsonResponse.successResponse(updatedUser));
                     }
                 });
-        } catch (e){
+        } catch (e) {
             next(handlerUtils.catchError(e, 'Error trying to update user, please try again later'));
         }
     },
@@ -184,7 +192,7 @@ module.exports = {
                 }
                 res.sendStatus(200);
             });
-        } catch (e){
+        } catch (e) {
             next(handlerUtils.catchError(e, 'Error trying to update user, please try again later'));
         }
     }

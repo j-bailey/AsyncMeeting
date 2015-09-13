@@ -34,7 +34,8 @@ var schema = new mongoose.Schema({
     searchLastName: String,
     searchFirstName: String,
     permissions: [{type: mongoose.Schema.Types.ObjectId, ref: 'Permission'}],
-    roles: [{type: mongoose.Schema.Types.ObjectId, ref: 'Role'}]
+    roles: [{type: mongoose.Schema.Types.ObjectId, ref: 'Role'}],
+    rootTenantMeetingArea: [{type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea'}]
 });
 
 var invalidUsernameMessage = 'Cannot contain ":::" at the beginning or end of the username, must 3-20 character long, ' +

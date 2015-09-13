@@ -42,34 +42,6 @@ var acl = null;
 
 describe('controller/api/meetingAreas', function () {
 
-    var getUserWithTentantIdByUserId = function (userId) {
-        var defer = Q.defer();
-        User.findById(userId).select('+tenantId').lean().exec(function (err, savedUser) {
-            if (err) {
-                return defer.reject(err);
-            }
-            defer.resolve(savedUser);
-        });
-        return defer.promise;
-    };
-    var loginToServer = function (user, email, password) {
-        var defer = Q.defer();
-        user
-            .post('/email-login')
-            .set('Accept', 'application/json, text/plain, */*')
-            .set('Accept-encoding', 'gzip, deflate')
-            .set('Content-type', 'application/json;charset=UTF-8')
-            .send({email: email, password: password})
-            .end(function (err, res) {
-                // user1 will manage its own cookies
-                // res.redirects contains an Array of redirects
-                if (err) {
-                    return defer.reject(err);
-                }
-                defer.resolve(res.body.access_token);
-            });
-        return defer.promise;
-    };
 
     before(function (done) {
         Acl.init().then(function (aclIns) {
@@ -92,18 +64,18 @@ describe('controller/api/meetingAreas', function () {
                 usersHandler.createNewSignedUpUser(user3Obj)
             ]).spread(function (savedUser1, savedUser2, savedUser3) {
                 Q.allSettled([
-                        getUserWithTentantIdByUserId(savedUser1.value._id),
-                        getUserWithTentantIdByUserId(savedUser2.value._id),
-                        getUserWithTentantIdByUserId(savedUser3.value._id)
+                        global.getUserWithTentantIdByUserId(savedUser1.value._id),
+                        global.getUserWithTentantIdByUserId(savedUser2.value._id),
+                        global.getUserWithTentantIdByUserId(savedUser3.value._id)
                     ]
                 ).spread(function (u1, u2, u3) {
                         userModel1 = u1.value;
                         userModel2 = u2.value;
                         userModel3 = u3.value;
                         Q.allSettled([
-                            loginToServer(user1, email1, pass1),
-                            loginToServer(user2, email2, pass2),
-                            loginToServer(user3, email3, pass3)
+                            global.loginToServer(user1, email1, pass1),
+                            global.loginToServer(user2, email2, pass2),
+                            global.loginToServer(user3, email3, pass3)
                         ]).spread(function (token1, token2, token3) {
                             accessToken1 = token1.value;
                             accessToken2 = token2.value;

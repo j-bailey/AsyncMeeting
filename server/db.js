@@ -1,6 +1,8 @@
 "use strict";
 
 var mongoose = require('mongoose');
+mongoose.Promise = require('q').Promise;
+
 var logger = require('winston');
 var nconf = require('nconf');
 

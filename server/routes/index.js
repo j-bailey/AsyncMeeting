@@ -16,6 +16,7 @@ router.use(function (req, res, next) {
 //router.use('/api/sessions', require('./../controllers/api/sessions'));
 router.use('/api/users', passport.authenticate('bearer', { session: true }), require('./../controllers/api/users'));
 router.use('/api/meetingareas', passport.authenticate('bearer', { session: true }),  require('./../controllers/api/meetingAreas'));
+router.use('/api/meetings', passport.authenticate('bearer', { session: true }),  require('./../controllers/api/meetings'));
 
 // catch 404 and forward to error handler
 router.use(function(req, res, next) {
