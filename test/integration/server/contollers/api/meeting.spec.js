@@ -14,24 +14,55 @@ var Acl = require('../../../../../server/security/acl'),
 require('../../../../../server/models/meeting');
 require('../../../../../server/models/user');
 
-var accessToken1,
-    email1 = 'tom@tom.com',
-    pass1 = 'pword123',
-    username1 = 'tom',
-    userModel1,
-    user1 = request('http://localhost:3001');
-var accessToken2,
-    email2 = 'terry@terry.com',
-    pass2 = 'pword123',
-    username2 = 'terry',
-    userModel2,
-    user2 = request('http://localhost:3001');
-var accessToken3,
-    email3 = 'bob@bob.com',
-    pass3 = 'pword123',
-    username3 = 'bob',
-    userModel3,
-    user3 = request('http://localhost:3001');
+var request = request('http://localhost:3001')
+
+var owningUser = {
+    accessToken: undefined,
+    email: 'tom@tom.com',
+    password: 'pword123',
+    username: 'tom',
+    userModel: undefined
+};
+var creatingUser = {
+    accessToken: undefined,
+    email: 'terry@terry.com',
+    password: 'pword123',
+    username: 'terry',
+    userModel: undefined
+};
+var inviteeUser = {
+    accessToken: undefined,
+    email: 'bob@bob.com',
+    password: 'pword123',
+    username: 'bob',
+    userModel: undefined
+};
+
+var viewingUser = {
+    accessToken: undefined,
+    email: 'vic@vic.com',
+    password: 'pword123',
+    username: 'vic',
+    userModel: undefined
+};
+
+var editingUser = {
+    accessToken: undefined,
+    email: 'eddy@eddy.com',
+    password: 'pword123',
+    username: 'eddy',
+    userModel: undefined
+};
+
+var noAccessUser = {
+    accessToken: undefined,
+    email: 'eddy@eddy.com',
+    password: 'pword123',
+    username: 'eddy',
+    userModel: undefined
+};
+
+var userJson = [owningUser, creatingUser, inviteeUser, viewingUser, editingUser, noAccessUser];
 var acl = null;
 var parentMeetingAreaId;
 
@@ -49,11 +80,11 @@ describe('controller/api/meetings', function () {
             UserAllowedResources.remove().exec();
             Meeting.remove().exec();
             User.remove().exec();
-            //if (err) done(err);
-            var user1Obj = new User({username: username1, email: email1, password: pass1});
-            var user2Obj = new User({username: username2, email: email2, password: pass2});
-            var user3Obj = new User({username: username3, email: email3, password: pass3});
-            var userObjs = [user1Obj, user2Obj, user3Obj];
+
+            var userObjs = [];
+            userJson.forEach(function (u) {
+                userObjs.push(new User(u));
+            });
             var createNewUsers = [];
             userObjs.forEach(function (uObj) {
                 createNewUsers.push(usersHandler.createNewSignedUpUser(uObj));
@@ -67,27 +98,25 @@ describe('controller/api/meetings', function () {
             });
             return Q.all(newUserList);
         }).then(function (newUserWithTenantIds) {
-            userModel1 = newUserWithTenantIds[0];
-            userModel2 = newUserWithTenantIds[1];
-            userModel3 = newUserWithTenantIds[2];
-            return Q.all([
-                global.loginToServer(user1, email1, pass1),
-                global.loginToServer(user2, email2, pass2),
-                global.loginToServer(user3, email3, pass3)
-            ]);
+            var loginPromises = [];
+            for (var i = 0; i < newUserWithTenantIds.length; i++) {
+                userJson[i].userModel = newUserWithTenantIds[i];
+                loginPromises.push(global.loginToServer(request, userJson[i].email, userJson[i].password));
+            }
+            return Q.all(loginPromises);
         }).then(function (tokens) {
-            accessToken1 = tokens[0];
-            accessToken2 = tokens[1];
-            accessToken3 = tokens[2];
+            for (var i = 0; i < tokens.length; i++) {
+                userJson[i].accessToken = tokens[i];
+            }
             done();
         }).catch(function (err) {
             return done(err);
         }).done();
     });
 
-    describe('POST', function () {
+    describe('POST meeting creation', function () {
         it('should get back a saved meeting when providing the minimal data', function (done) {
-            user1
+            request
                 .post('/api/meetings')
                 .send({
                     parentMeetingAreaId: parentMeetingAreaId,
@@ -98,7 +127,7 @@ describe('controller/api/meetings', function () {
                     endDate: new Date()
                 })
                 .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
                 .expect('Content-Type', /json/)
                 .expect(201)
                 .end(function (err, res) {
@@ -111,8 +140,31 @@ describe('controller/api/meetings', function () {
                     });
                 });
         });
+        it('should error due to lack of access', function (done) {
+            request
+                .post('/api/meetings')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    name: "My First Meeting",
+                    objective: "Create more meetings!",
+                    type: 'Presentation',
+                    format: 'Screencast',
+                    endDate: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + noAccessUser.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(401)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.message).to.equal('Not allowed');
+                    expect(result.status).to.equal('error');
+                    done();
+                });
+        });
         it('should throw a validation error due to lack of data', function (done) {
-            user1
+            request
                 .post('/api/meetings')
                 .send({
                     parentMeetingAreaId: parentMeetingAreaId,
@@ -122,7 +174,7 @@ describe('controller/api/meetings', function () {
                     endDate: new Date()
                 })
                 .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
                 .expect('Content-Type', /json/)
                 .expect(400)
                 .end(function (err, res) {
@@ -134,7 +186,7 @@ describe('controller/api/meetings', function () {
                 });
         });
         it('should get back a saved meeting when providing the minimal data with one agenda item', function (done) {
-            user1
+            request
                 .post('/api/meetings')
                 .send({
                     parentMeetingAreaId: parentMeetingAreaId,
@@ -146,12 +198,12 @@ describe('controller/api/meetings', function () {
                         name: 'How new meetings created to date',
                         description: 'Show how many new meetings were created from first quarter to now',
                         approvalRequest: false,
-                        owner: userModel2._id
+                        owner: creatingUser.userModel._id
                     }],
                     endDate: new Date()
                 })
                 .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
                 .expect('Content-Type', /json/)
                 .expect(201)
                 .end(function (err, res) {
@@ -161,13 +213,13 @@ describe('controller/api/meetings', function () {
                     Meeting.find({_id: result.data._id}, function (err, meetings) {
                         expect(meetings).to.have.length(1);
                         expect(meetings[0].agendaItems.length).to.equal(1);
-                        expect(meetings[0].invitees.indexOf(userModel2._id)).to.not.equal('-1');
+                        expect(meetings[0].invitees.indexOf(creatingUser.userModel._id)).to.not.equal('-1');
                         done();
                     });
                 });
         });
         it('should get back a saved meeting when providing a full data set for a meeting', function (done) {
-            user1
+            request
                 .post('/api/meetings')
                 .send({
                     parentMeetingAreaId: parentMeetingAreaId,
@@ -179,15 +231,15 @@ describe('controller/api/meetings', function () {
                         name: 'How many new meetings created to date',
                         description: 'Show how many new meetings were created from first quarter to now',
                         approvalRequest: false,
-                        owner: userModel2._id
+                        owner: creatingUser.userModel._id
                     }],
-                    invitees: [userModel3._id],
+                    invitees: [inviteeUser.userModel._id],
                     inviteesOnly: true,
-                    reminders: ['1/4', '1/2','3/4'],
+                    reminders: ['1/4', '1/2', '3/4'],
                     endDate: new Date()
                 })
                 .set('Accept', 'application/json')
-                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
                 .expect('Content-Type', /json/)
                 .expect(201)
                 .end(function (err, res) {
@@ -197,7 +249,7 @@ describe('controller/api/meetings', function () {
                     Meeting.find({_id: result.data._id}, function (err, meetings) {
                         expect(meetings).to.have.length(1);
                         expect(meetings[0].agendaItems.length).to.equal(1);
-                        expect(meetings[0].invitees.indexOf(userModel2._id)).to.not.equal('-1');
+                        expect(meetings[0].invitees.indexOf(creatingUser.userModel._id)).to.not.equal('-1');
                         done();
                     });
                 });
