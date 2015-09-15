@@ -257,7 +257,7 @@ describe('controller/api/meetings', function () {
         });
     });
     describe('DELETE meetings', function () {
-        it('should get delete for a minimal data meeting', function (done) {
+        it('should get delete success for a minimal data meeting along removal of resource from ACL', function (done) {
             request
                 .post('/api/meetings')
                 .send({
@@ -297,7 +297,13 @@ describe('controller/api/meetings', function () {
                                         return done(err);
                                     }
                                     expect(meetingAreas).to.have.length(0);
-                                    done();
+                                    expect(acl.isAllowed(owningUser.username, '/api/meetings/' + result.data._id, '*', function(err, allowed){
+                                        if (err){
+                                            return done(err);
+                                        }
+                                        expect(allowed).to.equal(false);
+                                        done();
+                                    }))
                                 });
                             })
                     });
