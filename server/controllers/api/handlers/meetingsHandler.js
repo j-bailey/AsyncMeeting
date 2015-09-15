@@ -71,7 +71,23 @@ module.exports = {
 
     },
     deleteMeetingById: function (req, res, next) {
-
+        try {
+            var dbConn = req.db,
+                Meeting = dbConn.model('Meeting'),
+                meetingId = req.params.meetingId;
+            Meeting.findById(meetingId).exec()
+                .then(function(meeting){
+                    return meeting.remove();
+                })
+                .then(function(deletedMeeting){
+                    res.status(200).json(jsonResponse.successResponse(deletedMeeting));
+                })
+                .catch(function(err){
+                    return next(handlerUtils.catchError(err, 'Unable to delete meeting right now, please again later.'));
+                }).done();
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to delete meeting right now, please again later.'));
+        }
     },
     removeUserAccess: function (req, res, next) {
 

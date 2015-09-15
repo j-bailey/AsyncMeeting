@@ -56,9 +56,9 @@ var editingUser = {
 
 var noAccessUser = {
     accessToken: undefined,
-    email: 'eddy@eddy.com',
+    email: 'ned@ned.com',
     password: 'pword123',
-    username: 'eddy',
+    username: 'ned',
     userModel: undefined
 };
 
@@ -70,17 +70,18 @@ var parentMeetingAreaId;
 describe('controller/api/meetings', function () {
 
     before(function (done) {
+        User = db.readWriteConnection.model('User');
+        Meeting = db.readWriteConnection.model('Meeting');
+        UserAllowedResources = db.readWriteConnection.model('UserAllowedResources');
         Acl.init().then(function (aclIns) {
             acl = aclIns;
         }).then(function () {
-            User = db.readWriteConnection.model('User');
-            Meeting = db.readWriteConnection.model('Meeting');
-            UserAllowedResources = db.readWriteConnection.model('UserAllowedResources');
-
-            UserAllowedResources.remove().exec();
-            Meeting.remove().exec();
-            User.remove().exec();
-
+            return UserAllowedResources.remove().exec();
+        }).then(function () {
+            return Meeting.remove().exec();
+        }).then(function () {
+            return User.remove().exec();
+        }).then(function () {
             var userObjs = [];
             userJson.forEach(function (u) {
                 userObjs.push(new User(u));
@@ -255,5 +256,52 @@ describe('controller/api/meetings', function () {
                 });
         });
     });
-})
-;
+    describe('DELETE meetings', function () {
+        it('should get delete for a minimal data meeting', function (done) {
+            request
+                .post('/api/meetings')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    name: "My First Meeting",
+                    objective: "Create more meetings!",
+                    type: 'Presentation',
+                    format: 'Screencast',
+                    endDate: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    Meeting.find({_id: result.data._id}, function (err, meetingAreas) {
+                        if (err){
+                            return done(err);
+                        }
+                        expect(meetingAreas).to.have.length(1);
+                        request
+                            .delete('/api/meetings/' + result.data._id)
+                            .set('Accept', 'application/json')
+                            .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                            .expect('Content-Type', /json/)
+                            .expect(200)
+                            .end(function(err, res){
+                                expect(err).to.be.null;
+                                var deleteResult = JSON.parse(res.text);
+                                expect(deleteResult.status).to.equal('success');
+                                expect(deleteResult.message).to.be.empty;
+                                Meeting.find({_id: result.data._id}, function (err, meetingAreas) {
+                                    if (err){
+                                        return done(err);
+                                    }
+                                    expect(meetingAreas).to.have.length(0);
+                                    done();
+                                });
+                            })
+                    });
+                });
+        });
+    });
+});
