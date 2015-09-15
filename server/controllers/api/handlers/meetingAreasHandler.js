@@ -349,7 +349,7 @@ module.exports = {
         try {
             var meetingAreaObj = req.body;
             delete meetingAreaObj.parentMeetingArea;
-            delete meetingAreaObj.__id;
+            delete meetingAreaObj._id;
 
             var meetingAreaId = req.params.meetingAreaId;
             modelUtils.throwErrorIfNotObjectId(meetingAreaId);

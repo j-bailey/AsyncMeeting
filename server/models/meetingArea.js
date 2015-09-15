@@ -22,11 +22,11 @@ schema.pre('validate', function (next) {
     if (meetingArea.isNew){
         if (!meetingArea.parentMeetingArea || (meetingArea.parentMeetingArea && meetingArea.parentMeetingArea === null)) {
             meetingArea.ancestors = [];
-            next();
+            return next();
         } else if (meetingArea.parentMeetingArea) {
             setAncestors(meetingArea, meetingArea.parentMeetingArea,next);
         } else {
-            next();
+            return next();
         }
     } else {
         if (meetingArea.isModified('ancestors') || meetingArea.isModified('parentMeetingArea')){
@@ -34,7 +34,10 @@ schema.pre('validate', function (next) {
             delete meetingArea.parentMeetingArea;
             //result = arePropertiesInSync(meetingArea);
         }
-        next();
+        if (meetingArea.isModified('parentMeetingArea')){
+            return next('Not allowed to change the parent of a meeting area at this time.');
+        }
+        return next();
     }
 });
 

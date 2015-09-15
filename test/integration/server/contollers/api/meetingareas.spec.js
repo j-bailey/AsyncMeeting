@@ -357,7 +357,7 @@ describe('controller/api/meetingAreas', function () {
                 .end(done);
         });
     });
-    describe('Post \'/:meetingAreaId/member/:userId\'', function () {
+    describe('POST \'/:meetingAreaId/member/:userId\'', function () {
         it('should grant viewer access to meeting area', function (done) {
             user1
                 .post('/api/meetingareas/' + parentMeetingAreaId + '/member/' + userModel2._id)
@@ -386,7 +386,7 @@ describe('controller/api/meetingAreas', function () {
                 });
         });
     });
-    describe('Delete \'/:meetingAreaId/member/:userId\'', function () {
+    describe('DELETE \'/:meetingAreaId/member/:userId\'', function () {
         it('should remove grant viewer access to meeting area', function (done) {
             user1
                 .delete('/api/meetingareas/' + parentMeetingAreaId + '/member/' + userModel2._id)
@@ -458,7 +458,7 @@ describe('controller/api/meetingAreas', function () {
                         expect(result.status).to.equal('error');
                         expect(result.data).to.be.empty;
                     })
-                    .end(function() {
+                    .end(function () {
                         MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: false}, function (err, raw) {
                             if (err) return done(err);
                             done();
@@ -482,7 +482,7 @@ describe('controller/api/meetingAreas', function () {
                         expect(result.status).to.equal('error');
                         expect(result.data).to.be.empty;
                     })
-                    .end(function() {
+                    .end(function () {
                         MeetingArea.update({_id: childMeetingAreaId}, {inheritsParentAccess: false}, function (err, raw) {
                             if (err) return done(err);
                             done();
@@ -644,17 +644,36 @@ describe('controller/api/meetingAreas', function () {
     describe('DELETE \'/\'', function () {
         it('should remove a meeting area', function (done) {
             user1
-                .delete('/api/meetingareas/' + child2MeetingAreaId)
-                .set('Authorization', 'Bearer ' + accessToken1)
+                .post('/api/meetingareas')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    title: "New Meeting Area for delete",
+                    description: "New Meeting Area for delete Description"
+                })
                 .set('Accept', 'application/json')
-                .expect(200)
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(201)
                 .end(function (err, res) {
-                    if (err) {
-                        return done(err);
-                    }
-                    MeetingArea.find({_id: child2MeetingAreaId}, function (err, meetingAreas) {
-                        expect(meetingAreas.length).to.be.equal(0);
-                        done();
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    MeetingArea.find({_id: result.data._id}, function (err, meetingAreas) {
+                        expect(meetingAreas).to.have.length(1);
+                        user1
+                            .delete('/api/meetingareas/' + result.data._id)
+                            .set('Authorization', 'Bearer ' + accessToken1)
+                            .set('Accept', 'application/json')
+                            .expect(200)
+                            .end(function (err, res) {
+                                if (err) {
+                                    return done(err);
+                                }
+                                MeetingArea.find({_id: result.data._id}, function (err, meetingAreas) {
+                                    expect(meetingAreas.length).to.be.equal(0);
+                                    done();
+                                });
+                            });
                     });
                 });
         });
@@ -752,6 +771,34 @@ describe('controller/api/meetingAreas', function () {
                     });
                 });
         });
+        it('should an updated meeting areas without changing the parent', function (done) {
+            user1
+                .put('/api/meetingareas/' + child2MeetingAreaId)
+                .send({
+                    title: "New Updated Meeting Area",
+                    description: "New Updated Meeting Area Description",
+                    parentMeetingArea: parentMeetingAreaId
+                })
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(200)
+                .end(function (err, res) {
+                    if (err) {
+                        return done(err);
+                    }
+                    var result = JSON.parse(res.text);
+                    expect(result.data.title).to.equal("New Updated Meeting Area");
+                    expect(result.data.description).to.equal("New Updated Meeting Area Description");
+                    MeetingArea.find({_id: child2MeetingAreaId}, function (err, meetingAreas) {
+                        expect(meetingAreas).to.not.be.empty;
+                        expect(meetingAreas[0].parentMeetingArea.toString()).to.not.equal(parentMeetingAreaId.toString());
+                        expect(meetingAreas[0].title).to.equal("New Updated Meeting Area");
+                        expect(meetingAreas[0].description).to.equal("New Updated Meeting Area Description");
+                        done();
+                    });
+                });
+        });
+
         it('should return a forbidden error', function (done) {
             user2
                 .put('/api/meetingareas/' + parentMeetingAreaId)
