@@ -76,17 +76,19 @@ module.exports = {
                 Meeting = dbConn.model('Meeting'),
                 meetingId = req.params.meetingId;
             Meeting.findById(meetingId).exec()
-                .then(function(meeting){
+                .then(function (meeting) {
                     return meeting.remove();
                 })
-                .then(function(deletedMeeting){
+                .then(function (deletedMeeting) {
                     var acl = Acl.getAcl();
-                    acl.removeResource('/api/meetings/' + meetingId, function(err){
-                        if (err) { next(err);}
+                    acl.removeResource('/api/meetings/' + meetingId, function (err) {
+                        if (err) {
+                            next(err);
+                        }
                         res.status(200).json(jsonResponse.successResponse(deletedMeeting));
                     });
                 })
-                .catch(function(err){
+                .catch(function (err) {
                     return next(handlerUtils.catchError(err, 'Unable to delete meeting right now, please again later.'));
                 }).done();
         } catch (e) {
@@ -97,7 +99,25 @@ module.exports = {
 
     },
     updateMeetingById: function (req, res, next) {
-
+        try {
+            var dbConn = req.db,
+                Meeting = dbConn.model('Meeting'),
+                newMeeting = req.body,
+                meetingId = req.params.meetingId;
+            delete newMeeting.parentMeetingAreaId;
+            delete newMeeting._id;
+            delete newMeeting.format;
+            delete newMeeting.type;
+            Meeting.findByIdAndUpdate(meetingId, newMeeting).exec()
+                .then(function (updatedMeeting) {
+                    res.status(200).json(jsonResponse.successResponse(updatedMeeting));
+                })
+                .catch(function (err) {
+                    return next(handlerUtils.catchError(err, 'Unable to update meeting right now, please again later.'));
+                }).done();
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to update meeting right now, please again later.'));
+        }
     },
     addReply: function (req, res, next) {
 

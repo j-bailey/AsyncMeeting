@@ -257,7 +257,7 @@ describe('controller/api/meetings', function () {
         });
     });
     describe('DELETE meetings', function () {
-        it('should get delete success for a minimal data meeting along removal of resource from ACL', function (done) {
+        it('should get delete success for a minimal data meeting along with removal of resource from ACL', function (done) {
             request
                 .post('/api/meetings')
                 .send({
@@ -277,7 +277,7 @@ describe('controller/api/meetings', function () {
                     var result = JSON.parse(res.text);
                     expect(result.data._id).to.not.be.null;
                     Meeting.find({_id: result.data._id}, function (err, meetingAreas) {
-                        if (err){
+                        if (err) {
                             return done(err);
                         }
                         expect(meetingAreas).to.have.length(1);
@@ -287,18 +287,18 @@ describe('controller/api/meetings', function () {
                             .set('Authorization', 'Bearer ' + owningUser.accessToken)
                             .expect('Content-Type', /json/)
                             .expect(200)
-                            .end(function(err, res){
+                            .end(function (err, res) {
                                 expect(err).to.be.null;
                                 var deleteResult = JSON.parse(res.text);
                                 expect(deleteResult.status).to.equal('success');
                                 expect(deleteResult.message).to.be.empty;
                                 Meeting.find({_id: result.data._id}, function (err, meetingAreas) {
-                                    if (err){
+                                    if (err) {
                                         return done(err);
                                     }
                                     expect(meetingAreas).to.have.length(0);
-                                    expect(acl.isAllowed(owningUser.username, '/api/meetings/' + result.data._id, '*', function(err, allowed){
-                                        if (err){
+                                    expect(acl.isAllowed(owningUser.username, '/api/meetings/' + result.data._id, '*', function (err, allowed) {
+                                        if (err) {
                                             return done(err);
                                         }
                                         expect(allowed).to.equal(false);
@@ -306,6 +306,104 @@ describe('controller/api/meetings', function () {
                                     }))
                                 });
                             })
+                    });
+                });
+        });
+    });
+    describe('PUT meeting for update', function () {
+        it('should get back an updated meeting', function (done) {
+            request
+                .post('/api/meetings')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    name: "My First Meeting",
+                    objective: "Create more meetings!",
+                    type: 'Presentation',
+                    format: 'Screencast',
+                    endDate: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    Meeting.find({_id: result.data._id}, function (err, meetingAreas) {
+                        expect(meetingAreas).to.have.length(1);
+                        request
+                            .put('/api/meetings/' + result.data._id)
+                            .send({
+                                name: "My First Update Meeting",
+                                objective: "Create more Update meetings!"
+                            })
+                            .set('Accept', 'application/json')
+                            .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                            .expect('Content-Type', /json/)
+                            .expect(200)
+                            .end(function (err, res) {
+                                expect(err).to.be.null;
+                                var updateResult = JSON.parse(res.text);
+                                expect(updateResult.data._id).to.not.be.null;
+                                Meeting.find({_id: updateResult.data._id}, function (err, meetingAreas) {
+                                    expect(meetingAreas).to.have.length(1);
+                                    expect(meetingAreas[0].name).to.equal('My First Update Meeting');
+                                    expect(meetingAreas[0].objective).to.equal('Create more Update meetings!');
+                                    done();
+                                });
+                            });
+                    });
+                });
+        });
+        it('should get back an updated meeting without changing the parent, format, or type', function (done) {
+            request
+                .post('/api/meetings')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    name: "My First Meeting",
+                    objective: "Create more meetings!",
+                    type: 'Presentation',
+                    format: 'Screencast',
+                    endDate: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    Meeting.find({_id: result.data._id}, function (err, meetingAreas) {
+                        expect(meetingAreas).to.have.length(1);
+                        request
+                            .put('/api/meetings/' + result.data._id)
+                            .send({
+                                name: "My First Update Meeting",
+                                objective: "Create more Update meetings!",
+                                parentMeetingAreaId: '111111111111111111111111',
+                                type: 'Invalid',
+                                format: 'Invalid',
+                            })
+                            .set('Accept', 'application/json')
+                            .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                            .expect('Content-Type', /json/)
+                            .expect(200)
+                            .end(function (err, res) {
+                                expect(err).to.be.null;
+                                var updateResult = JSON.parse(res.text);
+                                expect(updateResult.data._id).to.not.be.null;
+                                Meeting.find({_id: updateResult.data._id}, function (err, meetingAreas) {
+                                    expect(meetingAreas).to.have.length(1);
+                                    expect(meetingAreas[0].name).to.equal('My First Update Meeting');
+                                    expect(meetingAreas[0].objective).to.equal('Create more Update meetings!');
+                                    expect(meetingAreas[0].type).to.equal('Presentation');
+                                    expect(meetingAreas[0].format).to.equal('Screencast');
+                                    expect(meetingAreas[0].parentMeetingAreaId.toString()).to.equal(parentMeetingAreaId.toString());
+                                    done();
+                                });
+                            });
                     });
                 });
         });
