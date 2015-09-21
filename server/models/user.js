@@ -60,10 +60,10 @@ schema.pre('validate', function (next) {
         return next();
     }
 
-    if (user.isModified('lastName')) {
+    if (user.isModified('lastName') && user.lastName) {
         user.searchLastName = user.lastName.toLowerCase();
     }
-    if (user.isModified('firstName')) {
+    if (user.isModified('firstName') && user.firstName) {
         user.searchFirstName = user.firstName.toLowerCase();
     }
     next();
