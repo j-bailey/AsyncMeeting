@@ -11,7 +11,11 @@ function handleJsonErrorResponse(errMsg, httpCode, runSilent, res) {
         return;
     }
     if (errMsg && httpCode) {
-        return res.status(httpCode || 500).json(jsonResponse.errorResponse(errMsg));
+        if (httpCode === 200){
+            return res.status(httpCode).json(jsonResponse.successResponse(errMsg));
+        } else {
+            return res.status(httpCode || 500).json(jsonResponse.errorResponse(errMsg));
+        }
     } else {
         return res.status(httpCode || 500).json(jsonResponse.errorResponse('Unknown error, please try again later'));
     }

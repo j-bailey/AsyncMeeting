@@ -10,7 +10,7 @@ var secUtils = require('../../utils/securityUtils');
 //    secUtils.readOnlyDbConnection, handlers.getMeetingById);
 
 router.get('/',
-    secUtils.isAllowedResourceAccess('parentMeetingAreaId', true, '/api/meetingareas'),
+    secUtils.isAllowedResourceAccess('parentMeetingAreaId', true, '/api/meetingareas', 200, []),
     secUtils.readOnlyDbConnection, handlers.getMeetings);
 
 router.post('/',

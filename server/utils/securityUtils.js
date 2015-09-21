@@ -148,14 +148,14 @@ module.exports = {
             return nconf.get('security:passwordValidation:validationMessage');
         }
     },
-    isAllowedResourceAccess: function (resourceKey, allowNulls, resourceIdPrefix) {
+    isAllowedResourceAccess: function (resourceKey, allowNulls, resourceIdPrefix, httpCode, errorMsg) {
         return function (req, res, next) {
             var resourceId,
                 controlledResource;
 
             if (!resourceKey) {
                 logger.debug('Require resourceKey for isAllowedToResourceBasedOnUrlQueryValue');
-                return next(new RouteError(401, 'Not allowed', false));
+                return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
             }
             if (req.query && (req.query[resourceKey] || req.query[resourceKey] === null)) {
                 resourceId = req.query[resourceKey];
@@ -165,7 +165,7 @@ module.exports = {
                 resourceId = req.params[resourceKey];
             } else {
                 logger.debug('No acceptable ways to retrieve resource value for key "' + resourceKey + '" in isAllowedResourceAccess');
-                return next(new RouteError(401, 'Not allowed', false));
+                return next(new RouteError( httpCode || 401, errorMsg || 'Not allowed', false));
             }
 
             if (allowNulls && (resourceId === null || resourceId === 'null')) {
@@ -180,7 +180,7 @@ module.exports = {
                     }
                 } else {
                     logger.debug('Possible attack with invalid resource ID "' + resourceKey + '" in isAllowedResourceAccess');
-                    return next(new RouteError(401, 'Not allowed', false));
+                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                 }
             }
             acl.isAllowed(req.session.userId, controlledResource, req.method.toLowerCase(), function (err, allow) {
@@ -207,11 +207,11 @@ module.exports = {
                                 if (err) {
                                     logger.error('Could not find meeting area for ID: ' + resourceId);
                                     logger.debug(err);
-                                    return next(new RouteError(401, 'Not allowed', false));
+                                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                 }
                                 if (!meetingAreas || meetingAreas.length === 0) {
                                     logger.error('Could not find meeting area for ID: ' + resourceId);
-                                    return next(new RouteError(401, 'Not allowed', false));
+                                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                 }
                                 var userRootMeetingArea,
                                     targetMeetingArea;
@@ -228,14 +228,14 @@ module.exports = {
                                 if (targetMeetingArea === null && resourceId === null && allowNulls){
                                     meetingArea = userRootMeetingArea;
                                 } else if (targetMeetingArea === null && resourceId === null && !allowNulls) {
-                                    return next(new RouteError(401, 'Not allowed', false));
+                                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                 } else if (targetMeetingArea !== null) {
                                     meetingArea = targetMeetingArea;
                                 } else {
-                                    return next(new RouteError(401, 'Not allowed', false));
+                                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                 }
                                 if (!meetingArea.inheritsParentAccess){
-                                    return next(new RouteError(401, 'Not allowed', false));
+                                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                 }
                                 UserAllowedResources.find({$and: [{userId: req.session.userDbId}, {tenantId: meetingArea.tenantId}]})
                                     .exec(function (err, allowedResources) {
@@ -254,7 +254,7 @@ module.exports = {
                                                     if (allow) {
                                                         return next();
                                                     } else {
-                                                        return next(new RouteError(401, 'Not allowed', false));
+                                                        return next(new RouteError(httpCode || 401, errorMsg ||'Not allowed', false));
                                                     }
                                                 });
                                             } else {
@@ -275,7 +275,7 @@ module.exports = {
                                                                     return next();
                                                                 } else if (allowedResources[allowedResources.length - 1] === allowedResource &&
                                                                     meetingArea.ancestors[meetingArea.ancestors.length - 1] === ancestor) {
-                                                                    return next(new RouteError(401, 'Not allowed', false));
+                                                                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                                                 }
                                                             });
                                                         }
@@ -283,12 +283,12 @@ module.exports = {
                                                 });
                                             }
                                         } else {
-                                            return next(new RouteError(401, 'Not allowed', false));
+                                            return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                         }
                                     });
                             });
                     } else {
-                        return next(new RouteError(401, 'Not allowed', false));
+                        return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                     }
                 }
             });
