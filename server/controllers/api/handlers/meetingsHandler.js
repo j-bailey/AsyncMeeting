@@ -6,7 +6,7 @@ var ObjectId = require('mongoose').Types.ObjectId,
     Acl = require('../../../../server/security/acl'),
     jsonResponse = require('../../../utils/jsonResponseWrapper'),
     handlerUtils = require('../../../utils/handlerUtils'),
-    modelUtils = require('../../../utils/modelUtils'),
+    meetingAreaHandler = require('./meetingAreasHandler'),
     RouteError = require('../../../routes/routeError');
 
 var _createMeeting = function (meeting, ownerName, dbConn) {
@@ -49,8 +49,45 @@ var _createMeeting = function (meeting, ownerName, dbConn) {
 };
 
 module.exports = {
-    getMeetingById: function (req, res, next) {
+    //getMeetingById: function (req, res, next) {
+    //
+    //},
+    getMeetings: function (req, res, next) {
+        try {
+            var dbConn = req.db,
+                Meeting = dbConn.model('Meeting'),
+                skip = req.query.skip,
+                limit = req.query.limit;
 
+            var UserAllowedResources = req.db.model('UserAllowedResources');
+            UserAllowedResources.find({userId: req.session.userDbId})
+                .lean()
+                .exec()
+                .then(function (uarObjs) {
+                    var tenantIds = [];
+                    uarObjs.forEach(function (uarObj) {
+                        tenantIds.push(uarObj.tenantId);
+                    });
+                    return meetingAreaHandler._findAllowedMeetingArea(req.session.userDbId, tenantIds, {}, skip, limit, req.db);
+                })
+                .then(function (meetingAreas) {
+                    var areaIds = [];
+                    meetingAreas.forEach(function (obj) {
+                        areaIds.push(obj._id);
+                    });
+                    return Meeting.find({parentMeetingAreaId: {$in: areaIds}})
+                        .skip(skip)
+                        .limit(limit)
+                        .exec();
+                }).then(function (meetings) {
+                    res.status(200).json(jsonResponse.successResponse(meetings));
+                })
+                .catch(function (err) {
+                    return next(handlerUtils.catchError(err, 'Unable to create new meeting right now, please again later.'));
+                }).done();
+        } catch (e) {
+            return next(handlerUtils.catchError(e, 'Unable to create new meeting right now, please again later.'));
+        }
     },
     createNewMeeting: function (req, res, next) {
         try {
@@ -67,9 +104,9 @@ module.exports = {
             return next(handlerUtils.catchError(e, 'Unable to create new meeting right now, please again later.'));
         }
     },
-    grantUserAccess: function (req, res, next) {
-
-    },
+    //grantUserAccess: function (req, res, next) {
+    //
+    //},
     deleteMeetingById: function (req, res, next) {
         try {
             var dbConn = req.db,
@@ -95,9 +132,12 @@ module.exports = {
             return next(handlerUtils.catchError(e, 'Unable to delete meeting right now, please again later.'));
         }
     },
-    removeUserAccess: function (req, res, next) {
-
-    },
+    //removeUserAccess: function (req, res, next) {
+    //
+    //},
+    //addReply: function (req, res, next) {
+    //
+    //},
     updateMeetingById: function (req, res, next) {
         try {
             var dbConn = req.db,
@@ -118,8 +158,5 @@ module.exports = {
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to update meeting right now, please again later.'));
         }
-    },
-    addReply: function (req, res, next) {
-
     }
 };

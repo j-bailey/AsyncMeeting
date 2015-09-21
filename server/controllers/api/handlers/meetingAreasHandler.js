@@ -211,6 +211,7 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn, myFirstMeetin
 
 
 module.exports = {
+    _findAllowedMeetingArea: _findAllowedMeetingArea,
     getMeetingAreasWithParentId: function (req, res, next) {
         try {
             var parentId = req.query.parentId;

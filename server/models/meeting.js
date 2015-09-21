@@ -42,7 +42,7 @@ schema.pre('validate', function(next){
                         if (meeting.invitees.indexOf(approver) === -1) {
                             meeting.invitees.push(approver);
                         }
-                    })
+                    });
                 });
             }
         }

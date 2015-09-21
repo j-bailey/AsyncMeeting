@@ -310,6 +310,24 @@ describe('controller/api/meetings', function () {
                 });
         });
     });
+    describe('GET meetings by query', function () {
+        it.skip('should get a list of meetings', function (done) {
+            request
+                .get('/api/meetings?parentMeetingAreaId=null')
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var getResults = JSON.parse(res.text);
+                    expect(getResults.status).to.equal('success');
+                    expect(getResults.data.length).to.equal(1);
+                    done();
+                });
+
+        });
+    });
     describe('PUT meeting for update', function () {
         it('should get back an updated meeting', function (done) {
             request
@@ -356,6 +374,44 @@ describe('controller/api/meetings', function () {
                     });
                 });
         });
+        it('should get an error updating meeting with injection attack', function (done) {
+            request
+                .put('/api/meetings/111111111111111111111111;var%20date=new%20Date();%20do%7BcurDate%20=%20new%20Date();%7Dwhile(cur-Date-date<10000')
+                .send({
+                    name: "My First Update Meeting",
+                    objective: "Create more Update meetings!"
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(401)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var updateResult = JSON.parse(res.text);
+                    expect(updateResult.status).to.equal('error');
+                    expect(updateResult.message).to.equal('Not allowed');
+                    done();
+                });
+        });
+        it('should get an error updating meeting for an unavailable resource', function (done) {
+            request
+                .put('/api/meetings/111111111111111111111111')
+                .send({
+                    name: "My First Update Meeting",
+                    objective: "Create more Update meetings!"
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(401)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var updateResult = JSON.parse(res.text);
+                    expect(updateResult.status).to.equal('error');
+                    expect(updateResult.message).to.equal('Not allowed');
+                    done();
+                });
+        });
         it('should get back an updated meeting without changing the parent, format, or type', function (done) {
             request
                 .post('/api/meetings')
@@ -384,7 +440,7 @@ describe('controller/api/meetings', function () {
                                 objective: "Create more Update meetings!",
                                 parentMeetingAreaId: '111111111111111111111111',
                                 type: 'Invalid',
-                                format: 'Invalid',
+                                format: 'Invalid'
                             })
                             .set('Accept', 'application/json')
                             .set('Authorization', 'Bearer ' + owningUser.accessToken)
