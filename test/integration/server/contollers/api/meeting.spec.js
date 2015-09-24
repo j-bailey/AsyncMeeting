@@ -14,7 +14,7 @@ var Acl = require('../../../../../server/security/acl'),
 require('../../../../../server/models/meeting');
 require('../../../../../server/models/user');
 
-var request = request('http://localhost:3001')
+var request = request('http://localhost:3001');
 
 var owningUser = {
     accessToken: undefined,
@@ -63,11 +63,35 @@ var noAccessUser = {
 };
 
 var userJson = [owningUser, creatingUser, inviteeUser, viewingUser, editingUser, noAccessUser];
+var defaultMeetingSet = [];
 var acl = null;
 var parentMeetingAreaId;
 
+var defaultMeetingObj = {};
+
 
 describe('controller/api/meetings', function () {
+
+    var createMeeting = function (meetingObj) {
+        var defer = Q.defer(),
+            newMeeting = new Meeting(meetingObj);
+        meetingHandler._createMeeting(newMeeting, meetingObj.owningUser.username, db.readWriteConnection).then(function (savedMeeting) {
+            if (meetingObj.children) {
+                var childrenPromises = [];
+                for (var i = 0; i < meetingObj.children.length; i++) {
+                    childrenPromises.push(createMeeting(meetingObj.children[i]));
+                }
+                Q.allSettled(childrenPromises).then(function (result) {
+                    return defer.resolve(result);
+                });
+            } else {
+                return defer.resolve(savedMeeting);
+            }
+        }).catch(function (err) {
+            defer.reject(err);
+        }).done();
+        return defer.promise;
+    };
 
     before(function (done) {
         User = db.readWriteConnection.model('User');
@@ -109,6 +133,36 @@ describe('controller/api/meetings', function () {
             for (var i = 0; i < tokens.length; i++) {
                 userJson[i].accessToken = tokens[i];
             }
+            return
+        }).then(function () {
+            defaultMeetingObj = {
+                parentMeetingAreaId: parentMeetingAreaId,
+                name: "My First Meeting",
+                objective: "Create more meetings!",
+                type: 'Presentation',
+                format: 'Screencast',
+                agendaItems: [{
+                    name: 'How new meetings created to date',
+                    description: 'Show how many new meetings were created from first quarter to now',
+                    approvalRequest: false,
+                    owner: creatingUser.userModel._id
+                }],
+                endDate: new Date(),
+                owningUser: creatingUser
+            };
+            var createMeetingPromises = [],
+                ownerParent1stChild = JSON.parse(JSON.stringify(defaultMeetingObj)),
+                ownerParent2ndChild = JSON.parse(JSON.stringify(defaultMeetingObj)),
+                ownerParent1stChild1stChild = JSON.parse(JSON.stringify(defaultMeetingObj)),
+                meetingList = [ownerParent1stChild, ownerParent2ndChild];
+
+            defaultMeetingSet = [ownerParent1stChild, ownerParent2ndChild, ownerParent1stChild1stChild];
+            ownerParent1stChild.children = [ownerParent1stChild1stChild];
+            for (var i = 0; i < meetingList.length; i++) {
+                createMeetingPromises.push(createMeeting(meetingList[i]));
+            }
+            return Q.all(createMeetingPromises);
+        }).then(function (meetings) {
             done();
         }).catch(function (err) {
             return done(err);
@@ -353,7 +407,7 @@ describe('controller/api/meetings', function () {
                             expect(err).to.be.null;
                             var getResults = JSON.parse(res.text);
                             expect(getResults.status).to.equal('success');
-                            expect(getResults.data.length).to.equal(1);
+                            expect(getResults.data.length).to.equal(defaultMeetingSet.length + 1);
 
                             Meeting.remove({_id: getResults.data[0]._id}).exec().then(function (removed) {
                                 done();
@@ -392,7 +446,7 @@ describe('controller/api/meetings', function () {
                             expect(err).to.be.null;
                             var getResults = JSON.parse(res.text);
                             expect(getResults.status).to.equal('success');
-                            expect(getResults.data.length).to.equal(1);
+                            expect(getResults.data.length).to.equal(defaultMeetingSet.length + 1);
                             Meeting.remove({_id: getResults.data._id}).exec().then(function (removed) {
                                 done();
                             }).catch(function (err) {
@@ -401,7 +455,7 @@ describe('controller/api/meetings', function () {
                         });
                 });
         });
-        it('should get a list of meetings for false parent meeting area ID', function (done) {
+        it('should get an empty list of meetings for no access parent meeting area ID', function (done) {
             request
                 .post('/api/meetings')
                 .send({
@@ -422,6 +476,44 @@ describe('controller/api/meetings', function () {
                     expect(result.data._id).to.not.be.null;
                     request
                         .get('/api/meetings?parentMeetingAreaId=' + 111111111111111111111111)
+                        .set('Accept', 'application/json')
+                        .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                        .expect('Content-Type', /json/)
+                        .expect(200)
+                        .end(function (err, res) {
+                            expect(err).to.be.null;
+                            var getResults = JSON.parse(res.text);
+                            expect(getResults.status).to.equal('success');
+                            expect(getResults.data).to.deep.equal([]);
+                            Meeting.remove({_id: getResults.data._id}).exec().then(function (removed) {
+                                done();
+                            }).catch(function (err) {
+                                done(err);
+                            }).done()
+                        });
+                });
+        });
+        it('should get an empty list of meetings for an invalid parent meeting area ID', function (done) {
+            request
+                .post('/api/meetings')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    name: "My First Meeting",
+                    objective: "Create more meetings!",
+                    type: 'Presentation',
+                    format: 'Screencast',
+                    endDate: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    request
+                        .get('/api/meetings?parentMeetingAreaId=' + 11111111111111111111)
                         .set('Accept', 'application/json')
                         .set('Authorization', 'Bearer ' + owningUser.accessToken)
                         .expect('Content-Type', /json/)

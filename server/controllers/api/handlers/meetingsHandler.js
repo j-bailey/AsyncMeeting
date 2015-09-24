@@ -89,6 +89,7 @@ module.exports = {
             return next(handlerUtils.catchError(e, 'Unable to create new meeting right now, please again later.'));
         }
     },
+    _createMeeting: _createMeeting,
     createNewMeeting: function (req, res, next) {
         try {
             var dbConn = req.db,
