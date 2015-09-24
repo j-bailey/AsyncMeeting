@@ -7,7 +7,7 @@ var Acl = require('../../../../../server/security/acl'),
     usersHandler = require('../../../../../server/controllers/api/handlers/usersHandler'),
     request = require('supertest'),
     User,
-    bcrypt = require('bcrypt-nodejs'),
+    sleep = require('sleep'),
     db = require('../../../../../server/db');
 
 // Load the models, so they get tied to the DB connections
@@ -364,6 +364,7 @@ describe('controller/api/meetings', function () {
                                         return done(err);
                                     }
                                     expect(meetingAreas).to.have.length(0);
+                                    sleep.sleep(3);
                                     expect(acl.isAllowed(owningUser.username, '/api/meetings/' + result.data._id, '*', function (err, allowed) {
                                         if (err) {
                                             return done(err);

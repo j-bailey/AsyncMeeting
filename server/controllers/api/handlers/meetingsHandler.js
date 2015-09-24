@@ -123,8 +123,8 @@ module.exports = {
                         if (err) {
                             next(err);
                         }
-                        res.status(200).json(jsonResponse.successResponse(deletedMeeting));
                     });
+                    res.status(200).json(jsonResponse.successResponse(deletedMeeting));
                 })
                 .catch(function (err) {
                     return next(handlerUtils.catchError(err, 'Unable to delete meeting right now, please again later.'));
