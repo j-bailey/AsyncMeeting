@@ -4,6 +4,7 @@ var ObjectId = require('mongoose').Types.ObjectId,
     logger = require('winston'),
     Q = require('q'),
     Acl = require('../../../../server/security/acl'),
+    queryUtils = require('../../../utils/queryUtils'),
     jsonResponse = require('../../../utils/jsonResponseWrapper'),
     handlerUtils = require('../../../utils/handlerUtils'),
     meetingAreaHandler = require('./meetingAreasHandler'),
@@ -56,8 +57,9 @@ module.exports = {
         try {
             var dbConn = req.db,
                 Meeting = dbConn.model('Meeting'),
-                skip = req.query.skip,
-                limit = req.query.limit;
+                skip = req.query.skip || 0,
+                sort = req.query.sort || '',
+                limit =  queryUtils.getMaxQueryLimit('meeting', req.query.limit);
 
             var UserAllowedResources = req.db.model('UserAllowedResources');
             UserAllowedResources.find({userId: req.session.userDbId})
@@ -68,7 +70,7 @@ module.exports = {
                     uarObjs.forEach(function (uarObj) {
                         tenantIds.push(uarObj.tenantId);
                     });
-                    return meetingAreaHandler._findAllowedMeetingArea(req.session.userDbId, tenantIds, {}, skip, limit, req.db);
+                    return meetingAreaHandler._findAllowedMeetingArea(req.session.userDbId, tenantIds, {}, 0, 0, req.db);
                 })
                 .then(function (meetingAreas) {
                     var areaIds = [];
@@ -78,6 +80,8 @@ module.exports = {
                     return Meeting.find({parentMeetingAreaId: {$in: areaIds}})
                         .skip(skip)
                         .limit(limit)
+                        .sort(sort)
+                        .lean()
                         .exec();
                 }).then(function (meetings) {
                     res.status(200).json(jsonResponse.successResponse(meetings));
