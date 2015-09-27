@@ -214,15 +214,18 @@ module.exports = {
     _findAllowedMeetingArea: _findAllowedMeetingArea,
     getMeetingAreasWithParentId: function (req, res, next) {
         try {
-            var parentId = req.query.parentId;
-            var skip = req.query.skip;
-            var limit = req.query.limit;
+            var parentId = req.query.parentId,
+                skip = req.query.skip,
+                inTheTrash = (req.query.inTheTrash) ? true : false,
+                showAllTrashed = !!(inTheTrash && req.query.inTheTrash.toLowerCase() === 'all'),
+                limit = req.query.limit;
             if (parentId === "null") {
                 parentId = null;
             }
             modelUtils.throwErrorIfNotObjectId(parentId, true);
             var MeetingArea = req.db.model('MeetingArea');
             var UserAllowedResources = req.db.model('UserAllowedResources');
+            var criteria = {};
             if (parentId === null) {
                 UserAllowedResources.find({userId: req.session.userDbId})
                     .lean()
@@ -234,7 +237,12 @@ module.exports = {
                         uarObjs.forEach(function (uarObj) {
                             tenantIds.push(uarObj.tenantId);
                         });
-                        _findAllowedMeetingArea(req.session.userDbId, tenantIds, {}, skip, limit, req.db).then(function (meetingAreas) {
+                        if (!showAllTrashed && inTheTrash) {
+                            criteria = {$and: [{inTheTrash: inTheTrash}, {isRootTrashedItem: true}]};
+                        } else {
+                            criteria.inTheTrash = inTheTrash;
+                        }
+                        _findAllowedMeetingArea(req.session.userDbId, tenantIds, criteria, skip, limit, req.db).then(function (meetingAreas) {
                             res.status(200).json(jsonResponse.successResponse(meetingAreas));
                         }).catch(function (err) {
                             return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
@@ -242,8 +250,13 @@ module.exports = {
                     });
             } else {
                 MeetingArea.findOne({_id: parentId}).select('+tenantId').lean().exec(function (err, meetingArea) {
+                    if (!showAllTrashed && inTheTrash) {
+                        criteria = {$and: [{parentMeetingArea: (new ObjectId(meetingArea._id))}, {inTheTrash: inTheTrash}, {isRootTrashedItem: true}]};
+                    } else {
+                        criteria = {$and: [{parentMeetingArea: (new ObjectId(meetingArea._id))}, {inTheTrash: inTheTrash}]};
+                    }
                     _findAllowedMeetingArea(req.session.userDbId, meetingArea.tenantId,
-                        {parentMeetingArea: (new ObjectId(meetingArea._id))}, skip, limit, req.db).then(function (meetingAreas) {
+                        criteria, skip, limit, req.db).then(function (meetingAreas) {
                             res.status(200).json(jsonResponse.successResponse(meetingAreas));
                         }).catch(function (err) {
                             return next(handlerUtils.catchError(err, 'Unable to retrieve meeting areas right now, please again later.'));
@@ -257,8 +270,17 @@ module.exports = {
     getMeetingAreaById: function (req, res, next) {
         try {
             modelUtils.throwErrorIfNotObjectId(req.params.meetingAreaId, false, 'Need a valid Meeting Area ID');
-            var meetingAreaId = req.params.meetingAreaId;
-            _findAllowedMeetingArea(req.session.userDbId, null, {_id: (new ObjectId(meetingAreaId))},
+            var meetingAreaId = req.params.meetingAreaId,
+                criteria = {},
+                inTheTrash = (req.params.inTheTrash) ? true : false,
+                showAllTrashed = !!(inTheTrash && req.params.inTheTrash.toLowerCase() === 'all');
+
+            if (!showAllTrashed && inTheTrash) {
+                criteria = {$and: [{_id: new ObjectId(meetingAreaId)}, {inTheTrash: inTheTrash}, {isRootTrashedItem: true}]};
+            } else {
+                criteria = {$and: [{_id: new ObjectId(meetingAreaId)}, {inTheTrash: inTheTrash}]};
+            }
+            _findAllowedMeetingArea(req.session.userDbId, null, criteria,
                 0, 1, req.db).then(function (meetingAreas) {
                     if (meetingAreas && meetingAreas.length > 0) {
                         res.status(200).json(jsonResponse.successResponse(meetingAreas[0]));
@@ -379,12 +401,29 @@ module.exports = {
             modelUtils.throwErrorIfNotObjectId(req.params.meetingAreaId, false, 'Error: meetingAreaId is not valid or is missing!');
 
             var MeetingArea = req.db.model('MeetingArea');
-            MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function (err) {
-                if (err) {
-                    return handlerUtils.catchError(err, 'Unable to delete meeting area right now, please again later.');
-                }
-                res.status(200).json(jsonResponse.successResponse({}));
-            });
+            MeetingArea.findById(req.params.meetingAreaId)
+                .select('inTheTrash')
+                .exec()
+                .then(function (ma) {
+                    if (ma.inTheTrash) {
+                        MeetingArea.findOneAndRemove({_id: req.params.meetingAreaId}, function (err) {
+                            if (err) {
+                                return next(handlerUtils.catchError(err, 'Unable to delete meeting area right now, please again later.'));
+                            }
+                            res.status(200).json(jsonResponse.successResponse({}));
+                        });
+                    } else {
+                        MeetingArea.findById(req.params.meetingAreaId).exec().then(function (meetingArea) {
+                            meetingArea.inTheTrash = true;
+                            meetingArea.isRootTrashedItem = true;
+                            return meetingArea.save();
+                        }).then(function (raw) {
+                            res.status(200).json(jsonResponse.successResponse({}));
+                        }).catch(function (err) {
+                            return next(handlerUtils.catchError(err, 'Unable to delete meeting area right now, please again later.'));
+                        }).done();
+                    }
+                })
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to delete meeting area right now, please again later.'));
         }

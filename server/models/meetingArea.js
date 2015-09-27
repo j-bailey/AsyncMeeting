@@ -5,6 +5,7 @@ var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 var tenantInfo = require('./plugins/tenantInfo');
+var trashable = require('./plugins/trashable');
 var logger = require('winston');
 var db = require('../db');
 
@@ -14,6 +15,22 @@ var schema = new mongoose.Schema({
     inheritsParentAccess: {type: Boolean, required: true, default: true, select: true},
     parentMeetingArea: { type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea', select: true },
     ancestors: {type: [mongoose.Schema.Types.ObjectId], ref: 'MeetingArea', default:[], select:true}
+});
+
+schema.pre('init', function(next) {
+    try {
+        var meeting = this;
+        if (!meeting.trashSetIds){
+            meeting.trashSetIds = [];
+        }
+        //meeting.trashSetIds.push('ancestors|MeetingArea');  // This walks up the tree which is bad
+        meeting.trashSetIds.push('ancestors|MeetingArea|others');
+        meeting.trashSetIds.push('Meeting:parentMeetingAreaId');
+    } catch (e){
+        logger.error(e);
+        next(e);
+    }
+    next();
 });
 
 
@@ -89,6 +106,7 @@ schema.plugin(modifiedOn);
 schema.plugin(createInfo);
 schema.plugin(versionInfo);
 schema.plugin(tenantInfo);
+schema.plugin(trashable);
 
 
 db.readOnlyConnection.model('MeetingArea', schema);

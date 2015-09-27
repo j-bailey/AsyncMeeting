@@ -59,7 +59,8 @@ module.exports = {
                 Meeting = dbConn.model('Meeting'),
                 skip = req.query.skip || 0,
                 sort = req.query.sort || '',
-                limit =  queryUtils.getMaxQueryLimit('meeting', req.query.limit);
+                inTheTrash = (req.query.inTheTrash) ? true : false,
+                limit = queryUtils.getMaxQueryLimit('meeting', req.query.limit);
 
             var UserAllowedResources = req.db.model('UserAllowedResources');
             UserAllowedResources.find({userId: req.session.userDbId})
@@ -77,7 +78,12 @@ module.exports = {
                     meetingAreas.forEach(function (obj) {
                         areaIds.push(obj._id);
                     });
-                    return Meeting.find({parentMeetingAreaId: {$in: areaIds}})
+                    return Meeting.find({
+                        $and: [
+                            {parentMeetingAreaId: {$in: areaIds}},
+                            {inTheTrash: inTheTrash}
+                        ]
+                    })
                         .skip(skip)
                         .limit(limit)
                         .sort(sort)
@@ -117,22 +123,33 @@ module.exports = {
             var dbConn = req.db,
                 Meeting = dbConn.model('Meeting'),
                 meetingId = req.params.meetingId;
-            Meeting.findById(meetingId).exec()
+            Meeting.findById(meetingId).select('inTheTrash').exec()
                 .then(function (meeting) {
-                    return meeting.remove();
-                })
-                .then(function (deletedMeeting) {
-                    var acl = Acl.getAcl();
-                    acl.removeResource('/api/meetings/' + meetingId, function (err) {
-                        if (err) {
-                            next(err);
-                        }
-                    });
-                    res.status(200).json(jsonResponse.successResponse(deletedMeeting));
-                })
-                .catch(function (err) {
+                    if (meeting.inTheTrash) {
+                        meeting.remove()
+                            .then(function (deletedMeeting) {
+                                var acl = Acl.getAcl();
+                                acl.removeResource('/api/meetings/' + meetingId, function (err) {
+                                    if (err) {
+                                        next(err);
+                                    }
+                                });
+                                res.status(200).json(jsonResponse.successResponse({}));
+                            });
+                    } else {
+                        meeting.inTheTrash = true;
+                        meeting.isRootTrashedItem = true;
+                        meeting.save()
+                            .then(function (trashedMeeting) {
+                                res.status(200).json(jsonResponse.successResponse({}));
+                            }).catch(function (err) {
+                                return next(handlerUtils.catchError(err, 'Unable to delete meeting area right now, please again later.'));
+                            }).done();
+                    }
+                }).catch(function (err) {
                     return next(handlerUtils.catchError(err, 'Unable to delete meeting right now, please again later.'));
                 }).done();
+
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to delete meeting right now, please again later.'));
         }

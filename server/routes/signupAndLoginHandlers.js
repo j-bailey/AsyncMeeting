@@ -47,6 +47,7 @@ router.post('/login',
 router.post('/email-login',
     passport.authenticate('email-login'),
     function (req, res) {
+        // TODO Add better error handling
         //console.log("in email-logi POST");
         logger.debug("in email-login POST");
         res.setHeader('Content-Type', 'application/json');

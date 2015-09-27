@@ -1,6 +1,7 @@
 var Acl = require('../../../../../server/security/acl'),
     expect = require('chai').expect,
     Meeting,
+    MeetingArea,
     Q = require('q'),
     UserAllowedResources,
     meetingHandler = require('../../../../../server/controllers/api/handlers/meetingsHandler'),
@@ -15,7 +16,7 @@ var Acl = require('../../../../../server/security/acl'),
 require('../../../../../server/models/meeting');
 require('../../../../../server/models/user');
 
-var request = request('http://localhost:3001');
+request = request('http://localhost:3001');
 
 var owningUser = {
     accessToken: undefined,
@@ -147,7 +148,7 @@ describe('controller/api/meetings', function () {
             for (var i = 0; i < tokens.length; i++) {
                 userJsonObjs[userJsonObjsKeys[i]].accessToken = tokens[i];
             }
-            var MeetingArea = db.readWriteConnection.model('MeetingArea');
+            MeetingArea = db.readWriteConnection.model('MeetingArea');
             var meetingArea = new MeetingArea({
                 title: "Child Meeting Area Title",
                 description: "Child Meeting Area Description",
@@ -156,14 +157,14 @@ describe('controller/api/meetings', function () {
                 tenantId: userJsonObjs.owningUser.userModel.tenantId
             });
             return meetingAreasHandler._createMeetingArea(meetingArea, userJsonObjs.owningUser.userModel.username, db.readWriteConnection);
-        }).then(function(childMeetingArea) {
+        }).then(function (childMeetingArea) {
             childMeetingAreaId = childMeetingArea._id;
             var grantPromises = [
                 meetingAreasHandler._grantUserAccess(userJsonObjs.creatingUser.userModel._id, userJsonObjs.owningUser.userModel.tenantId, parentMeetingAreaId, 'editor', db.readWriteConnection),
                 meetingAreasHandler._grantUserAccess(userJsonObjs.childOnlyUser.userModel._id, userJsonObjs.owningUser.userModel.tenantId, childMeetingAreaId, 'editor', db.readWriteConnection)
-                ];
+            ];
             return Q.all(grantPromises);
-        }).then(function(){
+        }).then(function () {
             defaultMeetingObj = {
                 parentMeetingAreaId: parentMeetingAreaId,
                 name: "Default Meeting",
@@ -196,6 +197,10 @@ describe('controller/api/meetings', function () {
             }
             return Q.all(createMeetingPromises);
         }).then(function (meetings) {
+            defaultMeetingSet = [];
+            for (var i = 0; i < meetings.length; i++) {
+                defaultMeetingSet.push(meetings[i]);
+            }
             done();
         }).catch(function (err) {
             return done(err);
@@ -356,6 +361,38 @@ describe('controller/api/meetings', function () {
                 });
         });
     });
+    describe('DELETE meetings via meeting area', function () {
+        it('should trash children meetings for a trashed meeting area', function (done) {
+            request
+                .delete('/api/meetingareas/' + childMeetingAreaId)
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                .set('Accept', 'application/json')
+                .expect(200)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var deleteResult = JSON.parse(res.text);
+                    expect(deleteResult.status).to.equal('success');
+                    expect(deleteResult.message).to.be.empty;
+                    Meeting.find({_id: defaultMeetingSet[2].id})
+                        .select('+inTheTrash')
+                        .exec()
+                        .then(function (meeting) {
+                            expect(meeting[0].inTheTrash).to.be.equal(true);
+                            return MeetingArea.findById(childMeetingAreaId).exec();
+                        }).then(function (ma) {
+                            ma.inTheTrash = false;
+                            return ma.save();
+                        }).then(function (raw) {
+                            return Meeting.find({_id: defaultMeetingSet[2].id}).select('+inTheTrash').exec();
+                        }).then(function (m) {
+                            expect(m[0].inTheTrash).to.be.equal(false);
+                            done();
+                        }).catch(function (err) {
+                            done(err);
+                        }).done();
+                })
+        });
+    });
     describe('DELETE meetings', function () {
         it('should get delete success for a minimal data meeting along with removal of resource from ACL', function (done) {
             request
@@ -392,22 +429,89 @@ describe('controller/api/meetings', function () {
                                 var deleteResult = JSON.parse(res.text);
                                 expect(deleteResult.status).to.equal('success');
                                 expect(deleteResult.message).to.be.empty;
-                                Meeting.find({_id: result.data._id}, function (err, meetingAreas) {
-                                    if (err) {
-                                        return done(err);
-                                    }
-                                    expect(meetingAreas).to.have.length(0);
-                                    sleep.sleep(3);
-                                    expect(acl.isAllowed(owningUser.username, '/api/meetings/' + result.data._id, '*', function (err, allowed) {
-                                        if (err) {
-                                            return done(err);
-                                        }
-                                        expect(allowed).to.equal(false);
-                                        done();
-                                    }))
-                                });
+                                request
+                                    .delete('/api/meetings/' + result.data._id)
+                                    .set('Accept', 'application/json')
+                                    .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                                    .expect('Content-Type', /json/)
+                                    .expect(200)
+                                    .end(function (err, res) {
+                                        expect(err).to.be.null;
+                                        var deleteResult = JSON.parse(res.text);
+                                        expect(deleteResult.status).to.equal('success');
+                                        expect(deleteResult.message).to.be.empty;
+                                        Meeting.find({_id: result.data._id}, function (err, meetingAreas) {
+                                            if (err) {
+                                                return done(err);
+                                            }
+                                            expect(meetingAreas).to.have.length(0);
+                                            sleep.sleep(2);
+                                            expect(acl.isAllowed(owningUser.username, '/api/meetings/' + result.data._id, '*', function (err, allowed) {
+                                                if (err) {
+                                                    return done(err);
+                                                }
+                                                expect(allowed).to.equal(false);
+                                                done();
+                                            }))
+                                        });
+                                    });
                             })
                     });
+                });
+        });
+        it('should get success for trashing a minimal data meeting', function (done) {
+            request
+                .post('/api/meetings')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    name: "My First Meeting",
+                    objective: "Create more meetings!",
+                    type: 'Presentation',
+                    format: 'Screencast',
+                    endDate: new Date()
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    Meeting.find({_id: result.data._id}, function (err, meetingAreas) {
+                        if (err) {
+                            return done(err);
+                        }
+                        expect(meetingAreas).to.have.length(1);
+                        request
+                            .delete('/api/meetings/' + result.data._id)
+                            .set('Accept', 'application/json')
+                            .set('Authorization', 'Bearer ' + owningUser.accessToken)
+                            .expect('Content-Type', /json/)
+                            .expect(200)
+                            .end(function (err, res) {
+                                expect(err).to.be.null;
+                                var deleteResult = JSON.parse(res.text);
+                                expect(deleteResult.status).to.equal('success');
+                                expect(deleteResult.message).to.be.empty;
+                                Meeting.find({_id: result.data._id}).select('+inTheTrash').exec().then(function (meeting) {
+                                    expect(err).to.be.null;
+                                    expect(meeting).to.have.length(1);
+                                    expect(meeting[0].inTheTrash).to.have.equal(true);
+                                    expect(acl.isAllowed(owningUser.username, '/api/meetings/' + result.data._id, '*', function (err, allowed) {
+                                        expect(err).to.be.null;
+                                        expect(allowed).to.equal(true);
+                                        meeting[0].remove().then(function(){
+                                            done();
+                                        }).onRejection(function(err){
+                                            done(err);
+                                        }).done();
+                                    }))
+                                }).catch(function(err){
+                                    done(err);
+                                }).done();
+                            });
+                    })
                 });
         });
     });
@@ -466,6 +570,80 @@ describe('controller/api/meetings', function () {
 
                     done();
                 });
+        });
+        it('should get a list of non trashed meetings for null parent meeting area for creating owner off of parent meeting area', function (done) {
+            MeetingArea.findById(childMeetingAreaId).exec()
+                .then(function (ma) {
+                    ma.inTheTrash = true;
+                    return ma.save();
+                }).then(function (raw) {
+                    return Meeting.find({_id: defaultMeetingSet[2].id}).select('+inTheTrash').exec();
+                }).then(function (m) {
+                    expect(m[0].inTheTrash).to.be.equal(true);
+                    request
+                        .get('/api/meetings?parentMeetingAreaId=null')
+                        .set('Accept', 'application/json')
+                        .set('Authorization', 'Bearer ' + creatingUser.accessToken)
+                        .expect('Content-Type', /json/)
+                        .expect(200)
+                        .end(function (err, res) {
+                            expect(err).to.be.null;
+                            var getResults = JSON.parse(res.text);
+                            expect(getResults.status).to.equal('success');
+                            expect(getResults.data.length).to.equal(defaultMeetingSet.length - 1);
+                            MeetingArea.findById(childMeetingAreaId).exec()
+                                .then(function (ma) {
+                                    ma.inTheTrash = false;
+                                    return ma.save();
+                                }).then(function (raw) {
+                                    return Meeting.find({_id: defaultMeetingSet[2].id}).select('+inTheTrash').exec();
+                                }).then(function (m) {
+                                    expect(m[0].inTheTrash).to.be.equal(false);
+                                    done();
+                                }).catch(function (err) {
+                                    done(err);
+                                }).done();
+                        });
+                }).catch(function (err) {
+                    done(err);
+                }).done();
+        });
+        it('should get a list of trashed meetings for null parent meeting area for creating owner off of parent meeting area', function (done) {
+            MeetingArea.findById(childMeetingAreaId).exec()
+                .then(function (ma) {
+                    ma.inTheTrash = true;
+                    return ma.save();
+                }).then(function (raw) {
+                    return Meeting.find({_id: defaultMeetingSet[2].id}).select('+inTheTrash').exec();
+                }).then(function (m) {
+                    expect(m[0].inTheTrash).to.be.equal(true);
+                    request
+                        .get('/api/meetings?parentMeetingAreaId=null&inTheTrash=true')
+                        .set('Accept', 'application/json')
+                        .set('Authorization', 'Bearer ' + creatingUser.accessToken)
+                        .expect('Content-Type', /json/)
+                        .expect(200)
+                        .end(function (err, res) {
+                            expect(err).to.be.null;
+                            var getResults = JSON.parse(res.text);
+                            expect(getResults.status).to.equal('success');
+                            expect(getResults.data.length).to.equal(1);
+                            MeetingArea.findById(childMeetingAreaId).exec()
+                                .then(function (ma) {
+                                    ma.inTheTrash = false;
+                                    return ma.save();
+                                }).then(function (raw) {
+                                    return Meeting.find({_id: defaultMeetingSet[2].id}).select('+inTheTrash').exec();
+                                }).then(function (m) {
+                                    expect(m[0].inTheTrash).to.be.equal(false);
+                                    done();
+                                }).catch(function (err) {
+                                    done(err);
+                                }).done();
+                        });
+                }).catch(function (err) {
+                    done(err);
+                }).done();
         });
         it('should get a list of meetings for null parent meeting area for child owner off of child meeting area', function (done) {
             request
@@ -766,4 +944,5 @@ describe('controller/api/meetings', function () {
                 });
         });
     });
-});
+})
+;

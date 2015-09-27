@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
+var trashable = require('./plugins/trashable');
 var db = require('../db');
 var logger = require('winston');
 
@@ -118,6 +119,7 @@ schema.statics.allowedMeetingFormats = [
 schema.plugin(modifiedOn);
 schema.plugin(createInfo);
 schema.plugin(versionInfo);
+schema.plugin(trashable);
 
 db.readOnlyConnection.model('Meeting', schema);
 db.readWriteConnection.model('Meeting', schema);

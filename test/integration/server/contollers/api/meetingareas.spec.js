@@ -144,7 +144,7 @@ describe('controller/api/meetingAreas', function () {
 
 
     describe('GET \'/\' by query', function () {
-        it('should return meeting areas with the given parent id', function (done) {
+        it('should return non-trashed meeting areas with the given parent id', function (done) {
             user1
                 .get('/api/meetingareas?parentId=' + parentMeetingAreaId)
                 .set('Accept', 'application/json')
@@ -156,7 +156,78 @@ describe('controller/api/meetingAreas', function () {
                     expect(result.data).to.have.length(1);
                     expect(result.data[0]._id.toString()).to.equal(childMeetingAreaId.toString());
                 })
-                .end(done);
+                .end(function (){
+                    MeetingArea.findById(childMeetingAreaId).select('inTheTrash').exec().then(function(ma){
+                        expect(ma.inTheTrash).to.equal(false);
+                        done();
+                    })
+                });
+        });
+        it('should get root trashed meetings areas with no ID', function (done){
+            user1
+                .delete('/api/meetingareas/' + parentMeetingAreaId.toString())
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(200)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    user1
+                        .get('/api/meetingareas?parentId=null&inTheTrash=true')
+                        .set('Accept', 'application/json')
+                        .set('Authorization', 'Bearer ' + accessToken1)
+                        .expect('Content-Type', /json/)
+                        .expect(200)
+                        .end(function (err, res) {
+                            expect(err).to.be.null;
+                            var result = JSON.parse(res.text);
+                            expect(result.data).to.have.length(1);
+                            expect(result.data[0]._id.toString()).to.equal(parentMeetingAreaId.toString());
+                            MeetingArea.update({inTheTrash: true}, {inTheTrash: false}, {multi: true} ).select('inTheTrash').exec().then(function(ma) {
+                                expect(ma.nModified).to.equal(3);
+                                return MeetingArea.find({inTheTrash: true}).exec();
+                            }).then(function(mas){
+                                expect(mas.length).to.equal(0);
+                                done();
+                            }).catch(function(err){
+                                done(err);
+                            }).done();
+                        });
+                });
+        });
+        it('should get all trashed meetings areas with no ID', function (done){
+            user1
+                .delete('/api/meetingareas/' + parentMeetingAreaId.toString())
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .set('Accept', 'application/json')
+                .expect(200)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    user1
+                        .get('/api/meetingareas?parentId=null&inTheTrash=all')
+                        .set('Accept', 'application/json')
+                        .set('Authorization', 'Bearer ' + accessToken1)
+                        .expect('Content-Type', /json/)
+                        .expect(200)
+                        .end(function (err, res) {
+                            expect(err).to.be.null;
+                            var result = JSON.parse(res.text);
+                            expect(result.data).to.have.length(3);
+                            expect(result.data[0]._id.toString()).to.equal(parentMeetingAreaId.toString());
+                            MeetingArea.update({inTheTrash: true}, {inTheTrash: false}, {multi: true}).select('inTheTrash').exec().then(function(ma){
+                                expect(ma.nModified).to.equal(3);
+                                return MeetingArea.find({inTheTrash: true}).exec();
+                            }).then(function(mas){
+                                expect(mas.length).to.equal(0);
+                                done();
+                            }).catch(function(err){
+                                done(err);
+                            }).done();
+                        });
+                });
         });
         it('should return 2 meeting areas by skip and limit', function (done) {
             user1
@@ -642,7 +713,7 @@ describe('controller/api/meetingAreas', function () {
         });
     });
     describe('DELETE \'/\'', function () {
-        it('should remove a meeting area', function (done) {
+        it('should trash a meeting area', function (done) {
             user1
                 .post('/api/meetingareas')
                 .send({
@@ -669,10 +740,77 @@ describe('controller/api/meetingAreas', function () {
                                 if (err) {
                                     return done(err);
                                 }
-                                MeetingArea.find({_id: result.data._id}, function (err, meetingAreas) {
-                                    expect(meetingAreas.length).to.be.equal(0);
-                                    done();
-                                });
+                                MeetingArea.find({_id: result.data._id})
+                                    .select('+inTheTrash')
+                                    .exec()
+                                    .then(function (meetingAreas) {
+                                        expect(meetingAreas[0].inTheTrash).to.be.equal(true);
+                                        MeetingArea.findByIdAndRemove(result.data._id).exec().then(function(){})
+                                            .catch(function(err){
+                                                done(err);
+                                            }).done();
+                                        done();
+                                    }).catch(function (err) {
+                                        done(err);
+                                    }).done();
+                            });
+                    });
+                });
+        });
+        it('should delete a trashed a meeting area', function (done) {
+            user1
+                .post('/api/meetingareas')
+                .send({
+                    parentMeetingAreaId: parentMeetingAreaId,
+                    title: "New Meeting Area for delete",
+                    description: "New Meeting Area for delete Description"
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(201)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    var result = JSON.parse(res.text);
+                    expect(result.data._id).to.not.be.null;
+                    MeetingArea.find({_id: result.data._id}, function (err, meetingAreas) {
+                        expect(meetingAreas).to.have.length(1);
+                        user1
+                            .delete('/api/meetingareas/' + result.data._id)
+                            .set('Authorization', 'Bearer ' + accessToken1)
+                            .set('Accept', 'application/json')
+                            .expect(200)
+                            .end(function (err, res) {
+                                if (err) {
+                                    return done(err);
+                                }
+                                MeetingArea.find({_id: result.data._id})
+                                    .select('+inTheTrash')
+                                    .exec()
+                                    .then(function (meetingAreas) {
+                                        expect(meetingAreas[0].inTheTrash).to.be.equal(true);
+                                        user1
+                                            .delete('/api/meetingareas/' + result.data._id)
+                                            .set('Authorization', 'Bearer ' + accessToken1)
+                                            .set('Accept', 'application/json')
+                                            .expect(200)
+                                            .end(function (err, res) {
+                                                if (err) {
+                                                    return done(err);
+                                                }
+                                                MeetingArea.find({_id: result.data._id})
+                                                    .select('+inTheTrash')
+                                                    .exec()
+                                                    .then(function (meetingAreas) {
+                                                        expect(meetingAreas.length).to.be.equal(0);
+                                                        done();
+                                                    }).catch(function (err) {
+                                                        done(err);
+                                                    }).done();
+                                            });
+                                    }).catch(function (err) {
+                                        done(err);
+                                    }).done();
                             });
                     });
                 });
