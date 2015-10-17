@@ -501,9 +501,10 @@ describe('controller/api/meetings', function () {
                                     expect(acl.isAllowed(owningUser.username, '/api/meetings/' + result.data._id, '*', function (err, allowed) {
                                         expect(err).to.be.null;
                                         expect(allowed).to.equal(true);
+                                        expect(meeting.length).to.equal(1);
                                         meeting[0].remove().then(function(){
                                             done();
-                                        }).onRejection(function(err){
+                                        }).catch(function(err){
                                             done(err);
                                         }).done();
                                     }))

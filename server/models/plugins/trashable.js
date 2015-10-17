@@ -30,13 +30,16 @@ module.exports = exports = function trashable(schema) {
                 query = {};
 
             if (doc.inTheTrash) {
-                doc.trashedOnDate = new Date;
+                doc.trashedOnDate = new Date();
                 if (doc.name) {
                     doc.originalName = doc.name;
                     doc.name = doc.name + nodeUuid.v4();
                 }
                 if (doc.trashSetIds) {
-                    for (i = 0; i < doc.trashSetIds.length; i++) {
+                    var parseQueryItems = function (item) {
+                        queryIds.push(item);
+                    };
+                    for (i = 0; i < doc.trashSetIds.length; i += 1) {
                         tId = doc.trashSetIds[i];
                         if (tId.indexOf(':') > 0) {
                             tokens = tId.split(':');
@@ -59,9 +62,7 @@ module.exports = exports = function trashable(schema) {
                                 if (Array.isArray(doc.get(prop))) {
                                     var itemArray = doc.get(prop),
                                         queryIds = [];
-                                    itemArray.forEach(function (item) {
-                                        queryIds.push(item);
-                                    });
+                                    itemArray.forEach(parseQueryItems);
                                     query = {_id: {$in: queryIds}};
                                     promises.push(model.update(query, {inTheTrash: true}, {multi: true}));
                                 } else {
@@ -89,7 +90,7 @@ module.exports = exports = function trashable(schema) {
                 }
                 query = {};
                 if (doc.trashSetIds) {
-                    for (i = 0; i < doc.trashSetIds.length; i++) {
+                    for (i = 0; i < doc.trashSetIds.length; i += 1) {
                         tId = doc.trashSetIds[i];
                         if (tId.indexOf(':') > 0) {
                             tokens = tId.split(':');
@@ -126,7 +127,7 @@ module.exports = exports = function trashable(schema) {
             }
         }
         if (promises.length > 0) {
-            Q.all(promises).then(function (responses) {
+            Q.all(promises).then(function () {
                 next();
             }).catch(function (err) {
                 next(err);

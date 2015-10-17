@@ -127,7 +127,7 @@ module.exports = {
                 .then(function (meeting) {
                     if (meeting.inTheTrash) {
                         meeting.remove()
-                            .then(function (deletedMeeting) {
+                            .then(function () {
                                 var acl = Acl.getAcl();
                                 acl.removeResource('/api/meetings/' + meetingId, function (err) {
                                     if (err) {
@@ -140,7 +140,7 @@ module.exports = {
                         meeting.inTheTrash = true;
                         meeting.isRootTrashedItem = true;
                         meeting.save()
-                            .then(function (trashedMeeting) {
+                            .then(function () {
                                 res.status(200).json(jsonResponse.successResponse({}));
                             }).catch(function (err) {
                                 return next(handlerUtils.catchError(err, 'Unable to delete meeting area right now, please again later.'));

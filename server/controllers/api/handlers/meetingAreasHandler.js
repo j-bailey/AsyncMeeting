@@ -251,7 +251,8 @@ module.exports = {
             } else {
                 MeetingArea.findOne({_id: parentId}).select('+tenantId').lean().exec(function (err, meetingArea) {
                     if (!showAllTrashed && inTheTrash) {
-                        criteria = {$and: [{parentMeetingArea: (new ObjectId(meetingArea._id))}, {inTheTrash: inTheTrash}, {isRootTrashedItem: true}]};
+                        criteria = {$and: [{parentMeetingArea: (new ObjectId(meetingArea._id))}, {inTheTrash: inTheTrash},
+                            {isRootTrashedItem: true}]};
                     } else {
                         criteria = {$and: [{parentMeetingArea: (new ObjectId(meetingArea._id))}, {inTheTrash: inTheTrash}]};
                     }
@@ -417,13 +418,13 @@ module.exports = {
                             meetingArea.inTheTrash = true;
                             meetingArea.isRootTrashedItem = true;
                             return meetingArea.save();
-                        }).then(function (raw) {
+                        }).then(function () {
                             res.status(200).json(jsonResponse.successResponse({}));
                         }).catch(function (err) {
                             return next(handlerUtils.catchError(err, 'Unable to delete meeting area right now, please again later.'));
                         }).done();
                     }
-                })
+                });
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to delete meeting area right now, please again later.'));
         }
