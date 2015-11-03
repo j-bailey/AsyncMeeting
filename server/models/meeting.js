@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
-var trashable = require('./plugins/trashable');
+var trashable = require('./plugins/trashable').init();
 var db = require('../db');
 var logger = require('winston');
 

@@ -5,7 +5,21 @@ var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');
 var versionInfo = require('./plugins/versionInfo');
 var tenantInfo = require('./plugins/tenantInfo');
-var trashable = require('./plugins/trashable');
+var dependentEntities = [
+    {
+        type: 'traverseTree',
+        direction: 'children',
+        property: 'ancestors',
+        modelName: 'MeetingArea'
+    },
+    {
+        type: 'byModelId',
+        property: 'parentMeetingAreaId',
+        modelName: 'Meeting'
+    }
+];
+
+var trashable = require('./plugins/trashable').init(dependentEntities);
 var logger = require('winston');
 var db = require('../db');
 
@@ -16,23 +30,6 @@ var schema = new mongoose.Schema({
     parentMeetingArea: { type: mongoose.Schema.Types.ObjectId, ref: 'MeetingArea', select: true },
     ancestors: {type: [mongoose.Schema.Types.ObjectId], ref: 'MeetingArea', default:[], select:true}
 });
-
-schema.pre('init', function(next) {
-    try {
-        var meeting = this;
-        if (!meeting.trashSetIds){
-            meeting.trashSetIds = [];
-        }
-        //meeting.trashSetIds.push('ancestors|MeetingArea');  // This walks up the tree which is bad
-        meeting.trashSetIds.push('ancestors|MeetingArea|others');
-        meeting.trashSetIds.push('Meeting:parentMeetingAreaId');
-    } catch (e){
-        logger.error(e);
-        next(e);
-    }
-    next();
-});
-
 
 schema.pre('validate', function (next) {
     var meetingArea = this;
@@ -81,22 +78,6 @@ var setAncestors = function(meetingArea, parentMeetingArea, next) {
     }
 };
 
-//var arePropertiesInSync = function(meetingArea){
-//    if (!meetingArea.ancestros || !meetingArea.parentMeetingArea) {
-//        return new Error('This item is missing ancestors and/or parent meeting area ' + meetingArea._id);
-//    } else if (meetingArea.ancestors.length > 0 && meetingArea.parentMeetingArea != null) {
-//        var lastEntry = meetingArea.ancestors[meetingArea.ancestors.length - 1];
-//        if (lastEntry === meetingArea.parentMeetingArea) {
-//            return null;
-//        } else {
-//            return new Error('Ancestors last entry does not match the parent meeting area');
-//        }
-//    } else if (meetingArea.ancestors.length > 0 && meetingArea.parentMeetingArea === null) {
-//        return new Error ('Ancestors and parent are not in sync, parent meeting area is null while ancestors is not empty');
-//    } else if (meetingArea.ancestors.length === 0 && meetingArea.parentMeetingArea != null) {
-//        return new Error ('Ancestors and parent are not in sync, ancestors is empty while parent meeting area is not null');
-//    }
-//};
 
 // Add static methods
 
