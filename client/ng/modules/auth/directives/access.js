@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -27,7 +28,6 @@
                           }
                       },
                       roles = attrs.access.split(',');
-
 
                   if (roles.length > 0) {
                       determineVisibility(true);

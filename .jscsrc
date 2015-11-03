@@ -1,0 +1,38 @@
+{
+  "excludeFiles":
+  [
+    "node_modules/**"
+    , "coverage"
+    , "assets/**"
+    , "logs/**"
+    , "tmp/**"
+  ]
+, "requireLineFeedAtFileEnd": true
+, "disallowMultipleLineBreaks": true
+, "requireMultipleVarDecl": true
+, "disallowEmptyBlocks": true
+, "disallowMixedSpacesAndTabs": true
+, "disallowSpaceAfterObjectKeys": true
+, "disallowTrailingWhitespace": true
+, "disallowSpacesInCallExpression": true
+, "disallowTrailingComma": true
+, "disallowNewlineBeforeBlockStatements": true
+, "requireCapitalizedConstructors": true
+, "requireSpacesInsideObjectBrackets": "all"
+, "requireCommaBeforeLineBreak": true
+, "requireLineBreakAfterVariableAssignment": true
+, "requireOperatorBeforeLineBreak": true
+, "requireSpaceAfterLineComment": true
+, "requireSemicolons": true
+, "validateLineBreaks": "LF"
+, "requireSpaceBeforeBinaryOperators": [ "+", "-", "/", "*", "=", "==", "===", "!=", "!==" ]
+, "requireSpaceAfterBinaryOperators": [ "+", "-", "/", "*", "=", "==", "===", "!=", "!==" ]
+, "requireSpaceAfterKeywords": [ "if", "else", "for", "while", "do", "switch", "try", "catch" ]
+, "requireSpaceBeforeKeywords": [ "else", "while", "catch" ]
+, "disallowSpaceAfterPrefixUnaryOperators": [ "++", "--", "+", "-", "~", "!" ]
+, "disallowSpaceBeforePostfixUnaryOperators": [ "++", "--" ]
+, "requireSpaceBeforeBinaryOperators": [ "+", "-", "/", "*", "=", "==", "===", "!=", "!==" ]
+, "requireSpacesInFunctionExpression": { "beforeOpeningCurlyBrace": true }
+, "requireSpaceBetweenArguments": true
+, "requireSpacesInForStatement": true
+}

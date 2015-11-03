@@ -1,11 +1,44 @@
 {
-  "database": {
-    "url": "mongodb://localhost/asyncmeeting_dev"
+  "security": {
+    "passwordValidation": {
+      "validationRegex": "((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{8,20}$)",
+      "validationMessage": "Password must be between 8-20 in length. Must contain one digit, one lowercase, one uppercase character and one special character (@#$%)."
+    },
+    "scrypt": {
+      "maxtime": 1.0,
+      "maxmem": 0,
+      "maxmemfrac": 0.5,
+      "defaultSaltSize": 32,
+      "N": 1,
+      "r": 1,
+      "p": 1
+    }
   },
   "session": {
     "secret": "b1bce56042e44bb7c491e03d4142b652",
-    "timeout": "1800000",
-    "sessionIdName": "asm.sid"
+    "timeout": "120",
+    "sessionIdName": "asm.sid",
+    "proxy": null,
+    "rolling": false,
+    "cookie": {
+      "secure": false,
+      "domain": "",
+      "path": "/",
+      "httpOnly": true,
+      "maxAge": null
+    }
+  },
+  "query": {
+    "maxQueryLimit": {
+      "default":100,
+      "meetingArea": 50
+    }
+  },
+  "accessToken":{
+    "secret": "supersecretkey",
+    "timeout": 240,
+    "bindToClientIp": true,
+    "bindToClientUserAgent": true
   },
   "log": {
     "directory": "logs",
@@ -18,5 +51,48 @@
   },
   "errors": {
     "view": "error"
-  }
+  },
+  "server": {
+    "reservedCPUs": 0,
+    "singleProcess": false,
+    "PORT": 3000,
+    "NODE_ENV": "development",
+    "https": {
+      "keyFile": "",
+      "certFile": ""
+    }
+  },
+  "database": {
+    "read-only": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "asyncmeeting_dev",
+      "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
+    },
+    "read-write": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "asyncmeeting_dev",
+      "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
+    },
+    "admin": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "asyncmeeting_dev",
+      "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
+    },
+    "session": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "asyncmeeting_dev",
+      "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
+    },
+    "acl": {
+      "url": "mongodb://localhost:27017/asyncmeeting_dev",
+      "user": "",
+      "pass": ""
+    }
+  },
+  "PORT": 3000,
+  "NODE_ENV": "dev"
 }

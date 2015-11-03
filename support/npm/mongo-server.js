@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = (function() {
     var mongoServer = null;
     function start () {
@@ -41,5 +43,5 @@ module.exports = (function() {
         start: start,
         kill: kill,
         getProcessInfo: getProcessInfo
-    }
+    };
 })();

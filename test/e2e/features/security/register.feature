@@ -4,21 +4,24 @@ Feature: Register for an account
   so I can use AsyncMeeting
 
 # TODO need to add an account type to the process
+  @register
   Scenario Outline: Register with valid credentials
     Given System does not have any registration credentials
     And I am at registration point
     When I provide my username <username> for registration
     And I provide my email <email> for registration
     And I provide my password <password> for registration
-    And I reconfirm my password <password> for registration
+#    And I reconfirm my password <password> for registration
     And I submit for registration
-    Then I see a registration confirmation
+#    Then I see a registration confirmation
+    Then I am offered to login to the system
 
     Examples:
-      | username                      | email                                                   | password                      | description                   |
-      | u                             | u@u.c                                                   | u                             | shortest values               |
-      | abcdefghijklmnopqrstuvxyz     | abcdefghijklmnopqrstuvxyz@abcdefghijklmnopqrstuvxyz.com | abcdefghijklmnopqrstuvxyz     | longest values                |
-      | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | u!@#$%^&*()\|\]}[{'";:/>?<,`~@user.com                  | u!@#$%^&*()\|\]}[{'";:/>?<,`~ | acceptable special characters |
+      | username               | email                                                   | password | description                   |
+      | Us#1                   | u@u.c                                                   | aA123#   | shortest values               |
+      | Abcdefghijklmnopq1#    | abcdefghijklmnopqrstuvxyz@abcdefghijklmnopqrstuvxyz.com | aA123#   | longest values                |
+#      | u!@#$%^&*()\|\]}[{'";: | u!$%^&*\|}{'/?`~@user.com                               | aA123#   | acceptable special characters |
+#      | u:/>?<,`~              | u!$%^&*\|}{'/?`~@user.com                               | aA123#   | acceptable special characters |
 
 #      TODO Figure out how to handle HTML 5 validation messages
 #  @negative_test
@@ -33,6 +36,7 @@ Feature: Register for an account
 #      | field    | value | description           |
 #      | username |       | Number only username |
 
+  @WIP
   Scenario Outline: See password strength and acceptance
     Given System does not have any registration credentials
     And I am at registration point
@@ -46,7 +50,7 @@ Feature: Register for an account
       | P123@#$ds87f | strong   | Strongest password       |
 
 #    TODO Add common bad passwords
-  @negative_test
+  @negative_test @WIP
   Scenario Outline: See passwords fail due to strength
     Given System does not have any registration credentials
     And I am at registration point

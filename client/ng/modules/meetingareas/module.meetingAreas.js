@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -18,6 +19,5 @@
     angular.module(asm.modules.meetingareas.name, [
         'ngRoute', 'rcWizard', 'rcForm', 'rcDisabledBootstrap'
     ]);
-
 
 }(angular, asm));

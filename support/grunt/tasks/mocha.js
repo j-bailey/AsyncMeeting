@@ -1,31 +1,53 @@
-/**
- * Created by jlb on 4/19/15.
- */
-module.exports = function(grunt) {
-    grunt.registerTask('mocha', function () {
-        process.env.PORT = 3001;
-        process.env.NODE_ENV = 'test';
+"use strict";
 
-        grunt.task.run([
-            'start-redis-server',
-            'start-mongo-server',
-            'launch-mocha-process',
-            'start-redis-server',
-            'kill-mongo-server']);
+var fs = require('fs'),
+    path = require('path');
+
+module.exports = function(grunt) {
+    var processStatus;
+    grunt.registerTask('mocha', function (testFolder) {
+        process.env.PORT = 3001;
+        if(!process.env.NODE_ENV) {
+            process.env.NODE_ENV = 'dev-test';
+        }
+        process.env.configOverrideFile=path.normalize(path.join(__dirname, '../../../config/test.json'));
+
+        console.log('NODE_ENV = ' + process.env.NODE_ENV);
+
+        if (testFolder.indexOf('integration') > -1){
+            grunt.task.run(['start-external-services', 'file-launch:gulpTestServer:gulp:[\'test|server\']:3']);
+        }
+        grunt.task.run(['launch-mocha-process:' + testFolder]);
+
+        if (testFolder.indexOf('integration') > -1) {
+            grunt.task.run(['file-launch-kill:gulpTestServer', 'kill-external-services']);
+        }
+        grunt.task.run(['check-mocha-status']);
     });
 
-    grunt.registerTask('launch-mocha-process', function(){
-        var childProcess;
-        var fs = require('fs'),
-            nodeFs = require('node-fs'),
-            path = require('path'),
-            spawnSync = require('child_process').spawnSync;
+    grunt.registerTask('launch-mocha-process', function(testFolder) {
+        var childProcess,
+            spawnSync = require('child_process').spawnSync,
+            cmdArgs = [];
 
-        childProcess = spawnSync('./node_modules/.bin/mocha', [], {
+        if (fs.existsSync(path.join(testFolder, 'mocha.opts'))) {
+            console.log('using mocha.opts ' + path.join(testFolder, 'mocha.opts'));
+            cmdArgs.push('--opts');
+            cmdArgs.push(path.join(testFolder, 'mocha.opts'));
+        }
+        //cmdArgs.push(testFolder);
+        childProcess = spawnSync('./node_modules/.bin/mocha', cmdArgs, {
             detached: false,
             stdio: 'inherit',
             env: process.env
         });
+
+        processStatus = childProcess.status;
     });
 
-}
+    grunt.registerTask('check-mocha-status', function(){
+        if (processStatus !== 0) {
+            grunt.fail.warn(new Error('Failed with code: ' + processStatus), processStatus);
+        }
+    });
+};

@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -14,6 +15,5 @@
     angular.module(asm.modules.admin.name, [
         'ngRoute'
     ]);
-
 
 }(angular, asm));

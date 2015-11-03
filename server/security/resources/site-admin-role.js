@@ -3,7 +3,7 @@
  */
 var r = require('./acl-resources');
 
-var SITE_ADMIN_USER_ROLE = {key:'SiteAdminUserRole', name:'Site Admin User', desc:'',
+var SITE_ADMIN_USER_ROLE = { key:'SiteAdminUserRole', name:'Site Admin User', desc:'',
     allows: [
         {
             resources: [
@@ -13,6 +13,6 @@ var SITE_ADMIN_USER_ROLE = {key:'SiteAdminUserRole', name:'Site Admin User', des
                 r.HTTP_PERMISSIONS
             ]
         },
-    ]};
+    ] };
 
 module.exports.object = SITE_ADMIN_USER_ROLE;

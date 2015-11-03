@@ -1,6 +1,4 @@
-/**
- * Created by jlb on 4/19/15.
- */
+"use strict";
 
 module.exports = function (grunt) {
 
@@ -10,22 +8,29 @@ module.exports = function (grunt) {
             nodeFs = require('node-fs'),
             path = require('path'),
             logPath = path.join('.', 'tmp', 'web-launch'),
-            out = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a'),
-            err = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a'),
             spawn = require('child_process').spawn;
 
+        if (grunt.config.get('webLaunchBaseIsRunning') === null) {
+            grunt.config.set('webLaunchBaseIsRunning', false);
+        }
+        if (grunt.config.get('webLaunchBaseIsRunning')){
+            grunt.task.run(['web-launch-base']);
+        }
         if (!fs.existsSync(logPath)) {
             nodeFs.mkdirSync(logPath, 511, true);
         }
 
-        console.log('--' + cmdArgs + '--')
-        var args = ['support/grunt/web-launch-server', port, cmd];
-        if (cmdArgs && typeof cmdArgs == 'string' && cmdArgs.length > 0) {
+        var out = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a'),
+            err = fs.openSync(path.join(logPath, cmd + '-server.log'), 'a');
+
+        console.log('--' + cmdArgs + '--');
+        var args = ['support/grunt/web-launch-server', grunt.config.get('webLaunchBasePort'), port, cmd];
+        if (cmdArgs && typeof cmdArgs === 'string' && cmdArgs.length > 0) {
             cmdArgs = JSON.parse(cmdArgs.replace(/'/g, '"').replace(/\|/g, ':'));
             args.push.apply(args, cmdArgs);
         }
-        console.log('### 1')
-        console.log('args = ' + JSON.stringify(args))
+        console.log('### 1');
+        console.log('args = ' + JSON.stringify(args));
         webServer = spawn('node', args, {
             detached: true,
             stdio: ['ignore', out, err],
@@ -38,7 +43,7 @@ module.exports = function (grunt) {
 
             setTimeout(function () {
                 done();
-            }, pause * 1000)
+            }, pause * 1000);
             return done;
         }
     });
@@ -47,29 +52,22 @@ module.exports = function (grunt) {
         var http = require('http'),
             done = this.async();
 
-        var options = {
-            hostname: 'localhost',
-            port: port,
-            path: '/shutdown',
-            method: 'GET'
-        };
-        console.log('%%% -- ' + 'http://127.0.0.1:' + port + '/shutdown')
-
+        console.log('%%% -- ' + 'http://127.0.0.1:' + port + '/shutdown');
 
         http.get('http://127.0.0.1:' + port + '/shutdown', function (res) {
             console.log("Got response: " + res.statusCode);
-            if (res.statusCode == 200) {
+            if (res.statusCode === 200) {
                 done();
             } else {
-                done('Not 200, but ' + res.statusCode)
+                done('Not 200, but ' + res.statusCode);
             }
         }).on('error', function (e) {
             console.log("Got error: " + e.message);
             http.get('http://127.0.0.1:' + port + '/shutdown', function (res) {
                 console.log("Got response: " + res.statusCode);
-                console.log('here')
-                if (res.statusCode == 200) {
-                    console.log('here')
+                console.log('here');
+                if (res.statusCode === 200) {
+                    console.log('here');
                     //done();
                     //} else {
                     //    done('Not 200, but ' + res.statusCode)
@@ -94,8 +92,8 @@ module.exports = function (grunt) {
         //});
         //
         //req.end();
-        setTimeout((function () {
-            done('Timed out on web launch kill for port ' + port)
-        }), 5000)
+        setTimeout(function () {
+            done('Timed out on web launch kill for port ' + port);
+        }, 5000);
     });
 };

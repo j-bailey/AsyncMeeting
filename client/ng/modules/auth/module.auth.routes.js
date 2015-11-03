@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -19,6 +20,5 @@
 
             $routeProvider.otherwise({ redirectTo: asm.modules.auth.routes.login });
         }]);
-
 
 }(angular, asm));

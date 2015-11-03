@@ -1,24 +1,35 @@
-var LocalStrategy = require('passport-local').Strategy;
-var User = require('../models/user');
-var bCrypt = require('bcrypt-nodejs');
-var logger = require('winston');
+"use strict";
 
-module.exports = function(passport){
+var LocalStrategy = require('passport-local').Strategy;
+var db = require('../db');
+var User = db.readOnlyConnection.model('User');
+var logger = require('winston');
+var scrypt = require("scrypt");
+
+scrypt.verify.config.keyEncoding = "utf8";
+scrypt.verify.config.hashEncoding = "hex";
+
+module.exports = function(passport) {
+    var isValidPassword = function(user, password) {
+        return scrypt.verify(user.password, password);
+    };
+
     passport.use('login', new LocalStrategy({
-                passReqToCallback : true
+                passReqToCallback: true
             },
             function(req, username, password, done) {
 // check in mongo if a user with username exists or not
-                console.log('searching for user ' + username);
-                User.findOne({ 'username' : username },
+                logger.log('searching for user ' + username);
+                User.findOne({ 'username': username },
                     function(err, user) {
 // In case of any error, return using the done method
-                        console.log('found user = ' + JSON.stringify(user))
-                        if (err)
+                        logger.log('found user = ' + JSON.stringify(user));
+                        if (err) {
                             return done(err);
+                        }
 // Username does not exist, log the error and redirect back
                         if (!user){
-                            logger.debug('User Not Found with username '+username);
+                            logger.debug('User Not Found with username ' + username);
                             return done(null, false, req.flash('message', 'User Not found.'));
                         }
 // User exists but wrong password, log the error
@@ -33,8 +44,4 @@ module.exports = function(passport){
                 );
             })
     );
-
-    var isValidPassword = function(user, password){
-        return bCrypt.compareSync(password, user.password);
-    }
-}
+};

@@ -18,5 +18,11 @@
   },
   "errors": {
     "view": "error"
+  },
+  "server": {
+    "https": {
+      "keyFile": "",
+      "certFile": ""
+    }
   }
 }

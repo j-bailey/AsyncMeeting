@@ -1,3 +1,4 @@
+/* globals angular, asm, _ */
 (function (angular, asm) {
     'use strict';
 
@@ -23,7 +24,7 @@
                     },
                     // Set the label for the current route.
                     setLabel: function(label) {
-                        this.breadcrumbs[this.breadcrumbs.length-1].label = label;
+                        this.breadcrumbs[this.breadcrumbs.length - 1].label = label;
                     },
                     generateBreadcrumbs: function() {
                         // Get current path
@@ -32,17 +33,17 @@
                         // Check if current path is equal to any previous path in the breadcrumb trail.
                         // If it is, remove all paths down to the path found, otherwise push it onto the trail.
                         var pathElements = currentPath.trim().split('/');
-                        var currentPathLabel = pathElements[pathElements.length-1];
+                        var currentPathLabel = pathElements[pathElements.length - 1];
                         $log.debug("currentPathLabel is " + currentPathLabel);
-                        if ( currentPathLabel.substring(0,1) === ":" ) {
+                        if ( currentPathLabel.substring(0, 1) === ":" ) {
                             return;
                         }
 
                         if ( this.breadcrumbs.length === 0 ) {
-                            this.breadcrumbs.push({path: currentPath, label: currentPathLabel});
+                            this.breadcrumbs.push({ path: currentPath, label: currentPathLabel });
                         }
                         else {
-                            var breadcrumb = {path: currentPath, label: currentPathLabel};
+                            var breadcrumb = { path: currentPath, label: currentPathLabel };
                             var indexOfExistingBreadcrumb = -1;
 
                             // Find existing breadcrumb if one exists with the path.
@@ -86,6 +87,4 @@
         ]
     );
 }(angular, asm));
-
-
 

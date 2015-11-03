@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -6,7 +7,7 @@
         '$location',
         '$cookies',
         '$log',
-        function ($scope, $location, $cookies, $log) {
+        function ($scope, $location, $cookies) {
             $scope.currentUser = $cookies.currentUser;
         }
     ]);

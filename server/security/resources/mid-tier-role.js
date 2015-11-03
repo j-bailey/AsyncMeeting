@@ -3,7 +3,7 @@
  */
 var r = require('./acl-resources');
 
-var MID_TIER_USER_ROLE = {key:'MidTierUserRole', name:'Mid Tier User', desc:'',
+var MID_TIER_USER_ROLE = { key:'MidTierUserRole', name:'Mid Tier User', desc:'',
     allows: [
         {
             resources: [
@@ -22,6 +22,6 @@ var MID_TIER_USER_ROLE = {key:'MidTierUserRole', name:'Mid Tier User', desc:'',
                 r.MEETING_AREA_RESOURCE.allowedPermissions.limitedTo50
             ]
         }
-    ]};
+    ] };
 
 module.exports.object = MID_TIER_USER_ROLE;

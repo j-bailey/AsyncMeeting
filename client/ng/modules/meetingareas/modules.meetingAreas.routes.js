@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -10,7 +11,7 @@
                     templateUrl: 'ng/modules/meetingAreas/html/meetingAreas.html',
                     access: {
                         loginRequired: true,
-                        permissions: ['CanViewMeetingAreas', 'CanEditMeetingAreas', 'CanDeleteMeetingAreas']},
+                        permissions: ['CanViewMeetingAreas', 'CanEditMeetingAreas', 'CanDeleteMeetingAreas'] },
                     label: 'Meeting Areas'
                 })
                 .when(asm.modules.meetingareas.routes.meetingAreas + "/:meetingAreaId", {
@@ -18,10 +19,9 @@
                     templateUrl: 'ng/modules/meetingAreas/html/meetingAreas.html',
                     access: {
                         loginRequired: true,
-                        permissions: ['CanViewMeetingAreas', 'CanEditMeetingAreas', 'CanDeleteMeetingAreas']},
+                        permissions: ['CanViewMeetingAreas', 'CanEditMeetingAreas', 'CanDeleteMeetingAreas'] },
                     label: 'Meeting Area'
             });
         }]);
-
 
 }(angular, asm));

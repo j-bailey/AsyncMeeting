@@ -3,7 +3,10 @@ exports.config = {
     framework: 'cucumber',
     cucumberOpts: {
         format: 'pretty',
-        tags:'~@proxy_test'
+        tags:[
+            '~@proxy_test','' +
+            '~@element_comparison'
+            ]
     },
     specs: [
         'test/e2e/features/**/*.feature'

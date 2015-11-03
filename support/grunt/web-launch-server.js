@@ -1,19 +1,16 @@
-/**
- * Created by jlb on 4/19/15.
- */
+"use strict";
 
 var childProcess;
-var fs = require('fs'),
-    nodeFs = require('node-fs'),
-    path = require('path'),
-    spawn = require('child_process').spawn;
+var spawn = require('child_process').spawn;
 
 var args = process.argv.slice(2);
-var port = args[0];
-var cmd = args[1]
-var cmdArgs = args.slice(2);
+var basePort = args[0];
+var port = args[1];
+var cmd = args[2];
+var cmdArgs = args.slice(3);
 
-console.log('cmdArgs = ' + cmdArgs)
+console.log('cmdArgs = ' + cmdArgs);
+
 childProcess = spawn(cmd, cmdArgs, {
     detached: false,
     stdio: 'inherit',
@@ -21,36 +18,33 @@ childProcess = spawn(cmd, cmdArgs, {
 });
 
 
-var sys = require("sys"),
-    my_http = require("http"),
-    path = require("path"),
-    url = require("url"),
-    filesys = require("fs");
+var my_http = require("http"),
+    url = require("url");
 
 var server = my_http.createServer(function (request, response) {
     var myPath = url.parse(request.url).pathname;
-    console.log('New request ' + myPath)
+    console.log('New request ' + myPath);
     if (myPath && myPath === '/shutdown') {
-        console.log(' ---- Here')
-        console.log('Connected')
-        childProcess.on('exit', function (code, signal) {
+        console.log(' ---- Here');
+        console.log('Connected');
+        console.log('Before kill');
+
+        childProcess.on('exit', function (code) {
             console.log('child process terminated due to receipt of code ' + code);
             response.statusCode = 200;
             response.end(function () {
                 process.exit(0);
             });
         });
-        console.log('Before kill')
 
         childProcess.kill();
     }
 });
 server.listen(port, '127.0.0.1', function () {
-    console.log('Web launch server listening on', port)
+    console.log('Web launch server listening on', port);
 });
 server.on('error', onError);
 server.on('listening', onListening);
-
 
 /**
  * Event listener for HTTP server "error" event.
@@ -83,3 +77,35 @@ function onError(error) {
 function onListening() {
     console.log('Listening on port ' + server.address().port);
 }
+
+var keepAliveCheck = function () {
+    var http = require('http'),
+        done = this.async();
+
+    console.log('%%% -- ' + 'http://127.0.0.1:' + basePort + '/checkin');
+
+    http.get('http://127.0.0.1:' + basePort + '/checkin', function (res) {
+        console.log("Got response: " + res.statusCode);
+        if (res.statusCode === 200) {
+            done();
+        } else {
+            done('Not 200, but ' + res.statusCode);
+        }
+    }).on('error', function (e) {
+        console.log("Got error: " + e.message);
+        http.get('http://127.0.0.1:' + basePort + '/checkin', function (res) {
+            console.log("Got response: " + res.statusCode);
+            if (res.statusCode === 200) {
+                return;
+            } else {
+                childProcess.kill();
+            }
+        }).on('error', function (e) {
+            console.log("Got error: " + e.message);
+            childProcess.kill();
+        });
+    });
+
+};
+
+setInterval(keepAliveCheck, 50000);

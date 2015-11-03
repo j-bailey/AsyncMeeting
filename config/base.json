@@ -1,0 +1,10 @@
+{
+  "redis": {
+    "connectionType": "tcp",
+    "host": "localhost",
+    "port": 6379,
+    "password": "",
+    "options":{},
+    "db": 0
+  }
+}

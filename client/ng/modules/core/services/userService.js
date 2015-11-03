@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -14,19 +15,19 @@
         function ($http, $log) {
 
             var getUser = function () {
-                    $log.debug('in get user')
-                    return $http.get('/api/users')
+                    $log.debug('in get user');
+                    return $http.get('/api/users');
                 },
                 login = function (username, password) {
-                    $log.debug('in login')
-                    return $http.post('/login', {username: username, password: password});
+                    $log.debug('in login');
+                    return $http.post('/login', { username: username, password: password });
                 },
                 emailLogin = function (email, password) {
-                    $log.debug('in emailLogin')
-                    return $http.post('/email-login', {email: email, password: password});
+                    $log.debug('in emailLogin');
+                    return $http.post('/email-login', { email: email, password: password });
                 },
                 register = function (username, password, email) {
-                    return $http.post('/signup', {username: username, password: password, email: email});
+                    return $http.post('/signup', { username: username, password: password, email: email });
                 },
                 logout = function () {
                     $log.debug('in logout');
@@ -42,7 +43,5 @@
         }
     ]);
 }(angular, asm));
-
-
 
     

@@ -1,5 +1,8 @@
 tmp/
 dump.rdb
+*.log
+coverage/
+bower_components
 
 # Build target area
 assets
@@ -61,7 +64,6 @@ crashlytics-build.properties
 ### Node template
 # Logs
 logs
-*.log
 
 # Runtime data
 pids
@@ -88,3 +90,7 @@ build/Release
 node_modules
 
 
+npm-debug.log
+karma-coverage
+
+.DS_Store

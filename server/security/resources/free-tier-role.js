@@ -3,7 +3,7 @@
  */
 var r = require('./acl-resources');
 
-var FREE_TIER_USER_ROLE = {key:'FreeTierUserRole', name:'Free Tier User', desc:'',
+var FREE_TIER_USER_ROLE = { key:'FreeTierUserRole', name:'Free Tier User', desc:'',
     allows: [
         {
             resources: [
@@ -22,6 +22,6 @@ var FREE_TIER_USER_ROLE = {key:'FreeTierUserRole', name:'Free Tier User', desc:'
                 r.MEETING_AREA_RESOURCE.allowedPermissions.limitedToTwo
             ]
         }
-    ]};
+    ] };
 
 module.exports.object = FREE_TIER_USER_ROLE;

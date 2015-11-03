@@ -1,3 +1,4 @@
+/* globals angular, asm */
 (function (angular, asm) {
     'use strict';
 
@@ -13,6 +14,5 @@
                 }
             });
         }]);
-
 
 }(angular, asm));

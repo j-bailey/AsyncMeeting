@@ -1,39 +1,49 @@
+"use strict";
+
 var Acl = require('acl'),
     logger = require('winston'),
     fs = require('fs'),
-    cfg = require('config');
+    nconf = require('nconf'),
+    mongodb = require('mongodb'),
+    Q = require('q');
 
 var acl = null;
-
-function init() {
-    var mongodb = require('mongodb'),
-        dbUrl = cfg.get("database.url");
-    var self = this;
-    mongodb.connect(dbUrl, function (error, db) {
-        self.aclBackend = new Acl.mongodbBackend(db, "acl");
-        acl = new Acl(self.aclBackend);
-        logger.info('Acl is connected to ' + dbUrl);
-        setUpRoles();
-
-    });
-}
-
-function getAcl() {
-    if (acl === null) {
-        init();
-    }
-    return acl;
-}
 
 function setUpRoles() {
     fs.readdirSync(__dirname + '/resources').forEach(function (file) {
         if (file.indexOf('-role') > -1) {
             var role = require('./resources/' + file);
-            role.object.allows.forEach(function(allow) {
+            role.object.allows.forEach(function (allow) {
                 acl.allow(role.object.key, allow.resources, allow.permissions);
             });
         }
     });
+}
+
+var init = function () {
+    var defer = Q.defer();
+    var dbUrl = nconf.get("database:acl:url");
+    var self = this;
+    mongodb.connect(
+        dbUrl,
+        nconf.get("database:acl:user"),
+        nconf.get("database:acl:pass"),
+        function (error, db) {
+            if (error) {
+                logger.error('Error connecting to database for ACL set up.  ' + error);
+                defer.reject(error);
+            }
+            self.aclBackend = new Acl.mongodbBackend(db, "acl");
+            acl = new Acl(self.aclBackend);
+            logger.info('Acl is connected to ' + dbUrl);
+            setUpRoles();
+            defer.resolve(acl);
+        });
+    return defer.promise;
+};
+
+function getAcl() {
+    return acl;
 }
 
 module.exports.init = init;

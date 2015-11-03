@@ -1,21 +1,16 @@
-var login = require('./login');
-var emailLogin = require('./email-login');
-var signup = require('./signup');
-var User = require('../models/user');
+"use strict";
+
+var login = require('./login'),
+    emailLogin = require('./email-login'),
+    signup = require('./signup'),
+    bearer = require('./bearerAuthorization'),
+    serialization = require('./serialization');
+
 module.exports = function(passport) {
-    passport.serializeUser( function (user, done) {
-        var sessionUser = { _id: user._id, name: user.name, email: user.email, roles: user.roles };
-        done(null, sessionUser);
-    });
-
-    passport.deserializeUser( function(sessionUser, done) {
-        // The sessionUser object is different from the user mongoose collection
-        // it's actually req.session.passport.user and comes from the session collection
-        done(null, sessionUser)
-    });
-
+    serialization(passport);
     // Setting up Passport Strategies for Login and SignUp/Registration
     login(passport);
     emailLogin(passport);
     signup(passport);
-}
+    bearer(passport);
+};
