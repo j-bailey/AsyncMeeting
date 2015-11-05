@@ -91,7 +91,6 @@
     "karma-firefox-launcher": "^0.1.6",
     "karma-ie-launcher": "^0.1.5",
     "karma-mocha": "^0.1.10",
-    "karma-phantomjs-launcher": "^0.1.4",
     "karma-safari-launcher": "^0.1.1",
     "karma-sinon": "^1.0.4",
     "karma-sinon-chai": "^0.3.0",
