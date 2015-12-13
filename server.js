@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
-process.on('unacaughtException', function(err){
+process.on('uncaughtException', function(err){
     console.error('##### Uncaught Exception ######');
     if (err) {
         console.error(err);
@@ -30,6 +30,7 @@ if (singleProcess === 'true' || singleProcess === true) {
     numCPUs = numCPUs - reservedCPUs;
 }
 
+console.log('NODE_ENV: ' + nconf.get("NODE_ENV"));
 console.log('Number of reserved CPUs are: ' + reservedCPUs);
 console.log('Number of CPUs used by the app are: ' + numCPUs);
 
@@ -37,15 +38,32 @@ cluster.setupMaster({
     exec : './server/index.js' // Points to the index file you want to fork
 });
 // Fork workers.
+var shuttingDown = false;
+var exitCode = 0;
 for (var i = 0; i < numCPUs; i += 1) {
     cluster.fork();
 }
+
+
 cluster.on('disconnect', function(worker) {
     // FIXME This can probably use some work.
     console.log(worker);
     console.error('disconnect!');
-    cluster.fork();
+    if (!shuttingDown) {
+        console.log("Starting a new worker");
+        cluster.fork();
+    }
 });
 
 
+cluster.on('exit', function(worker, code) {
+    if (process.uptime() < 60 && code === 136  && !shuttingDown) {
+        shuttingDown = true;
+        exitCode = code;
+        for (var id in cluster.workers){
+            var w = cluster.workers[id];
+            w.kill();
+        }
+    }
+});
 

@@ -15,3 +15,8 @@ gulp.task('test:server', function () {
     console.log('Server started');
 });
 
+gulp.task('server', function () {
+    gulp.src('server/**/*').pipe( gulp.dest('build/server'));
+});
+
+

@@ -22,7 +22,13 @@ function setUpRoles() {
 
 var init = function () {
     var defer = Q.defer();
-    var dbUrl = nconf.get("database:acl:url");
+
+    var protocol = nconf.get("database:acl:protocol");
+    var host = (nconf.get("NODE_ENV").toUpperCase() === 'DEVELOPMENT')? 'localhost' : nconf.get("database:acl:host");
+    var port = nconf.get("database:acl:port");
+    var database = nconf.get("database:acl:database");
+
+    var dbUrl = protocol + "://" + host + ":" + port + "/" + database;
     var self = this;
     mongodb.connect(
         dbUrl,

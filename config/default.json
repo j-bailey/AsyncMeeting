@@ -55,44 +55,45 @@
   "server": {
     "reservedCPUs": 0,
     "singleProcess": false,
-    "PORT": 3000,
-    "NODE_ENV": "development",
     "https": {
-      "keyFile": "",
-      "certFile": ""
+      "keyFile": "./https.key",
+      "certFile": "./https.cert"
     }
   },
   "database": {
     "read-only": {
-      "host": "localhost",
+      "host": "mongo",
       "port": 27017,
       "database": "asyncmeeting_dev",
       "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
     },
     "read-write": {
-      "host": "localhost",
+      "host": "mongo",
       "port": 27017,
       "database": "asyncmeeting_dev",
       "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
     },
     "admin": {
-      "host": "localhost",
+      "host": "mongo",
       "port": 27017,
       "database": "asyncmeeting_dev",
       "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
     },
     "session": {
-      "host": "localhost",
+      "host": "mongo",
       "port": 27017,
       "database": "asyncmeeting_dev",
       "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
     },
     "acl": {
-      "url": "mongodb://localhost:27017/asyncmeeting_dev",
+      "protocol": "mongodb",
+      "host": "mongo",
+      "port": 27017,
+      "database": "asyncmeeting_dev",
       "user": "",
       "pass": ""
     }
   },
   "PORT": 3000,
-  "NODE_ENV": "dev"
+  "NODE_ENV": "development"
 }

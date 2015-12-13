@@ -7,7 +7,7 @@ var logger = require('winston');
 var nconf = require('nconf');
 
 
-var hostReadOnly = nconf.get("database:read-only:host");
+var hostReadOnly = (nconf.get("NODE_ENV").toUpperCase() === 'DEVELOPMENT')? 'localhost' : nconf.get("database:read-only:host");
 var databaseReadOnly = nconf.get("database:read-only:database");
 var portReadOnly = nconf.get("database:read-only:port");
 var optionsReadOnly = nconf.get("database:read-only:options");
@@ -30,7 +30,7 @@ readOnlyConnection.on('connected', function(err){
 });
 
 
-var hostReadWrite = nconf.get("database:read-write:host");
+var hostReadWrite = (nconf.get("NODE_ENV").toUpperCase() === 'DEVELOPMENT')? 'localhost' : nconf.get("database:read-write:host");
 var databaseReadWrite = nconf.get("database:read-write:database");
 var portReadWrite = nconf.get("database:read-write:port");
 var optionsReadWrite = nconf.get("database:read-write:options");
@@ -50,7 +50,7 @@ readWriteConnection.on('connected', function(err){
         databaseReadWrite );
 });
 
-var hostAdmin = nconf.get("database:admin:host");
+var hostAdmin = (nconf.get("NODE_ENV").toUpperCase() === 'DEVELOPMENT')? 'localhost' : nconf.get("database:admin:host");
 var databaseAdmin = nconf.get("database:admin:database");
 var portAdmin = nconf.get("database:admin:port");
 var optionsAdmin = nconf.get("database:admin:options");
@@ -71,7 +71,7 @@ adminConnection.on('connected', function(err){
 });
 
 
-var hostSession = nconf.get("database:session:host");
+var hostSession = (nconf.get("NODE_ENV").toUpperCase() === 'DEVELOPMENT')? 'localhost' : nconf.get("database:session:host");
 var databaseSession = nconf.get("database:session:database");
 var portSession = nconf.get("database:session:port");
 var optionsSession = nconf.get("database:session:options");

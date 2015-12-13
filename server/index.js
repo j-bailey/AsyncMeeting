@@ -120,4 +120,5 @@ acl.init().then(function() {
 }).catch(function(err){
     console.error('Error on start up: ' + err);
     console.error(err.stack);
+    process.exit(5000);
 }).done();
