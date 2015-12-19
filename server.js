@@ -61,8 +61,10 @@ cluster.on('exit', function(worker, code) {
         shuttingDown = true;
         exitCode = code;
         for (var id in cluster.workers){
-            var w = cluster.workers[id];
-            w.kill();
+            if (cluster.workers.hasOwnProperty(id)) {
+                var w = cluster.workers[id];
+                w.kill();
+            }
         }
     }
 });

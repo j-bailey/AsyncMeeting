@@ -10,6 +10,8 @@ var Q = require("q");
 
 var sinon = require('sinon');
 
+require('../../../../config/configSetup');
+
 chai.Should();
 chai.use(chaiAsPromised);
 

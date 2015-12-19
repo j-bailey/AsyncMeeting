@@ -12,7 +12,9 @@ module.exports = {
             return redisClient;
         } else {
             if (nconf.get('redis:connectionType') === 'tcp') {
-                redisClient = redis.createClient(nconf.get('redis:port'), (nconf.get("NODE_ENV").toUpperCase() === 'DEVELOPMENT')? 'localhost' : nconf.get('redis:host'), nconf.get('redis:options'));
+                redisClient = redis.createClient(nconf.get('redis:port'),
+                    (nconf.get("NODE_ENV").toUpperCase() === 'DEVELOPMENT')? 'localhost' : nconf.get('redis:host'),
+                    nconf.get('redis:options'));
             } else if (nconf.get('redis:connectionType') === 'unix-socket') {
                 redisClient = redis.createClient(nconf.get('redis:socketName'), nconf.get('redis:options'));
             } else {

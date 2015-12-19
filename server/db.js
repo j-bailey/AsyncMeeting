@@ -6,7 +6,6 @@ mongoose.Promise = require('q').Promise;
 var logger = require('winston');
 var nconf = require('nconf');
 
-
 var hostReadOnly = (nconf.get("NODE_ENV").toUpperCase() === 'DEVELOPMENT')? 'localhost' : nconf.get("database:read-only:host");
 var databaseReadOnly = nconf.get("database:read-only:database");
 var portReadOnly = nconf.get("database:read-only:port");

@@ -8,11 +8,37 @@ https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
   
 
 # Set up
-- install Mongodb
+
+- Install docker, Node and NPM
+- Reference Dockerfile to understand what additional items are required to run the software
 - run `npm install`
 
 # Run server for development
+
+Ensure you have your NODE_ENV set to 'development'.  This will put the software in the correct state
 run `npm run dev`
+
+# Docker 
+
+
+
+There is a build process, which processes client and server files, then puts them in the build folder. The Docker images
+is created from the contents of the build folder.  This images defaults to NODE_ENV=production and as much as possible, 
+it is set up for production.  The Asyncmeeting Docker image requires two additional imaages, one for Mongodb and one for 
+Redis.
+
+## Local Dev
+
+Start with `npm run docker-dev-setup`, this will download the required docker images and run them locally.  Then run 
+ `npm run docker-dev-build` to create the Asyncmeeting Docker image.  Then do `npm run docker-dev-run` to run the newly 
+  built image locally.  Now you have the code running locally in Docker. 
+
+To access the website host on your local Docker, use this command in unix to get the site IP:
+`echo $DOCKER_HOST | cut -f 2 -d ":" | cut -f 3 -d "/"`
+Then go to https://IP:3000 to interact with the site.  
+
+To cleanup your Docker environment run `npm run docker-dev-cleanup-all`.  This will stop all the docker containers and 
+remove them. This will not remove the images. 
 
 # Testing
 
@@ -75,9 +101,6 @@ This takes the Selenium element along with a few other arguments and creates the
 it with the reference image.  The comparison will return a value, zero means there is no difference between the screen shot
 and the reference image.  Any value above zero is a measure the difference between the two images.
 
-# Run server in production mode
-- run `export NODE_ENV=production`
-- run `npm start`
 
 # Logging
 Client/AngularJS Logging

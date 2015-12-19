@@ -42,8 +42,15 @@ module.exports = function () {
         this.takeScreenshot = takeScreenshot;
         this.imageUtils = imageUtils;
         var self = this;
+        var protocol = nconf.get("database:acl:protocol");
+        var host = (nconf.get("NODE_ENV").toUpperCase() === 'DEVELOPMENT')? 'localhost' : nconf.get("database:acl:host");
+        var port = nconf.get("database:acl:port");
+        var database = nconf.get("database:acl:database");
+
+        var dbUrl = protocol + "://" + host + ":" + port + "/" + database;
+
         mongodb.connect(
-            nconf.get("database:acl:url"),
+            dbUrl,
             nconf.get("database:acl:user"),
             nconf.get("database:acl:pass"),
             function (error, db) {

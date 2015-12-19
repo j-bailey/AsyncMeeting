@@ -85,9 +85,11 @@ acl.init().then(function() {
         nEnv = nconf.get('NODE_ENV');
     if (!nEnv || nEnv === 'development' || nEnv === 'dev-test' || nEnv === 'dev' ) {
         logger.info('Server is running in development mode!');
+        logger.info('Server is using HTTP!');
         server = http.createServer(domainProcessor);
     } else {
         logger.info('Server is running in ' + nEnv + ' mode!');
+        logger.info('Server is using HTTPS!');
         app.use(function (req, res, next) {
             var aYear = 60 * 60 * 24 * 365;
 // Set the Strict Transport Security header for a year

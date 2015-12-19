@@ -22,7 +22,11 @@
     "checkStyle": "./node_modules/.bin/jscs .",
     "dev": "./node_modules/grunt-cli/bin/grunt start-external-services && node ./support/npm/launch-dev.js",
     "start-external-services": "./node_modules/grunt-cli/bin/grunt start-external-services",
-    "kill-external-services": "./node_modules/grunt-cli/bin/grunt kill-external-services"
+    "kill-external-services": "./node_modules/grunt-cli/bin/grunt kill-external-services",
+    "docker-dev-setup": "npm run docker-dev-cleanup-all && docker pull redis && docker pull mongo && docker run --name async-redis -d redis && docker run --name async-mongo -d mongo",
+    "docker-dev-build": "gulp build && docker build -t productivegains/asyncmeeting:dev .",
+    "docker-dev-run": "docker kill async | echo '' && docker rm async | echo '' && docker run -d -p 3000:3000 --link async-redis:redis --link async-mongo:mongo --name async productivegains/asyncmeeting:dev",
+    "docker-dev-cleanup-all": "docker kill async async-redis async-mongo | echo '' && docker rm async async-redis async-mongo | echo ''"
   },
   "dependencies": {
     "acl": "git+https://github.com/OptimalBits/node_acl.git",
