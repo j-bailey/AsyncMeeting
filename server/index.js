@@ -108,7 +108,7 @@ acl.init().then(function() {
      * Listen on provided port, on all network interfaces.
      */
 
-    server.listen(port, function () {
+    server.listen(port, '0.0.0.0', function () {
         console.log('Server listening on', port);
     });
     server.on('listening', onListening);

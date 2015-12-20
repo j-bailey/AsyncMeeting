@@ -215,10 +215,10 @@ module.exports = {
     getMeetingAreasWithParentId: function (req, res, next) {
         try {
             var parentId = req.query.parentId,
-                skip = req.query.skip,
+                skip = parseInt(req.query.skip),
                 inTheTrash = (req.query.inTheTrash) ? true : false,
                 showAllTrashed = !!(inTheTrash && req.query.inTheTrash.toLowerCase() === 'all'),
-                limit = req.query.limit;
+                limit = parseInt(req.query.limit);
             if (parentId === "null") {
                 parentId = null;
             }

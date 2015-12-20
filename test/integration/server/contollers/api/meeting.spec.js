@@ -16,7 +16,7 @@ var Acl = require('../../../../../server/security/acl'),
 require('../../../../../server/models/meeting');
 require('../../../../../server/models/user');
 
-request = request('http://localhost:3001');
+request = request(process.env.baseUrl);
 
 var owningUser = {
     accessToken: undefined,

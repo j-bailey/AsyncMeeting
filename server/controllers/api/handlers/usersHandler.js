@@ -116,8 +116,8 @@ module.exports = {
     findByNameSearch: function (req, res, next) {
         try {
             var User = req.db.model('User');
-            var skip = req.query.skip || 0,
-                limit = queryUtils.getMaxQueryLimit('user', req.query.limit),
+            var skip = parseInt(req.query.skip || 0),
+                limit = parseInt(queryUtils.getMaxQueryLimit('user', req.query.limit)),
                 searchCriteria = req.query.searchCriteria;
 
             // FIXME add checks on input, so hacks do not make it to the query

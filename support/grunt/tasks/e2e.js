@@ -23,18 +23,18 @@ module.exports = function (grunt) {
             dbHost = dockerIp;
             protocol = (proto || 'https');
             srvPort = (sPort || 3000);
+            process.env.configOverrideFile = path.normalize(path.join(__dirname, '../../../config/docker-test.json'));
         }
         if (noServer || isLocalDockerRun) {
             var dbNames = ['read-only', 'read-write', 'admin', 'session', 'acl'];
-            for (var dbn in dbNames) {
-                var hostKey = 'database:' + dbNames[dbn] + ':host';
-                var portKey = 'database:' + dbNames[dbn] + ':port';
+            for (var i =0; i < dbNames.length; i += 1) {
+                var hostKey = 'database:' + dbNames[i] + ':host';
+                var portKey = 'database:' + dbNames[i] + ':port';
                 console.info('Key ' + hostKey + ' IP ' + dbHost);
                 console.info('Key ' + portKey + ' IP ' + dbPort);
-                process.env[hostKey] = dockerIp;
+                process.env[hostKey] = dbHost;
                 process.env[portKey] = dbPort;
             }
-            process.env.configOverrideFile = path.normalize(path.join(__dirname, '../../../config/docker-test.json'));
             grunt.config.set('baseUrl', protocol +'://' + srvHost + ':' + srvPort);
         } else {
             console.log('Testing against localhost site');

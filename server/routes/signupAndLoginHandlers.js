@@ -90,7 +90,7 @@ router.delete('/logout', function (req, res) {
         if (req.session && req.session.destroy) {
             req.session.destroy(); // Destroy session associated with user.
         } else if (req.session){
-            req.session = {}
+            req.session = {};
         }
         res.sendStatus(200);
     }

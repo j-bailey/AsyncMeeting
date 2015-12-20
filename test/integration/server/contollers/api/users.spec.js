@@ -18,7 +18,7 @@ var user1 = {
     username: 'tom',
     lastName: 'Smith',
     firstName: 'Tom',
-    request: request('http://localhost:3001')
+    request: request(process.env.baseUrl)
     };
 
 var user2 = {
@@ -29,7 +29,7 @@ var user2 = {
     username: 'kelly',
     lastName: 'Smith',
     firstName: 'Kelly',
-    request: request('http://localhost:3001')
+    request: request(process.env.baseUrl)
 };
 
 var user3 = {
