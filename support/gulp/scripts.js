@@ -17,7 +17,7 @@ gulp.task('js', function () {
         'client/ng/app.js',
         'client/ng/**/*.js']).pipe(sourcemaps.init()).pipe(concat('app.js'))
         .pipe(ngAnnotate()).pipe(sourcemaps.write()).pipe(gulp.dest('assets'));
-    gulp.src('assets/app.js').pipe( gulp.dest('build/assets'));
+    //gulp.src('assets/app.js').pipe( gulp.dest('build/assets'));
 });
 
 gulp.task('watch:js', ['js'], function () {

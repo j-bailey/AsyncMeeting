@@ -41,7 +41,7 @@ describe.skip('email-login', function() {
                     strategy._verify(null, email, password, doneFunc);
                 }
             };
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
             var findOneReturn = {select:sandbox.stub()};
             var leanReturn = {lean: sandbox.stub()};
             var execReturn = {exec:sandbox.stub()};
@@ -87,7 +87,7 @@ describe.skip('email-login', function() {
                 }
             };
             sandbox.stub(require('winston'), 'error', winstomSpy);
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
             //sandbox.stub(User.base.Model, 'findOne').yields(error, null);
             var findOneReturn = {select:sandbox.stub()};
             var leanReturn = {lean: sandbox.stub()};
@@ -129,7 +129,7 @@ describe.skip('email-login', function() {
                 }
             };
             sandbox.stub(require('winston'), 'debug', winstomSpy);
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
             //sandbox.stub(User.base.Model, 'findOne').yields(null, user);
             var findOneReturn = {select:sandbox.stub()};
             var leanReturn = {lean: sandbox.stub()};
@@ -174,7 +174,7 @@ describe.skip('email-login', function() {
                 }
             };
             sandbox.stub(require('winston'), 'debug', winstomSpy);
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return false;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return false;});
             //sandbox.stub(User.base.Model, 'findOne').yields(null, user);
             var findOneReturn = {select:sandbox.stub()};
             var leanReturn = {lean: sandbox.stub()};

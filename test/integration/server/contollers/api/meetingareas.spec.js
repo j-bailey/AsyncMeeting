@@ -7,7 +7,6 @@ var Acl = require('../../../../../server/security/acl'),
     usersHandler = require('../../../../../server/controllers/api/handlers/usersHandler'),
     request = require('supertest'),
     User,
-    bcrypt = require('bcrypt-nodejs'),
     db = require('../../../../../server/db');
 
 // Load the models, so they get tied to the DB connections

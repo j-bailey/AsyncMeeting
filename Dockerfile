@@ -40,8 +40,9 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
 
 COPY build/package.json /async/
 RUN chown -R async:async /async
- USER async
   COPY build /async/
+RUN chown -R async:async /async
+ USER async
 RUN cd /async/; npm install
 
 # TODO hack to get the server running

@@ -47,7 +47,7 @@ describe('signup', function() {
                 username: 'slyDog'
             };
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
             sandbox.stub(require('winston'), 'debug');
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);
@@ -87,7 +87,7 @@ describe('signup', function() {
             };
 
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
             sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
@@ -128,7 +128,7 @@ describe('signup', function() {
                 username: 'slyDog'
             };
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
             sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
@@ -165,7 +165,7 @@ describe('signup', function() {
             };
 
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
             sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
@@ -207,7 +207,7 @@ describe('signup', function() {
                 username: 'slyDog'
             };
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
             sandbox.stub(require('winston'), 'debug');
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
@@ -248,7 +248,7 @@ describe('signup', function() {
                 username: 'slyDog'
             };
 
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function() {return true;});
             var winstonErrorStub = sandbox.stub(require('winston'), 'error');
             var findOneStub = sandbox.stub(db.readOnlyConnection.model('User'), 'findOne');
             findOneStub.onCall(0).yields(null, null);

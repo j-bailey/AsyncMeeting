@@ -7,11 +7,6 @@ var LocalStrategy = require('passport-local').Strategy,
     logger = require('winston');
 
 module.exports = function(passport) {
-    //// Generates hash using bCrypt
-    //var createHash = function(password) {
-    //    return User.hashPassword(password);
-    //};
-
     passport.use('signup', new LocalStrategy({
                 passReqToCallback: true // allows us to pass back the entire request to the callback
             },

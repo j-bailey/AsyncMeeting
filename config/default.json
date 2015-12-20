@@ -64,36 +64,36 @@
     "read-only": {
       "host": "mongo",
       "port": 27017,
-      "database": "asyncmeeting_dev",
+      "database": "asyncmeeting_prod",
       "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
     },
     "read-write": {
       "host": "mongo",
       "port": 27017,
-      "database": "asyncmeeting_dev",
+      "database": "asyncmeeting_prod",
       "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
     },
     "admin": {
       "host": "mongo",
       "port": 27017,
-      "database": "asyncmeeting_dev",
+      "database": "asyncmeeting_prod",
       "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
     },
     "session": {
       "host": "mongo",
       "port": 27017,
-      "database": "asyncmeeting_dev",
+      "database": "asyncmeeting_prod",
       "options": {"user": "", "pass": "", "server": { "poolSize": 5 }}
     },
     "acl": {
       "protocol": "mongodb",
       "host": "mongo",
       "port": 27017,
-      "database": "asyncmeeting_dev",
+      "database": "asyncmeeting_prod",
       "user": "",
       "pass": ""
     }
   },
   "PORT": 3000,
-  "NODE_ENV": "development"
+  "NODE_ENV": "production"
 }

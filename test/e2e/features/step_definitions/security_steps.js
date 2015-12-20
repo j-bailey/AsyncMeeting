@@ -3,7 +3,6 @@ require('../../../../server/models/meetingArea');
 require('../../../../server/models/user');
 var User = db.adminConnection.model('User');
 var usersHandler = require('../../../../server/controllers/api/handlers/usersHandler');
-var bcrypt = require('bcrypt-nodejs');
 var chai = require('chai');
 chai.use(require('chai-as-promised'));
 var expect = chai.expect;
@@ -32,7 +31,7 @@ var steps = function () {
     });
 
     this.Given(/^I am logged out of the system$/, function (next) {
-        browser.get('http://localhost:3001');  // click 'login'
+        browser.get(browser.baseUrl);  // click 'login'
 
         //expect(browser.getCurrentUrl()).to.eventually.be('http://localhost:3001');
         expect(element(By.css('nav .login')).isPresent()).to.eventually.be.true.and.notify(next);
@@ -89,7 +88,7 @@ var steps = function () {
     });
 
     this.Given(/^I am at registration point$/, function (next) {
-        browser.get('http://localhost:3001');  // click 'login'
+        browser.get(browser.baseUrl);  // click 'login'
         //expect(browser.getCurrentUrl()).to.eventually.be('http://localhost:3001');
         element(By.css('nav .register')).click().then(next);
     });

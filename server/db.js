@@ -11,6 +11,7 @@ var databaseReadOnly = nconf.get("database:read-only:database");
 var portReadOnly = nconf.get("database:read-only:port");
 var optionsReadOnly = nconf.get("database:read-only:options");
 
+logger.info('Read-only host = ' + hostReadOnly);
 var readOnlyConnection = mongoose.createConnection(hostReadOnly, databaseReadOnly, portReadOnly, optionsReadOnly);
 readOnlyConnection.on('error', function (err) {
     if (err) {

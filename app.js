@@ -24,7 +24,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // Static content paths - ensure it comes before session middleware, otherwise sessions will be created for each static
-// file request if user a is not logged in.
+// file request if user a is not logged in.\
+console.log('setting assets to ' + __dirname + '/assets');
 app.use(express.static(__dirname + '/assets'));
 
 // Cookie-Parser Note: ensure cookie secret is the same as session secret

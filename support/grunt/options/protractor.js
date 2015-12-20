@@ -3,16 +3,14 @@
  */
 module.exports = {
     options: {
-        configFile: __dirname + "../../../../protractor.conf.js", // Default config file
+        configFile: __dirname + "/../../../protractor.conf.js", // Default config file
         keepAlive: false, // If false, the grunt process stops when the test fails.
-        noColor: false, // If true, protractor will not use colors in its output.
-        args: {
-            baseUrl: 'localhost:3001'
-        }
+        noColor: false // If true, protractor will not use colors in its output.
     },
     chrome: {
         options: {
             args: {
+                baseUrl: '<%= baseUrl %>',
                 browser: 'chrome',
                 cucumberOpts: {
                     tags: '<%= cucumberTags %>'
@@ -23,6 +21,7 @@ module.exports = {
     firefox: {
         options: {
             args: {
+                baseUrl: '<%= baseUrl %>',
                 browser: 'firefox',
                 cucumberOpts: {
                     tags: '<%= cucumberTags %>'
@@ -33,6 +32,7 @@ module.exports = {
     ie: {
         options: {
             args: {
+                baseUrl: '<%= baseUrl %>',
                 browser: 'ie',
                 seleniumAddress: 'http://127.0.0.1:4444/wd/hub',
                 cucumberOpts: {
@@ -44,6 +44,7 @@ module.exports = {
     phantomjs: {
         options: {
             args: {
+                baseUrl: '<%= baseUrl %>',
                 browser: 'phantomjs',
                 seleniumAddress: 'http://127.0.0.1:<%= seleniumAddress %>/wd/hub',
                 cucumberOpts: {
@@ -55,6 +56,7 @@ module.exports = {
     chromeNoTags: {
         options: {
             args: {
+                baseUrl: '<%= baseUrl %>',
                 browser: 'chrome'
             }
         }
@@ -62,6 +64,7 @@ module.exports = {
     firefoxNoTags: {
         options: {
             args: {
+                baseUrl: '<%= baseUrl %>',
                 browser: 'firefox'
             }
         }
@@ -69,6 +72,7 @@ module.exports = {
     ieNoTags: {
         options: {
             args: {
+                baseUrl: '<%= baseUrl %>',
                 browser: 'ie',
                 seleniumAddress: 'http://127.0.0.1:4444/wd/hub'
             }
@@ -77,6 +81,7 @@ module.exports = {
     phantomjsNoTags: {
         options: {
             args: {
+                baseUrl: '<%= baseUrl %>',
                 browser: 'phantomjs',
                 seleniumAddress: 'http://127.0.0.1:<%= seleniumAddress %>/wd/hub'
             }

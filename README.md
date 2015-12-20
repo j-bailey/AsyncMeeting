@@ -11,7 +11,9 @@ https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
 
 - Install docker, Node and NPM
 - Reference Dockerfile to understand what additional items are required to run the software
+- run `npm dev-preinstall`
 - run `npm install`
+- run `npm dev-postinstall`
 
 # Run server for development
 

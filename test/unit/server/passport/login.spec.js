@@ -44,7 +44,7 @@ describe.skip('login', function() {
                 }
             };
             sandbox.stub(require('winston'), 'log', winstomSpy);
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
             var u = db.readOnlyConnection.model('User');
             sandbox.stub(db.readOnlyConnection.model('User'), 'findOne').yields(null, user);
             require('../../../../server/passport/login')(passport);
@@ -80,7 +80,7 @@ describe.skip('login', function() {
                 }
             };
             sandbox.stub(require('winston'), 'log', winstomSpy);
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
             sandbox.stub(db.readOnlyConnection.model('User'), 'findOne').yields(error, null);
             require('../../../../server/passport/login')(passport);
         });
@@ -115,7 +115,7 @@ describe.skip('login', function() {
             };
             sandbox.stub(require('winston'), 'log', winstomSpy);
             sandbox.stub(require('winston'), 'debug', winstomSpy);
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return true;});
             sandbox.stub(db.readOnlyConnection.model('User'), 'findOne').yields(null, user);
             require('../../../../server/passport/login')(passport);
         });
@@ -153,7 +153,7 @@ describe.skip('login', function() {
             };
             sandbox.stub(require('winston'), 'debug', winstomSpy);
             sandbox.stub(require('winston'), 'log', winstomSpy);
-            sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return false;});
+            //sandbox.stub(require('bcrypt-nodejs'), 'compareSync', function(arg1, arg2) {return false;});
             sandbox.stub(db.readOnlyConnection.model('User'), 'findOne').yields(null, user);
             require('../../../../server/passport/login')(passport);
         });

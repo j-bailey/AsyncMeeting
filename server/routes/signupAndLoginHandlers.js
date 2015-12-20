@@ -21,7 +21,7 @@ router.post('/login',
             .populate('permissions')
             .populate('roles')
             .exec(function (err, user) {
-                if (err){
+                if (err) {
                     logger.error('Error getting token. ' + err);
                     res.status(500);
                     res.json({
@@ -30,17 +30,17 @@ router.post('/login',
                         code: "00001"
                     });
                 }
-            var clientIp = requestIp.getClientIp(req);
-            securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp,
-                req.headers['user-agent'], user._id.toString()).then(function (accessToken) {
-                res.json({
-                    user: user, access_token: accessToken,
-                    permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
-                });
-                // TODO test permissions need to be removed after permissions are fixed
-            }).done();
+                var clientIp = requestIp.getClientIp(req);
+                securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp,
+                    req.headers['user-agent'], user._id.toString()).then(function (accessToken) {
+                    res.json({
+                        user: user, access_token: accessToken,
+                        permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
+                    });
+                    // TODO test permissions need to be removed after permissions are fixed
+                }).done();
 
-        });
+            });
     }
 );
 
@@ -58,7 +58,7 @@ router.post('/email-login',
             .populate('permissions')
             .populate('roles')
             .exec(function (err, user) {
-                if (err){
+                if (err) {
                     logger.error('Error getting token. ' + err);
                     res.status(500);
                     res.json({
@@ -67,19 +67,19 @@ router.post('/email-login',
                         code: "00001"
                     });
                 }
-            logger.debug("Sending response");
-            logger.debug("Getting accessToken");
-            logger.debug('User = ' + JSON.stringify(user));
-            var clientIp = requestIp.getClientIp(req);
-            securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp,
-                req.headers['user-agent'], user._id.toString()).then(function (accessToken) {
-                res.json({
-                    user: user, access_token: accessToken,
-                    permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
-                });
-                // TODO test permissions need to be removed after permissions are fixed
-            }).done();
-        });
+                logger.debug("Sending response");
+                logger.debug("Getting accessToken");
+                logger.debug('User = ' + JSON.stringify(user));
+                var clientIp = requestIp.getClientIp(req);
+                securityUtils.generateAccessToken(user.username, user.tenantId, [], clientIp,
+                    req.headers['user-agent'], user._id.toString()).then(function (accessToken) {
+                    res.json({
+                        user: user, access_token: accessToken,
+                        permissions: ['CanReadMeetingAreas', 'CanCreateMeetingAreas', 'CanViewMeetingAreas', 'CanDeleteMeetingAreas']
+                    });
+                    // TODO test permissions need to be removed after permissions are fixed
+                }).done();
+            });
     }
 );
 
@@ -87,7 +87,11 @@ router.delete('/logout', function (req, res) {
         logger.debug("User logged out!");
         securityUtils.releaseAccessToken(req.access_token);
         req.logout(); // Passport logout
-        req.session.destroy(); // Destroy session associated with user.
+        if (req.session && req.session.destroy) {
+            req.session.destroy(); // Destroy session associated with user.
+        } else if (req.session){
+            req.session = {}
+        }
         res.sendStatus(200);
     }
 );
@@ -104,7 +108,7 @@ router.post('/signup', function (req, res, next) {
 
         if (!user) {
             logger.debug("res is " + res);
-            return res.status(400).json({status:'error', message: info.message});
+            return res.status(400).json({status: 'error', message: info.message});
         }
 
         req.login(user, function (err) {
