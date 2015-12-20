@@ -3,24 +3,39 @@
 var path = require('path');
 
 module.exports = function (grunt) {
-    grunt.registerTask('e2e', function (testBrowser, proxy, cucumberTags, isLocalDockerRun) {
+    grunt.registerTask('e2e', function (testBrowser, proxy, cucumberTags, isLocalDockerRun, noServer, proto, sHost, sPort, dHost, dPort) {
         var browser = (testBrowser || 'chrome').toLowerCase();
         var runInjectionProxy = proxy;
 
         process.env.NODE_ENV = 'dev-test';
 
+        var srvHost = (sHost || 'localhost'),
+            srvPort = (sPort || 3001),
+            dbHost = (dHost || 'localhost'),
+            dbPort = (dPort || 27017),
+            protocol = (proto || 'http');
+
         if (isLocalDockerRun) {
             console.log('Testing against local Docker site');
             var dockerIp = process.env.DOCKER_HOST.split(':')[1].split('/')[2];
             console.log('Docker host IP = ' + dockerIp);
+            srvHost = dockerIp;
+            dbHost = dockerIp;
+            protocol = (proto || 'https');
+            srvPort = (sPort || 3000);
+        }
+        if (noServer || isLocalDockerRun) {
             var dbNames = ['read-only', 'read-write', 'admin', 'session', 'acl'];
             for (var dbn in dbNames) {
-                var key = 'database:' + dbNames[dbn] + ':host';
-                console.info('Key ' + key + ' IP ' + dockerIp)
-                process.env[key] = dockerIp;
+                var hostKey = 'database:' + dbNames[dbn] + ':host';
+                var portKey = 'database:' + dbNames[dbn] + ':port';
+                console.info('Key ' + hostKey + ' IP ' + dbHost);
+                console.info('Key ' + portKey + ' IP ' + dbPort);
+                process.env[hostKey] = dockerIp;
+                process.env[portKey] = dbPort;
             }
             process.env.configOverrideFile = path.normalize(path.join(__dirname, '../../../config/docker-test.json'));
-            grunt.config.set('baseUrl', 'https://' + dockerIp + ':3000');
+            grunt.config.set('baseUrl', protocol +'://' + srvHost + ':' + srvPort);
         } else {
             console.log('Testing against localhost site');
             process.env.PORT = 3001;
