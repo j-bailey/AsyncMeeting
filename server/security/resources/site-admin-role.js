@@ -1,6 +1,5 @@
-/**
- * Created by jlb on 4/11/15.
- */
+"use strict";
+
 var r = require('./acl-resources');
 
 var SITE_ADMIN_USER_ROLE = { key:'SiteAdminUserRole', name:'Site Admin User', desc:'',

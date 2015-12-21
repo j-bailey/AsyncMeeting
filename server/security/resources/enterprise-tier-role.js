@@ -1,6 +1,5 @@
-/**
- * Created by jlb on 4/11/15.
- */
+"use strict";
+
 var r = require('./acl-resources');
 
 var ENTERPRISE_TIER_USER_ROLE = { key:'EnterpriseTierUserRole', name:'Enterprise Tier User', desc:'',

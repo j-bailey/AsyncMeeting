@@ -1,6 +1,5 @@
-/**
- * Created by jlb on 4/11/15.
- */
+"use strict";
+
 var r = require('./acl-resources');
 
 var FREE_TIER_USER_ROLE = { key:'FreeTierUserRole', name:'Free Tier User', desc:'',

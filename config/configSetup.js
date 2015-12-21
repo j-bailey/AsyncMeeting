@@ -1,3 +1,5 @@
+"use strict";
+
 var nconf = require('nconf');
 require('nconf-redis');
 

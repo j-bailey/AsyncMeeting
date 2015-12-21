@@ -1,6 +1,5 @@
-/**
- * Created by jlb on 4/18/15.
- */
+"use strict";
+
 module.exports = {
     options: {
         configFile: __dirname + "/../../../protractor.conf.js", // Default config file

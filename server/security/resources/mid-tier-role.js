@@ -1,6 +1,5 @@
-/**
- * Created by jlb on 4/11/15.
- */
+"use strict";
+
 var r = require('./acl-resources');
 
 var MID_TIER_USER_ROLE = { key:'MidTierUserRole', name:'Mid Tier User', desc:'',

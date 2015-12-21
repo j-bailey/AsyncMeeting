@@ -1,3 +1,5 @@
+"use strict";
+
 exports.config = {
     //baseUrl: 'http://localhost:3001',
     framework: 'cucumber',

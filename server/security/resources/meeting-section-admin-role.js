@@ -1,6 +1,5 @@
-/**
- * Created by jlb on 4/11/15.
- */
+"use strict";
+
 var r = require('./acl-resources');
 
 var MEETING_SECTION_ADMIN_USER_ROLE = { key:'MeetingSectionAdminUserRole', name:'Meeting Section Admin User', desc:'',

@@ -1,3 +1,5 @@
+"use strict";
+
 var mongoose = require('mongoose');
 var createInfo = require('./plugins/creationInfo');
 var modifiedOn = require('./plugins/modifiedOn');

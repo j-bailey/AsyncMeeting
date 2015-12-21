@@ -1,6 +1,5 @@
-/**
- * Created by jlb on 4/11/15.
- */
+"use strict";
+
 var HTTP_PERMISSIONS =
 {
     'delete': 'delete',

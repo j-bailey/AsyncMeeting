@@ -1,3 +1,5 @@
+"use strict";
+
 var router = require('express').Router();
 var handlers = require('./handlers/usersHandler');
 var acl = require('../../security/acl').getAcl();
