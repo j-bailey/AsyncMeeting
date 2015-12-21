@@ -34,6 +34,7 @@ module.exports = function(grunt) {
             env: process.env
         });
 
+        console.log('Child process = ' + JSON.stringify(childProcess));
         processStatus = childProcess.status;
     });
 
