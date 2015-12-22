@@ -5,7 +5,7 @@
   "scripts": {
     "dev-preinstall": "npm install -g node-gyp ",
     "dev-postinstall": "./node_modules/.bin/init-pg-testing-utils.js && bower install --config.interactive=false && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && ./node_modules/grunt-cli/bin/grunt post-install && npm run make-redis",
-    "ci-postinstall": "./node_modules/.bin/init-pg-testing-utils.js && bower install --config.interactive=false && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && ./node_modules/grunt-cli/bin/grunt post-install",
+    "ci-postinstall": "./node_modules/.bin/init-pg-testing-utils.js && ./node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update && ./node_modules/grunt-cli/bin/grunt post-install",
     "make-redis": "cd ./node_modules/redis-install/redis-3.0.2 && make && cd ../../../",
     "pretest": "npm run-script lint && ./node_modules/grunt-cli/bin/grunt start-external-services",
     "test": "npm run unit-tests:client && npm run unit-tests:server && npm run integration-tests:client-only && npm run integration-tests:server-only",

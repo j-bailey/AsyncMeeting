@@ -11,6 +11,8 @@ https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
 
 - Install docker, Node, Gulp globally and NPM
 - Reference Dockerfile to understand what additional items are required to run the software
+- run `npm install -g bower`
+- run `npm install -g gulp`
 - run `npm dev-preinstall`
 - run `npm install`
 - run `npm dev-postinstall`
