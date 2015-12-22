@@ -27,15 +27,12 @@ module.exports = function(grunt) {
         var childProcess,
             spawnSync = require('child_process').spawnSync;
 
-        console.log(JSON.stringify(process.env.PATH));
-        console.log(JSON.stringify(spawnSync));
         childProcess = spawnSync('karma', ['start', configFile, '--single-run'], {
             detached: false,
             stdio: 'inherit',
             env: process.env
         });
 
-        console.log('Child process = ' + JSON.stringify(childProcess));
         processStatus = childProcess.status;
     });
 
