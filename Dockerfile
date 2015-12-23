@@ -53,5 +53,6 @@ RUN mkdir /async/logs
 
 
 WORKDIR /async/
-  CMD ["node", "/async/server.js"]
+  # CMD ["node", "/async/server.js"]
+ENTRYPOINT ["/usr/local/bin/node", "/async/server.js"]
 
