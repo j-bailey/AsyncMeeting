@@ -18,7 +18,7 @@
     "integration-tests:client-only": "./node_modules/grunt-cli/bin/grunt karma:test/integration/ng/karma.conf.js",
     "integration-tests:server-only": "./node_modules/grunt-cli/bin/grunt mocha:test/integration/server",
     "e2e": "./node_modules/grunt-cli/bin/grunt e2e:::~@WIP ",
-    "e2e-all": "./node_modules/grunt-cli/bin/grunt e2e ",
+    "e2e-all": "./node_modules/grunt-cli/bin/grunt e2e  ",
     "lint": "./node_modules/.bin/jshint .",
     "checkStyle": "./node_modules/.bin/jscs .",
     "dev": "./node_modules/grunt-cli/bin/grunt start-external-services && node ./support/npm/launch-dev.js",
