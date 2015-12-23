@@ -8,7 +8,7 @@ gulp.task('html', function () {
 // .pipe(ngAnnotate()).pipe(uglify()).pipe(sourcemaps.write()).pipe(gulp.dest('assets'));
 //    gulp.src(['client/ng/views/**/*.html']).pipe(gulp.dest('assets/views'));
 //    gulp.src(['client/ng/layouts/**/*.html']).pipe(gulp.dest('assets/layouts'));
-    gulp.src(['client/**/*.html']).pipe(gulp.dest('assets'));
+    return gulp.src(['client/**/*.html']).pipe(gulp.dest('assets'));
     //gulp.src(['client/**/*.html']).pipe(gulp.dest('build/assets'));
 });
 

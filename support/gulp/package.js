@@ -3,7 +3,7 @@
 var gulp = require('gulp');
 var fs = require('fs.extra');
 
-gulp.task('base', function(done) {
+gulp.task('package', function(done) {
     gulp.src('.bowerrc').pipe(gulp.dest('build'));
     gulp.src('app.js').pipe(gulp.dest('build'));
     gulp.src('bower.json').pipe(gulp.dest('build'));
