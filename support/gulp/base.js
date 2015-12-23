@@ -17,7 +17,7 @@ gulp.task('base', function(done) {
     fs.rmrfSync('./build/assets/');
     fs.copyRecursive('./assets', './build/assets', function (err) {
         if (err) {
-            throw err;
+            done(err);
         }
         done();
     });
