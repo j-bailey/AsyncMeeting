@@ -31,7 +31,7 @@
     "docker-dev-e2e": "./node_modules/grunt-cli/bin/grunt e2e:::~@WIP:true ",
     "docker-dev-integration": "./node_modules/grunt-cli/bin/grunt mocha:test/integration/server:true ",
     "build": "gulp build",
-    "docker-build": "docker build -t productivegains/asyncmeeting:latest ."
+    "docker-build": "docker build -t productivegains/asyncmeeting ."
   },
   "dependencies": {
     "acl": "git+https://github.com/OptimalBits/node_acl.git",
