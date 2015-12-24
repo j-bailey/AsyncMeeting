@@ -15,7 +15,7 @@ module.exports = function (grunt) {
             dbPort = (dPort || 27017),
             protocol = (proto || 'http');
 
-        if (isLocalDockerRun) {
+        if (isLocalDockerRun && isLocalDockerRun.toUpperCase() === 'TRUE') {
             console.log('Testing against local Docker site');
             var dockerIp = process.env.DOCKER_HOST.split(':')[1].split('/')[2];
             console.log('Docker host IP = ' + dockerIp);
@@ -31,7 +31,7 @@ module.exports = function (grunt) {
         if (protocol === 'https'){
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
         }
-        if (noServer || isLocalDockerRun) {
+        if ((noServer && noServer.toUpperCase() === 'TRUE') || (isLocalDockerRun && isLocalDockerRun.toUpperCase() === 'TRUE')) {
             var dbNames = ['read-only', 'read-write', 'admin', 'session', 'acl'];
             for (var i =0; i < dbNames.length; i += 1) {
                 var hostKey = 'database:' + dbNames[i] + ':host';
@@ -46,12 +46,14 @@ module.exports = function (grunt) {
 
         console.log('NODE_ENV = ' + process.env.NODE_ENV);
 
-        if (testFolder.indexOf('integration') > -1 && !isLocalDockerRun && !noServer) {
+        if (testFolder.indexOf('integration') > -1 &&
+            !(isLocalDockerRun && isLocalDockerRun.toUpperCase() === 'TRUE') && !(noServer && noServer.toUpperCase() === 'TRUE')) {
             grunt.task.run(['start-external-services', 'file-launch:gulpTestServer:gulp:[\'test|server\']:3']);
         }
         grunt.task.run(['launch-mocha-process:' + testFolder]);
 
-        if (testFolder.indexOf('integration') > -1 && !isLocalDockerRun && !noServer) {
+        if (testFolder.indexOf('integration') > -1 &&
+            !(isLocalDockerRun && isLocalDockerRun.toUpperCase() === 'TRUE') && !(noServer && noServer.toUpperCase() === 'TRUE')) {
             grunt.task.run(['file-launch-kill:gulpTestServer', 'kill-external-services']);
         }
         grunt.task.run(['check-mocha-status']);

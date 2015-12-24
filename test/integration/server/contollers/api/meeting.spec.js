@@ -16,6 +16,8 @@ var Acl = require('../../../../../server/security/acl'),
 require('../../../../../server/models/meeting');
 require('../../../../../server/models/user');
 
+console.log('process.env.baseUrl = ' + process.env.baseUrl);
+
 request = request(process.env.baseUrl);
 
 var owningUser = {
