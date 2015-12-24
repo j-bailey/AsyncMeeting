@@ -5,7 +5,7 @@ var fs = require('fs'),
 
 module.exports = function (grunt) {
     var processStatus;
-    grunt.registerTask('mocha', function (testFolder, isLocalDockerRun, noServer, proto, sHost, sPort, dHost, dPort) {
+    grunt.registerTask('mocha', function (testFolder, isLocalDockerRun, noServer, proto, sHost, sPort, dHost, dPort, dName) {
         process.env.PORT = 3001;
         process.env.NODE_ENV = 'dev-test';
 
@@ -13,7 +13,8 @@ module.exports = function (grunt) {
             srvPort = (sPort || 3001),
             dbHost = (dHost || 'localhost'),
             dbPort = (dPort || 27017),
-            protocol = (proto || 'http');
+            protocol = (proto || 'http'),
+            dbName = (dName || 'asyncmeeting_test');
 
         if (isLocalDockerRun && isLocalDockerRun.toUpperCase() === 'TRUE') {
             console.log('Testing against local Docker site');
@@ -21,6 +22,7 @@ module.exports = function (grunt) {
             console.log('Docker host IP = ' + dockerIp);
             srvHost = dockerIp;
             dbHost = dockerIp;
+            dbName = (dName || 'asyncmeeting_prod');
             protocol = (proto || 'https');
             srvPort = (sPort || 3000);
             process.env.configOverrideFile = path.normalize(path.join(__dirname, '../../../config/docker-test.json'));
@@ -32,14 +34,17 @@ module.exports = function (grunt) {
             process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
         }
         if ((noServer && noServer.toUpperCase() === 'TRUE') || (isLocalDockerRun && isLocalDockerRun.toUpperCase() === 'TRUE')) {
-            var dbNames = ['read-only', 'read-write', 'admin', 'session', 'acl'];
-            for (var i =0; i < dbNames.length; i += 1) {
-                var hostKey = 'database:' + dbNames[i] + ':host';
-                var portKey = 'database:' + dbNames[i] + ':port';
+            var dbConns = ['read-only', 'read-write', 'admin', 'session', 'acl'];
+            for (var i =0; i < dbConns.length; i += 1) {
+                var hostKey = 'database:' + dbConns[i] + ':host';
+                var portKey = 'database:' + dbConns[i] + ':port';
+                var dbNameKey = 'database:' + dbConns[i] + ':database';
                 console.info('Key ' + hostKey + ' IP ' + dbHost);
                 console.info('Key ' + portKey + ' IP ' + dbPort);
+                console.info('Key ' + dbNameKey + ' IP ' + dbName);
                 process.env[hostKey] = dbHost;
                 process.env[portKey] = dbPort;
+                process.env[dbNameKey] = dbName;
             }
         }
         process.env.baseUrl = protocol + '://' + srvHost + ':' + srvPort;
@@ -70,7 +75,7 @@ module.exports = function (grunt) {
             cmdArgs.push(path.join(testFolder, 'mocha.opts'));
         }
         //cmdArgs.push(testFolder);
-        childProcess = spawnSync('./node_modules/.bin/mocha', cmdArgs, {
+        childProcess = spawnSync('./node_modules/mocha/bin/mocha', cmdArgs, {
             detached: false,
             stdio: 'inherit',
             env: process.env
