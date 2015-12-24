@@ -8,6 +8,7 @@ var ObjectId = require('mongoose').Types.ObjectId,
     jsonResponse = require('../../../utils/jsonResponseWrapper'),
     handlerUtils = require('../../../utils/handlerUtils'),
     meetingAreaHandler = require('./meetingAreasHandler'),
+    bluebird = require('bluebird'),
     RouteError = require('../../../routes/routeError');
 
 var _createMeeting = function (meeting, ownerName, dbConn) {
@@ -22,30 +23,38 @@ var _createMeeting = function (meeting, ownerName, dbConn) {
             foundUser = user;
             return MeetingArea.findOne({_id: new ObjectId(meeting.parentMeetingAreaId)}).select('+tenantId').lean().exec();
         }).then(function (parentMeetingArea) {
-            if (!parentMeetingArea) {
-                return defer.reject(new RouteError(404));
-            }
-            meeting.tenantId = parentMeetingArea.tenantId;
-            meeting.parentMeetingArea = parentMeetingArea._id;
-            return meeting.save();
-        }).then(function (savedMeeting) {
-            newMeeting = savedMeeting;
-            return User.addAllowedResource(foundUser._id, savedMeeting.tenantId, savedMeeting._id, 'Meeting');
-        }).then(function () {
-            var acl = Acl.getAcl();
-            acl.allow('meeting-creator-' + newMeeting._id, '/api/meetings/' + newMeeting._id, '*');
-            acl.addUserRoles(foundUser.username, 'meeting-creator-' + newMeeting._id);
-            acl.allow('meeting-viewer', '/api/meetings', 'get');
-            acl.addUserRoles(foundUser.username, 'meeting-viewer');
+        if (!parentMeetingArea) {
+            return defer.reject(new RouteError(404));
+        }
+        meeting.tenantId = parentMeetingArea.tenantId;
+        meeting.parentMeetingArea = parentMeetingArea._id;
+        return meeting.save();
+    }).then(function (savedMeeting) {
+        newMeeting = savedMeeting;
+        return User.addAllowedResource(foundUser._id, savedMeeting.tenantId, savedMeeting._id, 'Meeting');
+    }).then(function () {
+        var acl = Acl.getAcl();
+        var aclPromises = [];
+        aclPromises.push(acl.allow('meeting-creator-' + newMeeting._id, '/api/meetings/' + newMeeting._id, '*'));
+        aclPromises.push(acl.addUserRoles(foundUser.username, 'meeting-creator-' + newMeeting._id));
+        aclPromises.push(acl.allow('meeting-viewer', '/api/meetings', 'get'));
+        aclPromises.push(acl.addUserRoles(foundUser.username, 'meeting-viewer'));
 
-            return defer.resolve(newMeeting);
-        }).catch(function (err) {
-            logger.error("Error saving meeting area: " + err.message);
-            if (newMeeting) {
-                newMeeting.remove();
-            }
-            return defer.reject(err);
-        }).done();
+        bluebird.all(aclPromises)
+            .then(function () {
+                return defer.resolve(newMeeting);
+            }).catch(function (err) {
+            logger.error('Giving permission to /api/meetings/' + newMeeting._id + ' for ' + foundUser.username);
+            logger.debug(err);
+            return defer.reject(new RouteError());
+        });
+    }).catch(function (err) {
+        logger.error("Error saving meeting area: " + err.message);
+        if (newMeeting) {
+            newMeeting.remove();
+        }
+        return defer.reject(err);
+    }).done();
     return defer.promise;
 };
 
@@ -79,11 +88,11 @@ module.exports = {
                         areaIds.push(obj._id);
                     });
                     return Meeting.find({
-                        $and: [
-                            {parentMeetingAreaId: {$in: areaIds}},
-                            {inTheTrash: inTheTrash}
-                        ]
-                    })
+                            $and: [
+                                {parentMeetingAreaId: {$in: areaIds}},
+                                {inTheTrash: inTheTrash}
+                            ]
+                        })
                         .skip(skip)
                         .limit(limit)
                         .sort(sort)
@@ -134,6 +143,7 @@ module.exports = {
                                         next(err);
                                     }
                                 });
+
                                 res.status(200).json(jsonResponse.successResponse({}));
                             });
                     } else {
@@ -143,12 +153,12 @@ module.exports = {
                             .then(function () {
                                 res.status(200).json(jsonResponse.successResponse({}));
                             }).catch(function (err) {
-                                return next(handlerUtils.catchError(err, 'Unable to delete meeting area right now, please again later.'));
-                            }).done();
+                            return next(handlerUtils.catchError(err, 'Unable to delete meeting area right now, please again later.'));
+                        }).done();
                     }
                 }).catch(function (err) {
-                    return next(handlerUtils.catchError(err, 'Unable to delete meeting right now, please again later.'));
-                }).done();
+                return next(handlerUtils.catchError(err, 'Unable to delete meeting right now, please again later.'));
+            }).done();
 
         } catch (e) {
             return next(handlerUtils.catchError(e, 'Unable to delete meeting right now, please again later.'));

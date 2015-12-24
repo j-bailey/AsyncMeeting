@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "acl": "git+https://github.com/OptimalBits/node_acl.git",
+    "bluebird": "^3.1.1",
     "body-parser": "^1.14.1",
     "connect-flash": "^0.1.1",
     "connect-mongo": "^0.7.0",
