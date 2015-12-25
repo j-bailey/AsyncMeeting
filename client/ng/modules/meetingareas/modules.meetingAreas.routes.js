@@ -8,7 +8,7 @@
             $routeProvider
                 .when(asm.modules.meetingareas.routes.meetingAreas, {
                     controller: asm.modules.meetingareas.controllers.meetingAreasCtrl,
-                    templateUrl: 'ng/modules/meetingAreas/html/meetingAreas.html',
+                    templateUrl: 'ng/modules/meetingareas/html/meetingAreas.html',
                     access: {
                         loginRequired: true,
                         permissions: ['CanViewMeetingAreas', 'CanEditMeetingAreas', 'CanDeleteMeetingAreas'] },
@@ -16,7 +16,7 @@
                 })
                 .when(asm.modules.meetingareas.routes.meetingAreas + "/:meetingAreaId", {
                     controller: asm.modules.meetingareas.controllers.meetingAreasCtrl,
-                    templateUrl: 'ng/modules/meetingAreas/html/meetingAreas.html',
+                    templateUrl: 'ng/modules/meetingareas/html/meetingAreas.html',
                     access: {
                         loginRequired: true,
                         permissions: ['CanViewMeetingAreas', 'CanEditMeetingAreas', 'CanDeleteMeetingAreas'] },

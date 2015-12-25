@@ -13,14 +13,14 @@ gulp.task('package', function(done) {
     gulp.src('server.js').pipe(gulp.dest('build'));
     gulp.src('https.key').pipe(gulp.dest('build'));
     gulp.src('https.cert').pipe(gulp.dest('build'));
-    //gulp.src('assets/**/*').pipe(gulp.dest('build/assets'));
-    fs.rmrfSync('./build/assets/');
-    fs.copyRecursive('./assets', './build/assets', function (err) {
-        if (err) {
-            done(err);
-        }
-        done();
-    });
+    gulp.src('assets/**/*').pipe(gulp.dest('build/assets'));
+    //fs.rmrfSync('./build/assets/');
+    //fs.copyRecursive('./assets', './build/assets', function (err) {
+    //    if (err) {
+    //        done(err);
+    //    }
+    //    done();
+    //});
 });
 
 gulp.task('watch:config', ['config'], function () {
