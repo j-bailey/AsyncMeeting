@@ -28,7 +28,7 @@
     "docker-dev-build": "gulp build && gulp package && docker build -t productivegains/asyncmeeting:dev .",
     "docker-dev-run": "docker kill async | echo '' && docker rm async | echo '' && docker run -d -p 3000:3000 --link async-redis:redis --link async-mongo:mongo --name async productivegains/asyncmeeting:dev",
     "docker-dev-cleanup-all": "docker kill async async-redis async-mongo | echo '' && docker rm async async-redis async-mongo | echo ''",
-    "docker-dev-e2e": "./node_modules/grunt-cli/bin/grunt e2e:::~@WIP:true ",
+    "docker-dev-e2e": "./node_modules/grunt-cli/bin/grunt e2e:::~@WIP:true        ",
     "docker-dev-integration": "./node_modules/grunt-cli/bin/grunt mocha:test/integration/server:true ",
     "build": "gulp build",
     "docker-build": "docker build -t productivegains/asyncmeeting ."
