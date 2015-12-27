@@ -11,7 +11,7 @@ var SITE_ADMIN_USER_ROLE = { key:'SiteAdminUserRole', name:'Site Admin User', de
             permissions: [
                 r.HTTP_PERMISSIONS
             ]
-        },
+        }
     ] };
 
 module.exports.object = SITE_ADMIN_USER_ROLE;
