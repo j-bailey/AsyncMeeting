@@ -11,7 +11,7 @@ var MEETING_SECTION_ADMIN_USER_ROLE = { key:'MeetingSectionAdminUserRole', name:
             permissions: [
                 r.HTTP_PERMISSIONS
             ]
-        },
+        }
     ] };
 
 module.exports.object = MEETING_SECTION_ADMIN_USER_ROLE;
