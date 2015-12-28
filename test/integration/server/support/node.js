@@ -16,6 +16,9 @@ var sinon = require('sinon'),
 
 require('../../../../config/configSetup');
 
+if (!process.env.baseUrl){
+    process.env.baseUrl = 'http://localhost:3001';
+}
 chai.Should();
 chai.use(chaiAsPromised);
 
