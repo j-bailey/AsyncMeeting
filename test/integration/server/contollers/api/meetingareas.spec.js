@@ -68,70 +68,70 @@ describe('controller/api/meetingAreas', function () {
                         global.getUserWithTentantIdByUserId(savedUser3.value._id)
                     ]
                 ).spread(function (u1, u2, u3) {
-                        userModel1 = u1.value;
-                        userModel2 = u2.value;
-                        userModel3 = u3.value;
-                        Q.allSettled([
-                            global.loginToServer(user1, email1, pass1),
-                            global.loginToServer(user2, email2, pass2),
-                            global.loginToServer(user3, email3, pass3)
-                        ]).spread(function (token1, token2, token3) {
-                            accessToken1 = token1.value;
-                            accessToken2 = token2.value;
-                            accessToken3 = token3.value;
-                            var meetingArea = new MeetingArea({
-                                title: "Parent Meeting Area Title",
-                                description: "Parent Meeting Area Description",
-                                parentMeetingArea: null,
+                    userModel1 = u1.value;
+                    userModel2 = u2.value;
+                    userModel3 = u3.value;
+                    Q.allSettled([
+                        global.loginToServer(user1, email1, pass1),
+                        global.loginToServer(user2, email2, pass2),
+                        global.loginToServer(user3, email3, pass3)
+                    ]).spread(function (token1, token2, token3) {
+                        accessToken1 = token1.value;
+                        accessToken2 = token2.value;
+                        accessToken3 = token3.value;
+                        var meetingArea = new MeetingArea({
+                            title: "Parent Meeting Area Title",
+                            description: "Parent Meeting Area Description",
+                            parentMeetingArea: null,
+                            inheritsParentAccess: true,
+                            tenantId: userModel1.tenantId
+                        });
+
+                        meetingAreaHandler._createMeetingArea(meetingArea, userModel1.username, db.readWriteConnection).then(function (savedItem, err) {
+                            firstMeetingAreaId = savedItem.parentMeetingArea;
+                            parentMeetingAreaId = savedItem._id;
+
+                            var childMeetingArea = new MeetingArea({
+                                title: "Child Meeting Area Title",
+                                description: "Child Meeting Area Description",
+                                parentMeetingArea: savedItem._id,
                                 inheritsParentAccess: true,
                                 tenantId: userModel1.tenantId
                             });
 
-                            meetingAreaHandler._createMeetingArea(meetingArea, userModel1.username, db.readWriteConnection).then(function (savedItem, err) {
-                                firstMeetingAreaId = savedItem.parentMeetingArea;
-                                parentMeetingAreaId = savedItem._id;
+                            meetingAreaHandler._createMeetingArea(childMeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem, err) {
+                                childMeetingAreaId = savedChildItem._id;
 
-                                var childMeetingArea = new MeetingArea({
-                                    title: "Child Meeting Area Title",
-                                    description: "Child Meeting Area Description",
-                                    parentMeetingArea: savedItem._id,
+
+                                var child2MeetingArea = new MeetingArea({
+                                    title: "Child 2 Meeting Area Title",
+                                    description: "Child 2 Meeting Area Description",
+                                    parentMeetingArea: savedChildItem._id,
                                     inheritsParentAccess: true,
                                     tenantId: userModel1.tenantId
                                 });
 
-                                meetingAreaHandler._createMeetingArea(childMeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem, err) {
-                                    childMeetingAreaId = savedChildItem._id;
-
-
-                                    var child2MeetingArea = new MeetingArea({
-                                        title: "Child 2 Meeting Area Title",
-                                        description: "Child 2 Meeting Area Description",
-                                        parentMeetingArea: savedChildItem._id,
-                                        inheritsParentAccess: true,
-                                        tenantId: userModel1.tenantId
-                                    });
-
-                                    meetingAreaHandler._createMeetingArea(child2MeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem2) {
-                                        child2MeetingAreaId = savedChildItem2._id;
-                                        MeetingArea.findById(parentMeetingAreaId)
-                                            .select('+tenantId')
-                                            .lean()
-                                            .exec(function (err, meetingArea) {
-                                                if (err) {
-                                                    done(err);
-                                                }
-                                                meetingAreaHandler._grantUserAccess(userModel3._id, meetingArea.tenantId, meetingArea._id, 'editor', db.readWriteConnection).then(function () {
-                                                    done();
-                                                });
+                                meetingAreaHandler._createMeetingArea(child2MeetingArea, userModel1.username, db.readWriteConnection).then(function (savedChildItem2) {
+                                    child2MeetingAreaId = savedChildItem2._id;
+                                    MeetingArea.findById(childMeetingAreaId)
+                                        .select('+tenantId')
+                                        .lean()
+                                        .exec(function (err, meetingArea) {
+                                            if (err) {
+                                                done(err);
+                                            }
+                                            meetingAreaHandler._grantUserAccess(userModel3._id, meetingArea.tenantId, meetingArea._id, 'editor', db.readWriteConnection).then(function () {
+                                                done();
                                             });
-                                    });
+                                        });
                                 });
-
-                            }).catch(function (err) {
-                                return done(err);
                             });
-                        }).done()
+
+                        }).catch(function (err) {
+                            return done(err);
+                        });
                     }).done()
+                }).done()
             }).done();
         }).catch(function (err) {
             return done(err);
@@ -155,14 +155,14 @@ describe('controller/api/meetingAreas', function () {
                     expect(result.data).to.have.length(1);
                     expect(result.data[0]._id.toString()).to.equal(childMeetingAreaId.toString());
                 })
-                .end(function (){
-                    MeetingArea.findById(childMeetingAreaId).select('inTheTrash').exec().then(function(ma){
+                .end(function () {
+                    MeetingArea.findById(childMeetingAreaId).select('inTheTrash').exec().then(function (ma) {
                         expect(ma.inTheTrash).to.equal(false);
                         done();
                     })
                 });
         });
-        it('should get root trashed meetings areas with no ID', function (done){
+        it('should get root trashed meetings areas with no ID', function (done) {
             user1
                 .delete('/api/meetingareas/' + parentMeetingAreaId.toString())
                 .set('Authorization', 'Bearer ' + accessToken1)
@@ -183,19 +183,19 @@ describe('controller/api/meetingAreas', function () {
                             var result = JSON.parse(res.text);
                             expect(result.data).to.have.length(1);
                             expect(result.data[0]._id.toString()).to.equal(parentMeetingAreaId.toString());
-                            MeetingArea.update({inTheTrash: true}, {inTheTrash: false}, {multi: true} ).select('inTheTrash').exec().then(function(ma) {
+                            MeetingArea.update({inTheTrash: true}, {inTheTrash: false}, {multi: true}).select('inTheTrash').exec().then(function (ma) {
                                 expect(ma.nModified).to.equal(3);
                                 return MeetingArea.find({inTheTrash: true}).exec();
-                            }).then(function(mas){
+                            }).then(function (mas) {
                                 expect(mas.length).to.equal(0);
                                 done();
-                            }).catch(function(err){
+                            }).catch(function (err) {
                                 done(err);
                             }).done();
                         });
                 });
         });
-        it('should get all trashed meetings areas with no ID', function (done){
+        it('should get all trashed meetings areas with no ID', function (done) {
             user1
                 .delete('/api/meetingareas/' + parentMeetingAreaId.toString())
                 .set('Authorization', 'Bearer ' + accessToken1)
@@ -216,13 +216,13 @@ describe('controller/api/meetingAreas', function () {
                             var result = JSON.parse(res.text);
                             expect(result.data).to.have.length(3);
                             expect(result.data[0]._id.toString()).to.equal(parentMeetingAreaId.toString());
-                            MeetingArea.update({inTheTrash: true}, {inTheTrash: false}, {multi: true}).select('inTheTrash').exec().then(function(ma){
+                            MeetingArea.update({inTheTrash: true}, {inTheTrash: false}, {multi: true}).select('inTheTrash').exec().then(function (ma) {
                                 expect(ma.nModified).to.equal(3);
                                 return MeetingArea.find({inTheTrash: true}).exec();
-                            }).then(function(mas){
+                            }).then(function (mas) {
                                 expect(mas.length).to.equal(0);
                                 done();
-                            }).catch(function(err){
+                            }).catch(function (err) {
                                 done(err);
                             }).done();
                         });
@@ -360,9 +360,9 @@ describe('controller/api/meetingAreas', function () {
                     expect(err).to.be.null;
                     var result = JSON.parse(res.text);
                     MeetingArea.find({
-                        $or: [{ancestors: firstMeetingAreaId}, {_id: firstMeetingAreaId},
-                            {$and: [{tenantId: userModel1.tenantId}, {parentMeetingArea: null}]}]
-                    })
+                            $or: [{ancestors: firstMeetingAreaId}, {_id: firstMeetingAreaId},
+                                {$and: [{tenantId: userModel1.tenantId}, {parentMeetingArea: null}]}]
+                        })
                         .sort('_id')
                         .exec(function (err, meetingAreas) {
                             expect(result.data).to.have.length(meetingAreas.length);
@@ -390,7 +390,7 @@ describe('controller/api/meetingAreas', function () {
                         })
                         .sort('_id')
                         .exec(function (err, meetingAreas) {
-                            expect(result.data).to.have.length(meetingAreas.length + 1);
+                            expect(result.data).to.have.length(meetingAreas.length);
                             //expect(result.data[1]._id.toString()).to.equal(parentMeetingAreaId.toString());
                             //expect(result.data[2]._id.toString()).to.equal(childMeetingAreaId.toString());
                             //expect(result.data[3]._id.toString()).to.equal(child2MeetingAreaId.toString());
@@ -447,7 +447,7 @@ describe('controller/api/meetingAreas', function () {
                             expect(allowedResources).to.have.length(1);
                             expect(allowedResources[0].userId.toString()).to.equal(userModel2._id.toString());
                             expect(allowedResources[0].resourceType).to.equal('MeetingArea');
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 acl.isAllowed(userModel2.username, '/api/meetingareas/' + parentMeetingAreaId, 'get', function (err, result) {
                                     expect(err).to.be.null;
                                     expect(result).to.equal(true);
@@ -457,7 +457,36 @@ describe('controller/api/meetingAreas', function () {
                         });
                 });
         });
+        it('should deny due to user not being an admin of the meeting area', function (done) {
+            user1
+                .post('/api/meetingareas/' + parentMeetingAreaId + '/member/' + userModel3._id)
+                .send({
+                    permission: 'contributor'
+                })
+                .set('Accept', 'application/json')
+                .set('Authorization', 'Bearer ' + accessToken1)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    user1
+                        .post('/api/meetingareas/' + parentMeetingAreaId + '/member/' + userModel2._id)
+                        .send({
+                            permission: 'viewer'
+                        })
+                        .set('Accept', 'application/json')
+                        .set('Authorization', 'Bearer ' + accessToken3)
+                        .expect('Content-Type', /json/)
+                        .expect(401)
+                        .end(function (err, res) {
+                            expect(err).to.be.null;
+                            done();
+                        });
+                });
+        });
+
     });
+
     describe('DELETE \'/:meetingAreaId/member/:userId\'', function () {
         it('should remove grant viewer access to meeting area', function (done) {
             user1
@@ -746,14 +775,15 @@ describe('controller/api/meetingAreas', function () {
                                     .exec()
                                     .then(function (meetingAreas) {
                                         expect(meetingAreas[0].inTheTrash).to.be.equal(true);
-                                        MeetingArea.findByIdAndRemove(result.data._id).exec().then(function(){})
-                                            .catch(function(err){
+                                        MeetingArea.findByIdAndRemove(result.data._id).exec().then(function () {
+                                            })
+                                            .catch(function (err) {
                                                 done(err);
                                             }).done();
                                         done();
                                     }).catch(function (err) {
-                                        done(err);
-                                    }).done();
+                                    done(err);
+                                }).done();
                             });
                     });
                 });
@@ -806,12 +836,12 @@ describe('controller/api/meetingAreas', function () {
                                                         expect(meetingAreas.length).to.be.equal(0);
                                                         done();
                                                     }).catch(function (err) {
-                                                        done(err);
-                                                    }).done();
+                                                    done(err);
+                                                }).done();
                                             });
                                     }).catch(function (err) {
-                                        done(err);
-                                    }).done();
+                                    done(err);
+                                }).done();
                             });
                     });
                 });

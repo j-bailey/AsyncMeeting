@@ -73,7 +73,7 @@ var _grantUserAccess = function (allowedUserId, resourceTenantId, resourceId, pe
                 logger.debug(err);
                 defer.reject(new RouteError());
             }
-            resourceTenantId = meetingArea.tenantId;
+            resourceTenantId = meetingArea.tenantId.toString();
             User.findById(allowedUserId)
                 .lean()
                 .exec(function (err, userObj) {
@@ -91,6 +91,9 @@ var _grantUserAccess = function (allowedUserId, resourceTenantId, resourceId, pe
                             } else if (permission === 'editor') {
                                 aclPromises.push(acl.allow('meetingarea-editor-' + resourceId, '/api/meetingareas/' + resourceId, ['get', 'put']));
                                 aclPromises.push(acl.addUserRoles(userObj.username, 'meetingarea-editor-' + resourceId));
+                            } else if (permission === 'contributor') {
+                                aclPromises.push(acl.allow('meetingarea-contributor-' + resourceId, '/api/meetingareas/' + resourceId, ['get', 'put', 'post']));
+                                aclPromises.push(acl.addUserRoles(userObj.username, 'meetingarea-contributor-' + resourceId));
                             } else if (permission === 'admin') {
                                 aclPromises.push(
                                     acl.allow('meetingarea-admin-' + resourceId, '/api/meetingareas/' + resourceId,
@@ -216,6 +219,10 @@ var _createMeetingArea = function (meetingArea, ownerName, dbConn, myFirstMeetin
                     aclPromises.push(acl.addUserRoles(user.username, 'meetingarea-creator-' + savedMeetingArea._id));
                     aclPromises.push(acl.allow('meetingarea-viewer', '/api/meetingareas', 'get'));
                     aclPromises.push(acl.addUserRoles(user.username, 'meetingarea-viewer'));
+                    aclPromises.push(
+                        acl.allow('meetingarea-admin-' + savedMeetingArea._id, '/api/meetingareas/' + savedMeetingArea._id,
+                            ['get', 'post', 'put', 'delete']));
+                    aclPromises.push(acl.addUserRoles(user.username, 'meetingarea-admin-' + savedMeetingArea._id));
 
                     bluebird.all(aclPromises)
                         .then(function () {

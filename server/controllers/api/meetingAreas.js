@@ -20,6 +20,7 @@ router.post('/',
 
 router.post('/:meetingAreaId/member/:userId',
     secUtils.isAllowedResourceAccess('meetingAreaId', false),
+    secUtils.canGrantResourceAccess('meetingAreaId', 'meetingarea-admin-'),
     secUtils.determineDbConnection, handlers.grantUserAccess);
 
 router.delete('/:meetingAreaId',

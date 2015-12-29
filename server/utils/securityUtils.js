@@ -136,17 +136,158 @@ module.exports = {
         //}
         next();
     },
-    isInvalidPassword: function(password, username){
+    isInvalidPassword: function (password, username) {
         var dictResult = dictValidator.isImproper(username, password);
         if (dictResult) {
             return dictResult;
         }
         var validationRegex = nconf.get('security:passwordValidation:validationRegex');
-        if (new RegExp(validationRegex).test(password)){
+        if (new RegExp(validationRegex).test(password)) {
             return false;
         } else {
             return nconf.get('security:passwordValidation:validationMessage');
         }
+    },
+    canGrantResourceAccess: function (resourceKey, grantingRolePrefix, allowNulls, httpCode, errorMsg) {
+        return function (req, res, next) {
+            var resourceId;
+
+            if (!resourceKey) {
+                logger.debug('Require resourceKey for canGrantResourceAccess');
+                return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+            }
+            if (req.query && (req.query[resourceKey] || req.query[resourceKey] === null)) {
+                resourceId = req.query[resourceKey];
+            } else if (req.body && (req.body[resourceKey] || req.body[resourceKey] === null)) {
+                resourceId = req.body[resourceKey];
+            } else if (req.params && (req.params[resourceKey] || req.params[resourceKey] === null)) {
+                resourceId = req.params[resourceKey];
+            } else {
+                logger.debug('No acceptable ways to retrieve resource value for key "' + resourceKey + '" in canGrantResourceAccess');
+                return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+            }
+
+            var checkForValidObjectId = new RegExp("^[0-9a-fA-F]{24}$");
+            if (!checkForValidObjectId.test(resourceId)) {
+                logger.debug('Possible attack with invalid resource ID "' + resourceKey + '" in isAllowedResourceAccess');
+                return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+            }
+
+            if (resourceId === null || resourceId === 'null') {
+                return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+            } else if (req.baseUrl.indexOf('meetingarea') >= 0 && (resourceId !== null || resourceId !== 'null')) {
+                var MeetingArea = db.readOnlyConnection.model('MeetingArea');
+                // FIXME all injection hacks should not make it to a DB query
+                MeetingArea.find({
+                        $or: [
+                            {_id: resourceId},
+                            {$and: [{tenantId: req.session.tenantId}, {parentMeetingArea: null}]}
+                        ]
+                    })
+                    .select('+tenantId')
+                    .sort('-parentMeetingArea')
+                    .exec(function (err, meetingAreas) {
+                        if (err) {
+                            logger.error('Could not find meeting area for ID: ' + resourceId);
+                            logger.debug(err);
+                            return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                        }
+                        if (!meetingAreas || meetingAreas.length === 0) {
+                            logger.error('Could not find meeting area for ID: ' + resourceId);
+                            return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                        }
+                        var userRootMeetingArea,
+                            targetMeetingArea;
+                        if (meetingAreas[0].tenantId.toString() === req.session.tenantId &&
+                            meetingAreas[0].parentMeetingArea === null) {
+                            userRootMeetingArea = meetingAreas[0];
+                            targetMeetingArea = (meetingAreas.length === 2) ? meetingAreas[1] : null;
+                        } else {
+                            targetMeetingArea = meetingAreas[0];
+                            userRootMeetingArea = meetingAreas[1];
+                        }
+                        var UserAllowedResources = db.readOnlyConnection.model('UserAllowedResources');
+                        var meetingArea;
+                        if (targetMeetingArea === null && resourceId === null && allowNulls) {
+                            meetingArea = userRootMeetingArea;
+                        } else if (targetMeetingArea === null && resourceId === null && !allowNulls) {
+                            return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                        } else if (targetMeetingArea !== null) {
+                            meetingArea = targetMeetingArea;
+                        } else {
+                            return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                        }
+                        if (!meetingArea.inheritsParentAccess) {
+                            return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                        }
+                        UserAllowedResources.find({$and: [{userId: req.session.userDbId}, {tenantId: meetingArea.tenantId}]})
+                            .exec(function (err, allowedResources) {
+                                if (err) {
+                                    return next(err);
+                                }
+                                if (allowedResources && allowedResources.length > 0) {
+                                    if (meetingArea.parentMeetingArea === null) {
+                                        acl.hasRole(req.session.userId, grantingRolePrefix + meetingArea._id.toString())
+                                            .then(function (hasRole) {
+                                                if (hasRole) {
+                                                    return next();
+                                                } else {
+                                                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                                                }
+                                            }).catch(function (err) {
+                                            logger.error(err);
+                                            return next(err);
+                                        });
+                                    } else {
+                                        var aclPromises = [];
+                                        allowedResources.forEach(function (allowedResource) {
+                                            meetingArea.ancestors.forEach(function (ancestor) {
+                                                var resourceIdStr = allowedResource.resourceId.toString(),
+                                                    ancestorIdStr = ancestor.toString();
+
+                                                if (resourceIdStr === ancestorIdStr) {
+                                                    aclPromises.push(acl.hasRole(req.session.userId, grantingRolePrefix + ancestor.toString()));
+                                                }
+                                            });
+                                        });
+                                        Q.all(aclPromises).done(function (roleChecks) {
+                                            var index = roleChecks.length;
+                                            while (index--) {
+                                                if (roleChecks[index]) {
+                                                    return next();
+                                                }
+                                            }
+                                            return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                                        });
+                                    }
+                                } else {
+                                    var aclPromises = [];
+                                    allowedResources.forEach(function (allowedResource) {
+                                        meetingArea.ancestors.forEach(function (ancestor) {
+                                            var resourceIdStr = allowedResource.resourceId.toString(),
+                                                ancestorIdStr = ancestor.toString();
+
+                                            if (resourceIdStr === ancestorIdStr) {
+                                                aclPromises.push(acl.hasRole(req.session.userId, grantingRolePrefix + ancestor.toString()));
+                                            }
+                                        });
+                                    });
+                                    Q.all(aclPromises).done(function (roleChecks) {
+                                        var index = roleChecks.length;
+                                        while (index--) {
+                                            if (roleChecks[index]) {
+                                                return next();
+                                            }
+                                        }
+                                        return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                                    });
+                                }
+                            });
+                    });
+            } else {
+                return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+            }
+        };
     },
     isAllowedResourceAccess: function (resourceKey, allowNulls, resourceIdPrefix, httpCode, errorMsg) {
         return function (req, res, next) {
@@ -165,7 +306,7 @@ module.exports = {
                 resourceId = req.params[resourceKey];
             } else {
                 logger.debug('No acceptable ways to retrieve resource value for key "' + resourceKey + '" in isAllowedResourceAccess');
-                return next(new RouteError( httpCode || 401, errorMsg || 'Not allowed', false));
+                return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
             }
 
             if (allowNulls && (resourceId === null || resourceId === 'null')) {
@@ -174,7 +315,7 @@ module.exports = {
                 var checkForValidObjectId = new RegExp("^[0-9a-fA-F]{24}$");
                 if (checkForValidObjectId.test(resourceId)) {
                     if (resourceIdPrefix) {
-                        controlledResource = resourceIdPrefix + '/' +  resourceId;
+                        controlledResource = resourceIdPrefix + '/' + resourceId;
                     } else {
                         controlledResource = req.baseUrl + '/' + resourceId;
                     }
@@ -196,11 +337,11 @@ module.exports = {
                         var MeetingArea = db.readOnlyConnection.model('MeetingArea');
                         // FIXME all injection hacks should not make it to a DB query
                         MeetingArea.find({
-                            $or: [
-                                {_id: resourceId},
-                                {$and: [{tenantId: req.session.tenantId}, {parentMeetingArea: null}]}
-                            ]
-                        })
+                                $or: [
+                                    {_id: resourceId},
+                                    {$and: [{tenantId: req.session.tenantId}, {parentMeetingArea: null}]}
+                                ]
+                            })
                             .select('+tenantId')
                             .sort('-parentMeetingArea')
                             .exec(function (err, meetingAreas) {
@@ -216,16 +357,16 @@ module.exports = {
                                 var userRootMeetingArea,
                                     targetMeetingArea;
                                 if (meetingAreas[0].tenantId.toString() === req.session.tenantId &&
-                                    meetingAreas[0].parentMeetingArea === null){
+                                    meetingAreas[0].parentMeetingArea === null) {
                                     userRootMeetingArea = meetingAreas[0];
-                                    targetMeetingArea = (meetingAreas.length === 2)? meetingAreas[1]: null;
+                                    targetMeetingArea = (meetingAreas.length === 2) ? meetingAreas[1] : null;
                                 } else {
                                     targetMeetingArea = meetingAreas[0];
                                     userRootMeetingArea = meetingAreas[1];
                                 }
                                 var UserAllowedResources = db.readOnlyConnection.model('UserAllowedResources');
                                 var meetingArea;
-                                if (targetMeetingArea === null && resourceId === null && allowNulls){
+                                if (targetMeetingArea === null && resourceId === null && allowNulls) {
                                     meetingArea = userRootMeetingArea;
                                 } else if (targetMeetingArea === null && resourceId === null && !allowNulls) {
                                     return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
@@ -234,7 +375,7 @@ module.exports = {
                                 } else {
                                     return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                 }
-                                if (!meetingArea.inheritsParentAccess){
+                                if (!meetingArea.inheritsParentAccess) {
                                     return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                 }
                                 UserAllowedResources.find({$and: [{userId: req.session.userDbId}, {tenantId: meetingArea.tenantId}]})
@@ -247,16 +388,16 @@ module.exports = {
                                                 controlledResource = req.baseUrl + '/' + meetingArea._id.toString();
                                                 acl.isAllowed(req.session.userId,
                                                     controlledResource, req.method.toLowerCase(), function (err, allow) {
-                                                    if (err) {
-                                                        logger.error(err);
-                                                        return next(err);
-                                                    }
-                                                    if (allow) {
-                                                        return next();
-                                                    } else {
-                                                        return next(new RouteError(httpCode || 401, errorMsg ||'Not allowed', false));
-                                                    }
-                                                });
+                                                        if (err) {
+                                                            logger.error(err);
+                                                            return next(err);
+                                                        }
+                                                        if (allow) {
+                                                            return next();
+                                                        } else {
+                                                            return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                                                        }
+                                                    });
                                             } else {
                                                 allowedResources.forEach(function (allowedResource) {
                                                     meetingArea.ancestors.forEach(function (ancestor) {
@@ -267,19 +408,20 @@ module.exports = {
                                                             controlledResource = req.baseUrl + '/' + ancestor.toString();
                                                             acl.isAllowed(req.session.userId, controlledResource,
                                                                 req.method.toLowerCase(), function (err, allow) {
-                                                                if (err) {
-                                                                    logger.error(err);
-                                                                    return next(err);
-                                                                }
-                                                                if (allow) {
-                                                                    return next();
-                                                                } else if (allowedResources[allowedResources.length - 1] === allowedResource &&
-                                                                    meetingArea.ancestors[meetingArea.ancestors.length - 1] === ancestor) {
-                                                                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
-                                                                }
-                                                            });
+                                                                    if (err) {
+                                                                        logger.error(err);
+                                                                        return next(err);
+                                                                    }
+                                                                    if (allow) {
+                                                                        return next();
+                                                                    } else if (allowedResources[allowedResources.length - 1] === allowedResource &&
+                                                                        meetingArea.ancestors[meetingArea.ancestors.length - 1] === ancestor) {
+                                                                        return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
+                                                                    }
+                                                                });
                                                         }
                                                     });
+                                                    return next(new RouteError(httpCode || 401, errorMsg || 'Not allowed', false));
                                                 });
                                             }
                                         } else {
